@@ -23,6 +23,7 @@
           <p>Bass Tournament Management</p>
         </div>
       </div>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀️ Light Mode</button>
       <div class="header-stats">
         <div class="stat-chip">
           <span class="val" id="hBoats">0</span>
@@ -194,6 +195,12 @@
             </label>
             <button class="btn btn-danger" onclick="clearAll()">🗑️ Clear All Data</button>
           </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(139,180,225,0.2);border-radius:10px;padding:20px;margin-bottom:16px">
+          <h3 style="color:var(--header-bg);font-size:14px;margin-bottom:14px;text-transform:uppercase;letter-spacing:1px">Appearance</h3>
+          <p style="color:var(--header-bg);font-size:13px;margin-bottom:12px">Switch between dark and light mode. Your preference is saved automatically.</p>
+          <button class="btn btn-outline" onclick="toggleTheme()" style="font-size:14px;padding:8px 20px" id="themeToggleSettings">☀️ Switch to Light Mode</button>
         </div>
 
         <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(139,180,225,0.2);border-radius:10px;padding:20px">

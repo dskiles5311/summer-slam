@@ -22,6 +22,7 @@ function loadData() {
           updateHeaderStats();
         }, 0);
       }
+      if (parsed.theme) applyTheme(parsed.theme);
     }
   } catch (e) { rows = []; }
 }
@@ -32,7 +33,8 @@ function saveData() {
     lunkerFee: document.getElementById('lunkerFee')?.value ?? '20',
     optFee: document.getElementById('optFee')?.value ?? '50'
   };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ rows, nextId, fees }));
+  const theme = document.body.classList.contains('light') ? 'light' : 'dark';
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ rows, nextId, fees, theme }));
 }
 
 // ── DEFAULT ROW ──────────────────────────────────────────────────────────────
@@ -417,6 +419,29 @@ function showToast(msg, type = 'info') {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+// ── THEME ────────────────────────────────────────────────────────────────────
+function applyTheme(theme) {
+  if (theme === 'light') {
+    document.body.classList.add('light');
+    const btn = document.getElementById('themeToggle');
+    if (btn) btn.innerHTML = '🌙 Dark Mode';
+    const btn2 = document.getElementById('themeToggleSettings');
+    if (btn2) btn2.innerHTML = '🌙 Switch to Dark Mode';
+  } else {
+    document.body.classList.remove('light');
+    const btn = document.getElementById('themeToggle');
+    if (btn) btn.innerHTML = '☀️ Light Mode';
+    const btn2 = document.getElementById('themeToggleSettings');
+    if (btn2) btn2.innerHTML = '☀️ Switch to Light Mode';
+  }
+}
+
+function toggleTheme() {
+  const isLight = document.body.classList.contains('light');
+  applyTheme(isLight ? 'dark' : 'light');
+  saveData();
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   loadData();
@@ -465,3 +490,4 @@ window.doSort = doSort;
 window.exportCSV = exportCSV;
 window.printLeaderboard = printLeaderboard;
 window.switchTab = switchTab;
+window.toggleTheme = toggleTheme;
