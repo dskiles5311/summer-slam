@@ -1,11 +1,11 @@
 const CACHE_NAME = 'summer-slam-v1';
 const urlsToCache = [
-  '/summer-slam/',
-  '/summer-slam/index.html',
-  '/summer-slam/app.js',
-  '/summer-slam/style.css',
-  '/summer-slam/manifest.json'
- ];
+  '/',
+  '/index.html',
+  '/app.js',
+  '/style.css',
+  '/manifest.json'
+];
 
 self.addEventListener('install', event => {
   event.waitUntil(
