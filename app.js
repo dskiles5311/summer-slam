@@ -72,7 +72,7 @@ function calcRanks() {
 }
 
 function getStats() {
-  const active = rows.filter(r => r.boaterFirst || r.boaterLast) && r.boatNo;
+  const active = rows.filter(r => (r.boaterFirst || r.boaterLast) && r.boatNo);
   const weights = active.map(r => parseFloat(r.totalWeight) || 0);
   const lunkers = active.filter(r => r.lunker === 1 && r.lunkerWeight !== '').map(r => parseFloat(r.lunkerWeight) || 0);
   const buyIns = active.map(r => parseFloat(r.buyIn) || 0);
