@@ -199,8 +199,11 @@ function renderLeaderboard() {
   const container = document.getElementById('lbContainer');
   if (!container) return;
 
-  const active = rows.filter(r => (r.boaterFirst || r.boaterLast) && r._rank);
-  const top = active.filter(r => r._rank <= topN).sort((a, b) => a._rank - b._rank);
+  const active = rows
+    .filter(r => (r.boaterFirst || r.boaterLast) && r._rank && r.paid === 1 && r.appSigned === 1)
+    .sort((a, b) => a._rank - b._rank)
+    .map((r, i) => ({ ...r, _lbRank: i + 1 }));
+  const top = active.filter(r => r._lbRank <= topN);
 
   // Stats
   const s = getStats();
@@ -217,7 +220,7 @@ function renderLeaderboard() {
   }
 
   top.forEach(row => {
-    const r = row._rank;
+    const r = row._lbRank;
     const cardClass = r === 1 ? 'gold-card' : r === 2 ? 'silver-card' : r === 3 ? 'bronze-card' : 'normal-card';
     const rankClass = r === 1 ? 'r1' : r === 2 ? 'r2' : r === 3 ? 'r3' : 'rn';
     const rankDisplay = r === 1 ? '🥇' : r === 2 ? '🥈' : r === 3 ? '🥉' : `#${r}`;
