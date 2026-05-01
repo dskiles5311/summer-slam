@@ -1,5 +1,7 @@
-:root {
-  --navy: #0a1628;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  --navy: #000000;
   --navy-mid: #1a3a6e;
   --navy-light: #2a5298;
   --gold: #c8a84b;
@@ -17,11 +19,7 @@
   --text: #0a1628;
   --text-muted: #4a6080;
   --card-shadow: 0 2px 12px rgba(10,22,40,0.12);
-}
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
   font-family: 'Segoe UI', system-ui, sans-serif;
   background: var(--navy);
   color: var(--white);
@@ -157,7 +155,7 @@ main { flex: 1; padding: 16px 20px; overflow: hidden; }
 .btn-primary { background: var(--water-light); color: var(--white); }
 .btn-primary:hover { background: var(--water); }
 
-.btn-gold { background: var(--gold); color: var(--navy); }
+.btn-gold { background: var(--gold); color: var(--gold); }
 .btn-gold:hover { background: var(--gold-light); }
 
 .btn-danger { background: #c0392b; color: var(--white); }
