@@ -72,23 +72,30 @@ function calcRanks() {
 }
 
 function getStats() {
-  const active = rows.filter(r => (r.boaterFirst || r.boaterLast) && r.boatNo);
-  const weights = active.map(r => parseFloat(r.totalWeight) || 0);
-  const lunkers = active.filter(r => r.lunker === 1 && r.lunkerWeight !== '').map(r => parseFloat(r.lunkerWeight) || 0);
-  const buyIns = active.map(r => parseFloat(r.buyIn) || 0);
+  const paidRows = rows.filter(r => r.boaterFirst || r.boaterLast);
+  const rankedRows = paidRows.filter(r => r.boatNo);
+
+  const weights = rankedRows.map(r => parseFloat(r.totalWeight) || 0);
+  const lunkers = rankedRows
+    .filter(r => r.lunker === 1 && r.lunkerWeight !== '')
+    .map(r => parseFloat(r.lunkerWeight) || 0);
+
+  const buyIns = paidRows.map(r => parseFloat(r.buyIn) || 0);
+
   const lunkerFee = parseFloat(document.getElementById('lunkerFee')?.value || 0);
   const optFee = parseFloat(document.getElementById('optFee')?.value || 0);
 
-  const lunkerPaidCount = active.filter(r => r.lunker === 1).length;
-  const optionPaidCount = active.filter(r => r.option === 1).length;
+  const lunkerPaidCount = paidRows.filter(r => r.lunker === 1).length;
+  const optionPaidCount = paidRows.filter(r => r.option === 1).length;
 
   return {
-    totalBoats: active.length,
+    totalBoats: rankedRows.length,
     largestBag: weights.length ? Math.max(...weights).toFixed(2) : '0.00',
     lunkerToBeat: lunkers.length ? Math.max(...lunkers).toFixed(2) : '0.00',
     totalWeight: weights.reduce((a, b) => a + b, 0).toFixed(2),
     totalBuyIn: buyIns.reduce((a, b) => a + b, 0).toFixed(2),
-    totalApps: active.filter(r => r.appSigned).length,
+
+    totalApps: paidRows.filter(r => r.appSigned).length,
     lunkerPot: (lunkerPaidCount * lunkerFee).toFixed(2),
     optionPot: (optionPaidCount * optFee).toFixed(2),
     lunkerPaidCount,
