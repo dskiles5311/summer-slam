@@ -14,12 +14,25 @@ function loadData() {
       const parsed = JSON.parse(saved);
       rows = parsed.rows || [];
       nextId = parsed.nextId || (rows.length + 1);
+      if (parsed.fees) {
+        setTimeout(() => {
+          if (parsed.fees.entryFee !== undefined) document.getElementById('entryFee').value = parsed.fees.entryFee;
+          if (parsed.fees.lunkerFee !== undefined) document.getElementById('lunkerFee').value = parsed.fees.lunkerFee;
+          if (parsed.fees.optFee !== undefined) document.getElementById('optFee').value = parsed.fees.optFee;
+          updateHeaderStats();
+        }, 0);
+      }
     }
   } catch (e) { rows = []; }
 }
 
 function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ rows, nextId }));
+  const fees = {
+    entryFee: document.getElementById('entryFee')?.value ?? '249',
+    lunkerFee: document.getElementById('lunkerFee')?.value ?? '20',
+    optFee: document.getElementById('optFee')?.value ?? '50'
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ rows, nextId, fees }));
 }
 
 // ── DEFAULT ROW ──────────────────────────────────────────────────────────────
@@ -423,6 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ── EXPOSE TO HTML ────────────────────────────────────────────────────────────
+window.saveData = saveData;
 window.openEdit = openEdit;
 window.closeEdit = closeEdit;
 window.saveEdit = saveEdit;
