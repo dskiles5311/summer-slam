@@ -72,7 +72,7 @@ function calcRanks() {
 function getStats() {
   const active = rows.filter(r => r.boaterFirst || r.boaterLast);
   const weights = active.map(r => parseFloat(r.totalWeight) || 0);
-  const lunkers = active.map(r => parseFloat(r.lunkerWeight) || 0);
+  const lunkers = active.filter(r => r.lunker == 1).map(r => parseFloat(r.lunkerWeight) || 0);
   const buyIns = active.map(r => parseFloat(r.buyIn) || 0);
   const lunkerFee = parseFloat(document.getElementById('lunkerFee')?.value || 0);
   const optFee = parseFloat(document.getElementById('optFee')?.value || 0);
@@ -97,15 +97,24 @@ function getStats() {
 // ── SORT ──────────────────────────────────────────────────────────────────────
 function sortRows(field, dir) {
   currentSort = { field, dir };
+  const numericFields = ['totalWeight','lunkerWeight','numFish','boatNo','buyIn','_rank'];
   rows.sort((a, b) => {
     let va = a[field], vb = b[field];
-    // numeric fields
-    if (['totalWeight','lunkerWeight','numFish','boatNo','buyIn','_rank'].includes(field)) {
+    const isNumeric = numericFields.includes(field);
+
+    // Treat empty/blank as always last regardless of sort direction
+    const aBlank = va === '' || va === null || va === undefined;
+    const bBlank = vb === '' || vb === null || vb === undefined;
+    if (aBlank && bBlank) return 0;
+    if (aBlank) return 1;
+    if (bBlank) return -1;
+
+    if (isNumeric) {
       va = parseFloat(va) || 0;
       vb = parseFloat(vb) || 0;
     } else {
-      va = (va || '').toLowerCase();
-      vb = (vb || '').toLowerCase();
+      va = va.toLowerCase();
+      vb = vb.toLowerCase();
     }
     if (va < vb) return dir === 'asc' ? -1 : 1;
     if (va > vb) return dir === 'asc' ? 1 : -1;
