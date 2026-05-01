@@ -72,13 +72,13 @@ function calcRanks() {
 function getStats() {
   const active = rows.filter(r => r.boaterFirst || r.boaterLast);
   const weights = active.map(r => parseFloat(r.totalWeight) || 0);
-  const lunkers = active.filter(r => r.lunker == 1).map(r => parseFloat(r.lunkerWeight) || 0);
+  const lunkers = active.filter(r => r.lunker === 1 && r.lunkerWeight !== '').map(r => parseFloat(r.lunkerWeight) || 0);
   const buyIns = active.map(r => parseFloat(r.buyIn) || 0);
   const lunkerFee = parseFloat(document.getElementById('lunkerFee')?.value || 0);
   const optFee = parseFloat(document.getElementById('optFee')?.value || 0);
 
-  const lunkerPaidCount = active.filter(r => r.lunker == 1).length;
-  const optionPaidCount = active.filter(r => r.option == 1).length;
+  const lunkerPaidCount = active.filter(r => r.lunker === 1).length;
+  const optionPaidCount = active.filter(r => r.option === 1).length;
 
   return {
     totalBoats: active.length,
@@ -102,19 +102,20 @@ function sortRows(field, dir) {
     let va = a[field], vb = b[field];
     const isNumeric = numericFields.includes(field);
 
-    // Treat empty/blank as always last regardless of sort direction
-    const aBlank = va === '' || va === null || va === undefined;
-    const bBlank = vb === '' || vb === null || vb === undefined;
+    // Blank = empty string, null, undefined, or NaN after parse
+    const isBlank = v => v === '' || v === null || v === undefined || (isNumeric && isNaN(parseFloat(v)));
+    const aBlank = isBlank(va);
+    const bBlank = isBlank(vb);
     if (aBlank && bBlank) return 0;
-    if (aBlank) return 1;
+    if (aBlank) return 1;   // always push blanks to bottom
     if (bBlank) return -1;
 
     if (isNumeric) {
-      va = parseFloat(va) || 0;
-      vb = parseFloat(vb) || 0;
+      va = parseFloat(va);
+      vb = parseFloat(vb);
     } else {
-      va = va.toLowerCase();
-      vb = vb.toLowerCase();
+      va = String(va).toLowerCase();
+      vb = String(vb).toLowerCase();
     }
     if (va < vb) return dir === 'asc' ? -1 : 1;
     if (va > vb) return dir === 'asc' ? 1 : -1;
@@ -269,11 +270,20 @@ function closeEdit() {
 function saveEdit() {
   const fields = ['boaterFirst','boaterLast','coAnglerFirst','coAnglerLast','boatNo','numFish','lunkerWeight','totalWeight','lunker','option','paid','appSigned','buyIn'];
   const data = {};
+  // Status fields: store as integer 0/1 or '' if unset
+  const statusFields = ['lunker','option','paid','appSigned'];
+  // Float fields: keep '' when blank so sort can detect empty
+  const floatFields = ['numFish','lunkerWeight','totalWeight','buyIn'];
   fields.forEach(f => {
     const el = document.getElementById('ef_' + f);
     if (!el) return;
-    const numFields = ['numFish','lunkerWeight','totalWeight','lunker','option','paid','appSigned','buyIn'];
-    data[f] = numFields.includes(f) ? (el.value === '' ? '' : parseFloat(el.value)) : el.value;
+    if (statusFields.includes(f)) {
+      data[f] = el.value === '' ? '' : parseInt(el.value);
+    } else if (floatFields.includes(f)) {
+      data[f] = el.value === '' ? '' : parseFloat(el.value);
+    } else {
+      data[f] = el.value;
+    }
   });
 
   if (editingId !== null) {
