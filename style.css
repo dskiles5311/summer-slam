@@ -155,7 +155,7 @@ main { flex: 1; padding: 16px 20px; overflow: hidden; }
 .btn-primary { background: var(--water-light); color: var(--white); }
 .btn-primary:hover { background: var(--water); }
 
-.btn-gold { background: var(--gold); color: var(--gold); }
+.btn-gold { background: var(--gold); color: var(--navy); }
 .btn-gold:hover { background: var(--gold-light); }
 
 .btn-danger { background: #c0392b; color: var(--white); }
@@ -555,7 +555,7 @@ body.light .add-row-btn:hover {
 }
 
 body.light .btn-outline {
-  color: #1a3a6e;
+  color: #aac0dd;
   border-color: #aac0dd;
 }
 
