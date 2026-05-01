@@ -61,8 +61,11 @@ function getStats() {
   const weights = active.map(r => parseFloat(r.totalWeight) || 0);
   const lunkers = active.map(r => parseFloat(r.lunkerWeight) || 0);
   const buyIns = active.map(r => parseFloat(r.buyIn) || 0);
-  const entryFee = parseFloat(document.getElementById('entryFee')?.value || 0);
+  const lunkerFee = parseFloat(document.getElementById('lunkerFee')?.value || 0);
   const optFee = parseFloat(document.getElementById('optFee')?.value || 0);
+
+  const lunkerPaidCount = active.filter(r => r.lunker == 1).length;
+  const optionPaidCount = active.filter(r => r.option == 1).length;
 
   return {
     totalBoats: active.length,
@@ -70,7 +73,11 @@ function getStats() {
     lunkerToBeat: lunkers.length ? Math.max(...lunkers).toFixed(2) : '0.00',
     totalWeight: weights.reduce((a, b) => a + b, 0).toFixed(2),
     totalBuyIn: buyIns.reduce((a, b) => a + b, 0).toFixed(2),
-    totalApps: active.filter(r => r.appSigned).length
+    totalApps: active.filter(r => r.appSigned).length,
+    lunkerPot: (lunkerPaidCount * lunkerFee).toFixed(2),
+    optionPot: (optionPaidCount * optFee).toFixed(2),
+    lunkerPaidCount,
+    optionPaidCount
   };
 }
 
@@ -155,6 +162,10 @@ function updateHeaderStats() {
   document.getElementById('hLunker').textContent = s.lunkerToBeat + ' lbs';
   document.getElementById('hBag').textContent = s.largestBag + ' lbs';
   document.getElementById('hPot').textContent = '$' + s.totalBuyIn;
+  document.getElementById('hLunkerPot').textContent = '$' + s.lunkerPot;
+  document.getElementById('hLunkerCount').textContent = s.lunkerPaidCount + ' paid';
+  document.getElementById('hOptionPot').textContent = '$' + s.optionPot;
+  document.getElementById('hOptionCount').textContent = s.optionPaidCount + ' paid';
 }
 
 // ── LEADERBOARD ──────────────────────────────────────────────────────────────

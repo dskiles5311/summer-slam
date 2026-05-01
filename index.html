@@ -40,6 +40,16 @@
           <span class="val" id="hPot">$0.00</span>
           <span class="lbl">Total Buy-In</span>
         </div>
+        <div class="stat-chip" style="border-color:rgba(255,180,80,0.4)">
+          <span class="val" id="hLunkerPot" style="color:#ffb450">$0.00</span>
+          <span class="lbl">🎣 Lunker Pot</span>
+          <span class="lbl" id="hLunkerCount" style="color:rgba(255,180,80,0.7)">0 paid</span>
+        </div>
+        <div class="stat-chip" style="border-color:rgba(120,200,255,0.4)">
+          <span class="val" id="hOptionPot" style="color:#78c8ff">$0.00</span>
+          <span class="lbl">⚡ Option Pot</span>
+          <span class="lbl" id="hOptionCount" style="color:rgba(120,200,255,0.7)">0 paid</span>
+        </div>
       </div>
     </div>
     <nav class="nav-tabs">
@@ -159,11 +169,17 @@
               <input type="number" id="entryFee" value="249" min="0" step="1" onchange="updateHeaderStats()" />
             </div>
             <div class="form-field">
+              <label>Lunker Fee ($)</label>
+              <input type="number" id="lunkerFee" value="20" min="0" step="1" onchange="updateHeaderStats()" />
+            </div>
+            <div class="form-field">
               <label>Option Fee ($)</label>
-              <input type="number" id="optFee" value="50" min="0" step="1" />
+              <input type="number" id="optFee" value="50" min="0" step="1" onchange="updateHeaderStats()" />
             </div>
           </div>
           <p style="color:var(--header-bg);font-size:11px;margin-top:8px">
+            Lunker Pot = Lunker Fee × number of "Lunker Paid = Yes" entries.<br>
+            Option Pot = Option Fee × number of "Option Paid = Yes" entries.<br>
             Buy-In cells are highlighted red if below the entry fee amount.
           </p>
         </div>
