@@ -125,28 +125,39 @@
         <p style="color:var(--header-bg);font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-top:4px">Live Tournament Leaderboard</p>
       </div>
 
+      <!-- ── TOP ROW: 4 stat chips ── -->
+      <div class="summary-grid-top" style="margin-bottom:10px">
+        <div class="summary-chip">
+          <span class="sc-lbl">Total Boats</span>
+          <span class="sc-val" id="lbBoats">0</span>
+        </div>
+        <div class="summary-chip">
+          <span class="sc-lbl">Lunker to Beat</span>
+          <span class="sc-val" id="lbLunker">0.00 lbs</span>
+        </div>
+        <div class="summary-chip">
+          <span class="sc-lbl">Largest Bag</span>
+          <span class="sc-val" id="lbBag">0.00 lbs</span>
+        </div>
+        <div class="summary-chip">
+          <span class="sc-lbl">Total Weight</span>
+          <span class="sc-val" id="lbWeight">0.00 lbs</span>
+        </div>
+      </div>
+
+      <!-- ── DETAIL CARDS: lunker holder + bag holder ── -->
       <div class="summary-grid" style="margin-bottom:16px">
         <div class="summary-card">
-          <span class="s-val" id="lbBoats">0</span>
-          <span class="s-lbl">Total Boats</span>
-        </div>
-        <div class="summary-card">
-          <span class="s-val" id="lbLunker">0.00 lbs</span>
-          <span class="s-lbl">Lunker to Beat</span>
+          <span class="s-lbl">🎣 Lunker Holder</span>
+          <span class="s-boat" id="lbLunkerBoat"></span>
           <span class="s-name" id="lbLunkerName"></span>
-          <span class="s-name" id="lbLunkerCo"></span>
-          <span class="s-name" id="lbLunkerBoat"></span>
+          <span class="s-name s-co" id="lbLunkerCo"></span>
         </div>
         <div class="summary-card">
-          <span class="s-val" id="lbBag">0.00 lbs</span>
-          <span class="s-lbl">Largest Bag</span>
+          <span class="s-lbl">🏆 Bag Leader</span>
+          <span class="s-boat" id="lbBagBoat"></span>
           <span class="s-name" id="lbBagName"></span>
-          <span class="s-name" id="lbBagCo"></span>
-          <span class="s-name" id="lbBagBoat"></span>
-        </div>
-        <div class="summary-card">
-          <span class="s-val" id="lbWeight">0.00 lbs</span>
-          <span class="s-lbl">Total Weight</span>
+          <span class="s-name s-co" id="lbBagCo"></span>
         </div>
       </div>
 
