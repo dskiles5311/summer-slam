@@ -223,18 +223,23 @@
   </main>
 </div>
 
-<!-- ── EDIT MODAL ── -->
-<div class="modal-overlay" id="editModal">
-  <div class="modal">
-    <h3 id="modalTitle">Add Entry</h3>
-    <div class="form-grid">
+<!-- ── INLINE EDIT PANEL ── -->
+<div id="editPanel" class="edit-panel" style="display:none">
+  <div class="edit-panel-inner">
+    <div class="edit-panel-header">
+      <h3 id="modalTitle">Add Entry</h3>
+      <button class="edit-panel-close" onclick="closeEdit()">✕</button>
+    </div>
+
+    <div class="edit-section-label">Boater &amp; Co-Angler</div>
+    <div class="edit-grid-2">
       <div class="form-field">
-        <label>Boater First Name</label>
-        <input type="text" id="ef_boaterFirst" placeholder="First" />
+        <label>Boater First</label>
+        <input type="text" id="ef_boaterFirst" placeholder="First" autocomplete="given-name" />
       </div>
       <div class="form-field">
-        <label>Boater Last Name</label>
-        <input type="text" id="ef_boaterLast" placeholder="Last" />
+        <label>Boater Last</label>
+        <input type="text" id="ef_boaterLast" placeholder="Last" autocomplete="family-name" />
       </div>
       <div class="form-field">
         <label>Co-Angler First</label>
@@ -244,25 +249,34 @@
         <label>Co-Angler Last</label>
         <input type="text" id="ef_coAnglerLast" placeholder="Last" />
       </div>
+    </div>
+
+    <div class="edit-section-label">Catch Details</div>
+    <div class="edit-grid-3">
       <div class="form-field">
-        <label>Boat Number</label>
-        <input type="text" id="ef_boatNo" placeholder="e.g. 42" />
+        <label>Boat #</label>
+        <input type="text" id="ef_boatNo" placeholder="42" inputmode="numeric" />
       </div>
       <div class="form-field">
-        <label>Number of Fish</label>
-        <input type="number" id="ef_numFish" placeholder="0" min="0" max="10" />
+        <label># Fish</label>
+        <input type="number" id="ef_numFish" placeholder="0" min="0" max="10" inputmode="numeric" />
       </div>
       <div class="form-field">
-        <label>Lunker Weight (lbs)</label>
-        <input type="number" id="ef_lunkerWeight" placeholder="0.00" step="0.01" min="0" />
+        <label>Lunker Wt (lbs)</label>
+        <input type="number" id="ef_lunkerWeight" placeholder="0.00" step="0.01" min="0" inputmode="decimal" />
       </div>
       <div class="form-field">
-        <label>Total Weight (lbs)</label>
-        <input type="number" id="ef_totalWeight" placeholder="0.00" step="0.01" min="0" />
+        <label>Total Wt (lbs)</label>
+        <input type="number" id="ef_totalWeight" placeholder="0.00" step="0.01" min="0" inputmode="decimal" />
+      </div>
+      <div class="form-field">
+        <label>Buy-In ($)</label>
+        <input type="number" id="ef_buyIn" placeholder="0.00" step="0.01" min="0" inputmode="decimal" />
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
+    <div class="edit-section-label">Payment &amp; Status</div>
+    <div class="edit-grid-4">
       <div class="form-field">
         <label>Lunker Paid</label>
         <select id="ef_lunker">
@@ -297,14 +311,9 @@
       </div>
     </div>
 
-    <div class="form-field" style="margin-bottom:16px">
-      <label>Buy-In Amount ($)</label>
-      <input type="number" id="ef_buyIn" placeholder="0.00" step="0.01" min="0" />
-    </div>
-
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeEdit()">Cancel</button>
-      <button class="btn btn-gold" onclick="saveEdit()">Save Entry</button>
+    <div class="edit-panel-actions">
+      <button class="btn btn-outline btn-lg" onclick="closeEdit()">Cancel</button>
+      <button class="btn btn-gold btn-lg" onclick="saveEdit()">✔ Save Entry</button>
     </div>
   </div>
 </div>

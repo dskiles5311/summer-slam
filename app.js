@@ -277,12 +277,15 @@ function openEdit(id) {
   });
 
   document.getElementById('modalTitle').textContent = id === 'new' ? 'Add Entry' : 'Edit Entry';
-  document.getElementById('editModal').classList.add('show');
-  document.getElementById('ef_boaterFirst').focus();
+  const panel = document.getElementById('editPanel');
+  panel.style.display = 'block';
+  // Scroll panel into view smoothly on mobile
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  setTimeout(() => document.getElementById('ef_boaterFirst').focus(), 200);
 }
 
 function closeEdit() {
-  document.getElementById('editModal').classList.remove('show');
+  document.getElementById('editPanel').style.display = 'none';
   editingId = null;
 }
 
@@ -477,11 +480,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('csvImport')?.addEventListener('change', e => {
     if (e.target.files[0]) importCSV(e.target.files[0]);
     e.target.value = '';
-  });
-
-  // Modal close on overlay click
-  document.getElementById('editModal')?.addEventListener('click', e => {
-    if (e.target === document.getElementById('editModal')) closeEdit();
   });
 
   // Keyboard shortcut
