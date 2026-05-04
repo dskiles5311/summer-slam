@@ -95,13 +95,29 @@ function getStats() {
   const lunkerPaidCount = namedRows.filter(r => r.lunker === 1).length;
   const optionPaidCount = namedRows.filter(r => r.option === 1).length;
 
+  // Find the row with the top lunker weight (lunker=yes only)
+  const lunkerRows = boatRows.filter(r => r.lunker === 1 && r.lunkerWeight !== '');
+  const topLunkerRow = lunkerRows.length
+    ? lunkerRows.reduce((best, r) => (parseFloat(r.lunkerWeight) > parseFloat(best.lunkerWeight) ? r : best))
+    : null;
+
+  // Find the row with the largest total bag
+  const bagRows = namedRows.filter(r => r.totalWeight !== '');
+  const topBagRow = bagRows.length
+    ? bagRows.reduce((best, r) => (parseFloat(r.totalWeight) > parseFloat(best.totalWeight) ? r : best))
+    : null;
+
+  const maxLunker = topLunkerRow ? parseFloat(topLunkerRow.lunkerWeight).toFixed(2) : '0.00';
+  const maxBag = topBagRow ? parseFloat(topBagRow.totalWeight).toFixed(2) : '0.00';
+
   return {
     totalBoats: boatRows.length,
-    largestBag: weights.length ? Math.max(...weights).toFixed(2) : '0.00',
-    lunkerToBeat: lunkers.length ? Math.max(...lunkers).toFixed(2) : '0.00',
+    largestBag: maxBag,
+    largestBagRow: topBagRow,
+    lunkerToBeat: maxLunker,
+    lunkerToBeatRow: topLunkerRow,
     totalWeight: weights.reduce((a, b) => a + b, 0).toFixed(2),
     totalBuyIn: buyIns.reduce((a, b) => a + b, 0).toFixed(2),
-
     totalApps: namedRows.filter(r => r.appSigned).length,
     lunkerPot: (lunkerPaidCount * lunkerFee).toFixed(2),
     optionPot: (optionPaidCount * optFee).toFixed(2),
@@ -222,9 +238,23 @@ function renderLeaderboard() {
   // Stats
   const s = getStats();
   document.getElementById('lbBoats').textContent = s.totalBoats;
-  document.getElementById('lbLunker').textContent = s.lunkerToBeat + ' lbs';
-  document.getElementById('lbBag').textContent = s.largestBag + ' lbs';
   document.getElementById('lbWeight').textContent = s.totalWeight + ' lbs';
+
+  // Lunker to Beat card
+  document.getElementById('lbLunker').textContent = s.lunkerToBeat + ' lbs';
+  const lr = s.lunkerToBeatRow;
+  document.getElementById('lbLunkerName').textContent = lr
+    ? `${lr.boaterFirst} ${lr.boaterLast}`.trim() : '—';
+  document.getElementById('lbLunkerSub').textContent = lr
+    ? `Co: ${lr.coAnglerFirst || ''} ${lr.coAnglerLast || ''}`.trim().replace(/^Co:\s*$/, '') + (lr.boatNo ? ` · Boat #${lr.boatNo}` : '') : '';
+
+  // Largest Bag card
+  document.getElementById('lbBag').textContent = s.largestBag + ' lbs';
+  const br = s.largestBagRow;
+  document.getElementById('lbBagName').textContent = br
+    ? `${br.boaterFirst} ${br.boaterLast}`.trim() : '—';
+  document.getElementById('lbBagSub').textContent = br
+    ? `Co: ${br.coAnglerFirst || ''} ${br.coAnglerLast || ''}`.trim().replace(/^Co:\s*$/, '') + (br.boatNo ? ` · Boat #${br.boatNo}` : '') : '';
 
   container.innerHTML = '';
 
