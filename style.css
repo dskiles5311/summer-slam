@@ -491,16 +491,18 @@ body.light {
   --navy-mid: #dce6f5;
   --navy-light: #c2d4ee;
   --gold: #b8860b;
-  --gold-light: #996600;
+  --gold-light: #7a5000;
   --water: #1a5f9e;
   --water-light: #1a6abf;
-  --header-bg: #8cb4e1;
+  --header-bg: #2a4a7a;
   --white: #0a1628;
   --header-text: #ffffff;
   --light-bg: #ffffff;
   --border: #aac0dd;
   --text: #0a1628;
   --text-muted: #3a5070;
+  --red-text: #9c0006;
+  --green-text: #276221;
   --card-shadow: 0 2px 12px rgba(10,22,40,0.08);
 }
 
@@ -569,10 +571,27 @@ body.light .btn-outline:hover {
 body.light .summary-card {
   background: #ffffff;
   border-color: #aac0dd;
+  box-shadow: 0 1px 4px rgba(10,22,40,0.08);
 }
 
 body.light .lb-card.normal-card {
   background: rgba(10,22,40,0.04);
+  border-color: #aac0dd;
+}
+
+body.light .lb-card.gold-card {
+  background: linear-gradient(135deg, rgba(184,134,11,0.12) 0%, rgba(220,230,245,0.8) 100%);
+  border-color: rgba(184,134,11,0.5);
+}
+
+body.light .lb-card.silver-card {
+  background: linear-gradient(135deg, rgba(150,150,150,0.12) 0%, rgba(220,230,245,0.8) 100%);
+  border-color: rgba(150,150,150,0.4);
+}
+
+body.light .lb-card.bronze-card {
+  background: linear-gradient(135deg, rgba(180,100,30,0.12) 0%, rgba(220,230,245,0.8) 100%);
+  border-color: rgba(180,100,30,0.4);
 }
 
 /* lb-name uses --white which flips automatically */
@@ -606,7 +625,14 @@ body.light .stat-chip {
   background: rgba(255,255,255,0.15);
 }
 
-body.light .rank-cell { color: #996600; }
+body.light .rank-cell { color: #7a5000; }
+body.light .cell-neutral { background: rgba(10,22,40,0.08); color: #2a4a7a; }
+body.light .lb-rank.rn { color: #2a4a7a; }
+body.light .lb-fish .val { color: #1a5f9e; }
+body.light .leaderboard-header h2 { color: #7a5000; text-shadow: none; }
+body.light .top-n-control input { background: #ffffff; border-color: #aac0dd; color: #0a1628; }
+body.light .table-wrapper { box-shadow: 0 1px 8px rgba(10,22,40,0.1); }
+body.light .toolbar .sort-group label { color: #2a4a7a; }
 body.light .rank-1 { color: #b8860b; }
 
 body.light tbody td[style*="color:#e8c876"] {
