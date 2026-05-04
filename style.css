@@ -1,7 +1,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  --navy: #000000;
+  --navy: #0a1628;
   --navy-mid: #1a3a6e;
   --navy-light: #2a5298;
   --gold: #c8a84b;
@@ -19,19 +19,20 @@ body {
   --text: #0a1628;
   --text-muted: #4a6080;
   --card-shadow: 0 2px 12px rgba(10,22,40,0.12);
-
+  --header-text: #ffffff;
   font-family: 'Segoe UI', system-ui, sans-serif;
   background: var(--navy);
   color: var(--white);
   min-height: 100vh;
   font-size: 14px;
+  transition: background 0.2s, color 0.2s;
 }
 
 /* ── APP SHELL ── */
 #app { display: flex; flex-direction: column; min-height: 100vh; }
 
 header {
-  background: linear-gradient(135deg, var(--navy-mid) 0%, var(--water) 100%);
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, var(--water) 100%);
   padding: 0;
   border-bottom: 2px solid var(--gold);
   box-shadow: 0 2px 20px rgba(0,0,0,0.5);
@@ -93,7 +94,7 @@ header {
 
 .stat-chip .lbl {
   font-size: 10px;
-  color: var(--header-bg);
+  color: rgba(255,255,255,0.65);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -110,7 +111,7 @@ header {
   padding: 10px 20px;
   background: transparent;
   border: none;
-  color: var(--header-bg);
+  color: rgba(255,255,255,0.7);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -120,7 +121,7 @@ header {
   text-transform: uppercase;
 }
 
-.nav-tab:hover { color: var(--white); background: rgba(255,255,255,0.05); }
+.nav-tab:hover { color: #ffffff; background: rgba(255,255,255,0.05); }
 .nav-tab.active { color: var(--gold-light); border-bottom-color: var(--gold); }
 
 /* ── MAIN CONTENT ── */
@@ -493,8 +494,9 @@ body.light {
   --gold-light: #996600;
   --water: #1a5f9e;
   --water-light: #1a6abf;
-  --header-bg: #1a3a6e;
+  --header-bg: #8cb4e1;
   --white: #0a1628;
+  --header-text: #ffffff;
   --light-bg: #ffffff;
   --border: #aac0dd;
   --text: #0a1628;
@@ -573,9 +575,7 @@ body.light .lb-card.normal-card {
   background: rgba(10,22,40,0.04);
 }
 
-body.light .lb-name {
-  color: #0a1628;
-}
+/* lb-name uses --white which flips automatically */
 
 body.light .modal {
   background: #ffffff;
@@ -603,7 +603,7 @@ body.light #panel-settings > div > div {
 }
 
 body.light .stat-chip {
-  background: rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.15);
 }
 
 body.light .rank-cell { color: #996600; }
@@ -619,7 +619,7 @@ body.light tbody td[style*="color:#e8c876"] {
   border: 1px solid rgba(255,255,255,0.2);
   border-radius: 20px;
   padding: 5px 12px;
-  color: var(--white);
+  color: #ffffff;
   cursor: pointer;
   font-size: 13px;
   display: flex;
