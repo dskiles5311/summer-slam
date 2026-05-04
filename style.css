@@ -703,8 +703,8 @@ body.light {
   --navy:       #f2f5ee;   /* page bg — warm sage white */
   --navy-mid:   #e4ece0;   /* card / panel bg */
   --navy-light: #cddfc8;   /* elevated surface */
-  --gold:       #8a6a20;   /* tan accent — dark enough for light bg */
-  --gold-light: #6b5018;   /* tan heading */
+  --gold:       #8a6a20;   /* tan accent */
+  --gold-light: #1a3320;   /* dark green — readable on light backgrounds */
   --water:      #2d6e38;   /* forest green accent */
   --water-light:#3a8a46;   /* green highlight */
   --red-soft:   #ffc7ce;
@@ -764,8 +764,23 @@ body.light .lb-angler-name.lb-co { color: #3d5c40; }
 body.light .lb-rank.rn { color: #3d5c40; }
 body.light .lb-stat-item .val { color: #2d6e38; }
 body.light .lb-payout .val { color: #276221; }
-body.light .leaderboard-header h2 { color: #6b5018; }
+body.light .leaderboard-header h2 { color: #1a3320; }
 body.light .top-n-control input { background: #ffffff; border-color: #b8ccb4; color: #1a2e1a; }
+
+/* ── Override --gold-light usages in light mode for readability ── */
+/* Anything that uses --gold-light on a light background needs to be dark green instead */
+body.light .logo-text h1          { color: #f0ede6; }  /* stays on dark header — keep light */
+body.light .stat-chip .val        { color: #f0ede6; }  /* on dark header — keep light */
+body.light .summary-card .s-val   { color: #1a3320; }  /* on light card — dark green */
+body.light .lb-stat-item.highlight .val { color: #1a3320; } /* total weight on card */
+body.light .lb-weight .val        { color: #1a3320; }
+body.light .rank-cell             { color: #1a3320; }
+body.light .rank-1                { color: #8a6a20; }
+body.light .edit-panel-header h3  { color: #1a3320; }
+body.light .nav-tab.active        { color: #e0c48a; border-bottom-color: #e0c48a; } /* on dark header */
+/* Settings headings using --gold-light inline */
+body.light h2[style*="gold-light"],
+body.light [style*="color:var(--gold-light)"] { color: #1a3320 !important; }
 
 /* Roster misc */
 body.light .rank-cell { color: #6b5018; }
