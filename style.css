@@ -704,7 +704,8 @@ body.light {
   --navy-mid: #dce6f5;
   --navy-light: #c2d4ee;
   --gold: #b8860b;
-  --gold-light: #7a5000;
+  --gold-light: #b8860b;
+  /*--gold-light: #7a5000;*/
   --water: #1a5f9e;
   --water-light: #1a6abf;
   --header-bg: #2a4a7a;
