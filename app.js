@@ -15,24 +15,31 @@ function loadData() {
       const parsed = JSON.parse(saved);
       rows = parsed.rows || [];
       nextId = parsed.nextId || (rows.length + 1);
-      if (parsed.fees) {
-        setTimeout(() => {
+
+      // Restore payouts synchronously so they're available when leaderboard renders
+      if (parsed.payoutSettings) {
+        const ps = parsed.payoutSettings;
+        payouts = ps.payouts || [];
+      }
+
+      if (parsed.theme) applyTheme(parsed.theme);
+
+      // Restore DOM inputs after paint
+      setTimeout(() => {
+        if (parsed.fees) {
           if (parsed.fees.entryFee !== undefined) document.getElementById('entryFee').value = parsed.fees.entryFee;
           if (parsed.fees.lunkerFee !== undefined) document.getElementById('lunkerFee').value = parsed.fees.lunkerFee;
           if (parsed.fees.optFee !== undefined) document.getElementById('optFee').value = parsed.fees.optFee;
           updateHeaderStats();
-        }, 0);
-      }
-      if (parsed.payoutSettings) {
-        setTimeout(() => {
+        }
+        if (parsed.payoutSettings) {
           const ps = parsed.payoutSettings;
           if (ps.totalPayout !== undefined) document.getElementById('totalPayout').value = ps.totalPayout;
           if (ps.numWinners !== undefined) document.getElementById('numWinners').value = ps.numWinners;
-          payouts = ps.payouts || [];
           renderPayoutRows();
-        }, 0);
-      }
-      if (parsed.theme) applyTheme(parsed.theme);
+          renderLeaderboard(); // re-render now that payouts are in DOM
+        }
+      }, 0);
     }
   } catch (e) { rows = []; }
 }
@@ -287,27 +294,38 @@ function renderLeaderboard() {
     const payoutAmt = (payouts && payouts[r - 1]) ? payouts[r - 1] : 0;
     const payoutHtml = payoutAmt > 0
       ? `<div class="lb-payout"><div class="val">$${payoutAmt.toLocaleString()}</div><div class="lbl">Payout</div></div>`
-      : '';
+      : '<div class="lb-payout"></div>';
+
+    const coName = [row.coAnglerFirst, row.coAnglerLast].filter(Boolean).join(' ') || '—';
 
     const div = document.createElement('div');
     div.className = `lb-card ${cardClass}`;
     div.innerHTML = `
       <div class="lb-rank ${rankClass}">${rankDisplay}</div>
-      <div>
-        <div class="lb-name">${escHtml(row.boaterFirst)} ${escHtml(row.boaterLast)}</div>
-        <div class="lb-sub">Co: ${escHtml(row.coAnglerFirst)} ${escHtml(row.coAnglerLast)} &bull; Boat #${escHtml(row.boatNo)}</div>
+      <div class="lb-anglers">
+        <div class="lb-angler-row">
+          <span class="lb-angler-label">Boater</span>
+          <span class="lb-angler-name">${escHtml(row.boaterFirst)} ${escHtml(row.boaterLast)}</span>
+        </div>
+        <div class="lb-angler-row">
+          <span class="lb-angler-label">Co-Angler</span>
+          <span class="lb-angler-name lb-co">${escHtml(coName)}</span>
+        </div>
+        <div class="lb-boat-badge">Boat #${escHtml(row.boatNo)}</div>
       </div>
-      <div class="lb-fish">
-        <div class="val">${row.numFish || '—'}</div>
-        <div class="lbl">Fish</div>
-      </div>
-      <div class="lb-fish">
-        <div class="val">${row.lunkerWeight ? parseFloat(row.lunkerWeight).toFixed(2) : '—'}</div>
-        <div class="lbl">Lunker</div>
-      </div>
-      <div class="lb-weight">
-        <div class="val">${row.totalWeight ? parseFloat(row.totalWeight).toFixed(2) : '—'} lbs</div>
-        <div class="lbl">Total Weight</div>
+      <div class="lb-stats">
+        <div class="lb-stat-item">
+          <div class="val">${row.numFish || '—'}</div>
+          <div class="lbl">Fish</div>
+        </div>
+        <div class="lb-stat-item">
+          <div class="val">${row.lunkerWeight ? parseFloat(row.lunkerWeight).toFixed(2) : '—'}</div>
+          <div class="lbl">Lunker (lbs)</div>
+        </div>
+        <div class="lb-stat-item highlight">
+          <div class="val">${row.totalWeight ? parseFloat(row.totalWeight).toFixed(2) : '—'} lbs</div>
+          <div class="lbl">Total Weight</div>
+        </div>
       </div>
       ${payoutHtml}
     `;
@@ -639,7 +657,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadData();
   sortRows('totalWeight', 'desc');
   renderTable();
-  renderPayoutRows();
 
   // Tab navigation
   document.querySelectorAll('.nav-tab').forEach(btn => {

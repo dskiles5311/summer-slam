@@ -319,49 +319,130 @@ td input[type="number"]:focus {
 
 .lb-card {
   display: grid;
-  grid-template-columns: 60px 1fr 1fr 1fr auto auto;
+  grid-template-columns: 70px 1fr auto auto;
   align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border-radius: 10px;
-  margin-bottom: 8px;
+  gap: 16px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  margin-bottom: 10px;
   border: 1px solid rgba(139,180,225,0.15);
-  transition: transform 0.1s;
+  transition: transform 0.1s, box-shadow 0.1s;
 }
 
-.lb-card:hover { transform: translateX(4px); }
+.lb-card:hover { transform: translateX(4px); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
 
-.lb-card.gold-card { background: linear-gradient(135deg, rgba(200,168,75,0.2) 0%, rgba(26,58,110,0.5) 100%); border-color: rgba(200,168,75,0.4); }
+.lb-card.gold-card   { background: linear-gradient(135deg, rgba(200,168,75,0.2) 0%, rgba(26,58,110,0.5) 100%); border-color: rgba(200,168,75,0.4); }
 .lb-card.silver-card { background: linear-gradient(135deg, rgba(192,192,192,0.15) 0%, rgba(26,58,110,0.4) 100%); border-color: rgba(192,192,192,0.3); }
 .lb-card.bronze-card { background: linear-gradient(135deg, rgba(205,127,50,0.15) 0%, rgba(26,58,110,0.4) 100%); border-color: rgba(205,127,50,0.3); }
 .lb-card.normal-card { background: rgba(255,255,255,0.04); }
 
+/* Rank medal */
 .lb-rank {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 900;
   text-align: center;
+  line-height: 1;
 }
 .lb-rank.r1 { color: #FFD700; text-shadow: 0 0 20px rgba(255,215,0,0.5); }
 .lb-rank.r2 { color: #C0C0C0; }
 .lb-rank.r3 { color: #CD7F32; }
-.lb-rank.rn { color: var(--header-bg); font-size: 20px; }
+.lb-rank.rn { color: var(--header-bg); font-size: 22px; font-weight: 800; }
 
+/* Angler names — side by side */
+.lb-anglers { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+
+.lb-angler-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.lb-angler-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--header-bg);
+  min-width: 64px;
+  flex-shrink: 0;
+}
+
+.lb-angler-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lb-angler-name.lb-co {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--header-bg);
+}
+
+.lb-boat-badge {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--navy);
+  background: var(--header-bg);
+  border-radius: 4px;
+  padding: 2px 8px;
+  letter-spacing: 0.3px;
+}
+
+/* Stats cluster */
+.lb-stats {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.lb-stat-item { text-align: center; }
+.lb-stat-item .val { font-size: 15px; font-weight: 700; color: var(--water-light); }
+.lb-stat-item .lbl { font-size: 10px; color: var(--header-bg); margin-top: 1px; }
+.lb-stat-item.highlight .val { font-size: 18px; font-weight: 800; color: var(--gold-light); }
+
+/* Payout badge */
+.lb-payout {
+  text-align: center;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+.lb-payout .val {
+  font-size: 17px;
+  font-weight: 800;
+  color: #4CAF50;
+}
+.lb-payout .lbl { font-size: 10px; color: var(--header-bg); }
+
+/* Legacy selectors kept for compatibility */
 .lb-name { font-weight: 700; font-size: 15px; color: var(--white); }
-.lb-sub { font-size: 11px; color: var(--header-bg); margin-top: 2px; }
-
+.lb-sub  { font-size: 11px; color: var(--header-bg); margin-top: 2px; }
 .lb-fish { text-align: center; }
 .lb-fish .val { font-size: 16px; font-weight: 700; color: var(--water-light); }
 .lb-fish .lbl { font-size: 10px; color: var(--header-bg); }
-
 .lb-weight { text-align: right; }
 .lb-weight .val { font-size: 18px; font-weight: 800; color: var(--gold-light); }
 .lb-weight .lbl { font-size: 10px; color: var(--header-bg); }
 
-.lb-payout { text-align: right; min-width: 80px; }
-.lb-payout .val { font-size: 16px; font-weight: 800; color: #4CAF50; }
-.lb-payout .lbl { font-size: 10px; color: var(--header-bg); }
-
+/* Light mode */
 body.light .lb-payout .val { color: #276221; }
+body.light .lb-boat-badge { color: #ffffff; background: #2a5298; }
+body.light .lb-angler-name.lb-co { color: #2a4a7a; }
+body.light .lb-stat-item .val { color: #1a5f9e; }
+
+/* Responsive */
+@media (max-width: 700px) {
+  .lb-card { grid-template-columns: 50px 1fr; grid-template-rows: auto auto; }
+  .lb-stats { display: none; }
+  .lb-payout { text-align: right; }
+  .lb-angler-name { font-size: 15px; }
+}
 
 /* ── SUMMARY PANEL ── */
 .summary-grid {
@@ -701,25 +782,10 @@ body.light .summary-card {
   box-shadow: 0 1px 4px rgba(10,22,40,0.08);
 }
 
-body.light .lb-card.normal-card {
-  background: rgba(10,22,40,0.04);
-  border-color: #aac0dd;
-}
-
-body.light .lb-card.gold-card {
-  background: linear-gradient(135deg, rgba(184,134,11,0.12) 0%, rgba(220,230,245,0.8) 100%);
-  border-color: rgba(184,134,11,0.5);
-}
-
-body.light .lb-card.silver-card {
-  background: linear-gradient(135deg, rgba(150,150,150,0.12) 0%, rgba(220,230,245,0.8) 100%);
-  border-color: rgba(150,150,150,0.4);
-}
-
-body.light .lb-card.bronze-card {
-  background: linear-gradient(135deg, rgba(180,100,30,0.12) 0%, rgba(220,230,245,0.8) 100%);
-  border-color: rgba(180,100,30,0.4);
-}
+body.light .lb-card.normal-card  { background: rgba(10,22,40,0.04); border-color: #aac0dd; }
+body.light .lb-card.gold-card    { background: linear-gradient(135deg, rgba(184,134,11,0.12) 0%, rgba(220,230,245,0.8) 100%); border-color: rgba(184,134,11,0.5); }
+body.light .lb-card.silver-card  { background: linear-gradient(135deg, rgba(150,150,150,0.12) 0%, rgba(220,230,245,0.8) 100%); border-color: rgba(150,150,150,0.4); }
+body.light .lb-card.bronze-card  { background: linear-gradient(135deg, rgba(180,100,30,0.12) 0%, rgba(220,230,245,0.8) 100%); border-color: rgba(180,100,30,0.4); }
 
 /* lb-name uses --white which flips automatically */
 
