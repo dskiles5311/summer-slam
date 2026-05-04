@@ -265,18 +265,16 @@ function renderLeaderboard() {
   // Lunker to Beat card
   document.getElementById('lbLunker').textContent = s.lunkerToBeat + ' lbs';
   const lr = s.lunkerToBeatRow;
-  document.getElementById('lbLunkerName').textContent = lr
-    ? `${lr.boaterFirst} ${lr.boaterLast}`.trim() : '—';
-  document.getElementById('lbLunkerSub').textContent = lr
-    ? `Co: ${lr.coAnglerFirst || ''} ${lr.coAnglerLast || ''}`.trim().replace(/^Co:\s*$/, '') + (lr.boatNo ? ` · Boat #${lr.boatNo}` : '') : '';
+  document.getElementById('lbLunkerName').textContent = lr ? `${lr.boaterFirst} ${lr.boaterLast}`.trim() : '—';
+  document.getElementById('lbLunkerCo').textContent   = lr ? `${lr.coAnglerFirst || ''} ${lr.coAnglerLast || ''}`.trim() || '—' : '';
+  document.getElementById('lbLunkerBoat').textContent = lr && lr.boatNo ? `Boat #${lr.boatNo}` : '';
 
   // Largest Bag card
   document.getElementById('lbBag').textContent = s.largestBag + ' lbs';
   const br = s.largestBagRow;
-  document.getElementById('lbBagName').textContent = br
-    ? `${br.boaterFirst} ${br.boaterLast}`.trim() : '—';
-  document.getElementById('lbBagSub').textContent = br
-    ? `Co: ${br.coAnglerFirst || ''} ${br.coAnglerLast || ''}`.trim().replace(/^Co:\s*$/, '') + (br.boatNo ? ` · Boat #${br.boatNo}` : '') : '';
+  document.getElementById('lbBagName').textContent  = br ? `${br.boaterFirst} ${br.boaterLast}`.trim() : '—';
+  document.getElementById('lbBagCo').textContent    = br ? `${br.coAnglerFirst || ''} ${br.coAnglerLast || ''}`.trim() || '—' : '';
+  document.getElementById('lbBagBoat').textContent  = br && br.boatNo ? `Boat #${br.boatNo}` : '';
 
   container.innerHTML = '';
 
