@@ -163,8 +163,29 @@
          SETTINGS TAB
     ══════════════════════════════════════════════════════ -->
     <div id="panel-settings" class="tab-panel">
-      <div style="max-width:500px">
+      <div style="max-width:640px">
         <h2 style="color:var(--gold-light);margin-bottom:20px;font-size:18px">Tournament Settings</h2>
+
+        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(139,180,225,0.2);border-radius:10px;padding:20px;margin-bottom:16px">
+          <h3 style="color:var(--header-bg);font-size:14px;margin-bottom:14px;text-transform:uppercase;letter-spacing:1px">Payout Structure</h3>
+          <div class="edit-grid-2" style="margin-bottom:14px">
+            <div class="form-field">
+              <label>Total Payout ($)</label>
+              <input type="number" id="totalPayout" value="0" min="0" step="1" inputmode="numeric" onchange="recalcPayouts()" />
+            </div>
+            <div class="form-field">
+              <label>Number of Winners</label>
+              <input type="number" id="numWinners" value="10" min="1" max="100" step="1" inputmode="numeric" onchange="recalcPayouts()" />
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+            <button class="btn btn-primary btn-sm" onclick="recalcPayouts()">↻ Auto-Calculate</button>
+            <button class="btn btn-outline btn-sm" onclick="clearPayouts()">Clear Payouts</button>
+          </div>
+          <!-- payout rows injected here -->
+          <div id="payoutRows"></div>
+          <div id="payoutSummary" style="margin-top:10px;font-size:12px;color:var(--header-bg)"></div>
+        </div>
 
         <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(139,180,225,0.2);border-radius:10px;padding:20px;margin-bottom:16px">
           <h3 style="color:var(--header-bg);font-size:14px;margin-bottom:14px;text-transform:uppercase;letter-spacing:1px">Fee Structure</h3>

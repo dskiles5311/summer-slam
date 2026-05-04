@@ -319,7 +319,7 @@ td input[type="number"]:focus {
 
 .lb-card {
   display: grid;
-  grid-template-columns: 60px 1fr 1fr 1fr auto;
+  grid-template-columns: 60px 1fr 1fr 1fr auto auto;
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
@@ -356,6 +356,12 @@ td input[type="number"]:focus {
 .lb-weight { text-align: right; }
 .lb-weight .val { font-size: 18px; font-weight: 800; color: var(--gold-light); }
 .lb-weight .lbl { font-size: 10px; color: var(--header-bg); }
+
+.lb-payout { text-align: right; min-width: 80px; }
+.lb-payout .val { font-size: 16px; font-weight: 800; color: #4CAF50; }
+.lb-payout .lbl { font-size: 10px; color: var(--header-bg); }
+
+body.light .lb-payout .val { color: #276221; }
 
 /* ── SUMMARY PANEL ── */
 .summary-grid {

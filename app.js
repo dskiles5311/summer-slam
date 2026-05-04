@@ -3,6 +3,7 @@
 // ── DATA STORE ──────────────────────────────────────────────────────────────
 const STORAGE_KEY = 'summerSlam_v2';
 let rows = [];
+let payouts = [];   // array of dollar amounts per place, e.g. [4000, 1000, 800, ...]
 let nextId = 1;
 let currentSort = { field: 'totalWeight', dir: 'desc' };
 let editingId = null;
@@ -22,6 +23,15 @@ function loadData() {
           updateHeaderStats();
         }, 0);
       }
+      if (parsed.payoutSettings) {
+        setTimeout(() => {
+          const ps = parsed.payoutSettings;
+          if (ps.totalPayout !== undefined) document.getElementById('totalPayout').value = ps.totalPayout;
+          if (ps.numWinners !== undefined) document.getElementById('numWinners').value = ps.numWinners;
+          payouts = ps.payouts || [];
+          renderPayoutRows();
+        }, 0);
+      }
       if (parsed.theme) applyTheme(parsed.theme);
     }
   } catch (e) { rows = []; }
@@ -33,8 +43,13 @@ function saveData() {
     lunkerFee: document.getElementById('lunkerFee')?.value ?? '20',
     optFee: document.getElementById('optFee')?.value ?? '50'
   };
+  const payoutSettings = {
+    totalPayout: document.getElementById('totalPayout')?.value ?? '0',
+    numWinners: document.getElementById('numWinners')?.value ?? '10',
+    payouts
+  };
   const theme = document.body.classList.contains('light') ? 'light' : 'dark';
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ rows, nextId, fees, theme }));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ rows, nextId, fees, payoutSettings, theme }));
 }
 
 // ── DEFAULT ROW ──────────────────────────────────────────────────────────────
@@ -269,6 +284,11 @@ function renderLeaderboard() {
     const rankClass = r === 1 ? 'r1' : r === 2 ? 'r2' : r === 3 ? 'r3' : 'rn';
     const rankDisplay = r === 1 ? '🥇' : r === 2 ? '🥈' : r === 3 ? '🥉' : `#${r}`;
 
+    const payoutAmt = (payouts && payouts[r - 1]) ? payouts[r - 1] : 0;
+    const payoutHtml = payoutAmt > 0
+      ? `<div class="lb-payout"><div class="val">$${payoutAmt.toLocaleString()}</div><div class="lbl">Payout</div></div>`
+      : '';
+
     const div = document.createElement('div');
     div.className = `lb-card ${cardClass}`;
     div.innerHTML = `
@@ -289,6 +309,7 @@ function renderLeaderboard() {
         <div class="val">${row.totalWeight ? parseFloat(row.totalWeight).toFixed(2) : '—'} lbs</div>
         <div class="lbl">Total Weight</div>
       </div>
+      ${payoutHtml}
     `;
     container.appendChild(div);
   });
@@ -469,6 +490,127 @@ function showToast(msg, type = 'info') {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+
+// ── PAYOUT ────────────────────────────────────────────────────────────────────
+
+// Weighted distribution matching the example pattern:
+// Place 1 gets ~38%, 2 gets ~10%, tapering to roughly equal small amounts at bottom
+function calcWeightedPayouts(total, n) {
+  if (n <= 0 || total <= 0) return [];
+
+  // Generate raw weights: sharply weighted toward 1st place
+  const weights = [];
+  for (let i = 0; i < n; i++) {
+    // Exponential decay: w(i) = 1 / (i + 1)^1.6
+    weights.push(1 / Math.pow(i + 1, 1.6));
+  }
+  const sumW = weights.reduce((a, b) => a + b, 0);
+
+  // Scale to total, round to whole dollars
+  let rawAmounts = weights.map(w => Math.round((w / sumW) * total));
+
+  // Fix rounding so sum exactly equals total
+  let diff = total - rawAmounts.reduce((a, b) => a + b, 0);
+  // Distribute rounding difference starting from 1st place
+  let i = 0;
+  while (diff !== 0) {
+    const step = diff > 0 ? 1 : -1;
+    rawAmounts[i % n] += step;
+    diff -= step;
+    i++;
+  }
+
+  return rawAmounts;
+}
+
+function recalcPayouts() {
+  const total = parseInt(document.getElementById('totalPayout')?.value || 0);
+  const n = parseInt(document.getElementById('numWinners')?.value || 0);
+  if (total > 0 && n > 0) {
+    payouts = calcWeightedPayouts(total, n);
+  } else {
+    payouts = Array(n).fill(0);
+  }
+  renderPayoutRows();
+  saveData();
+  renderLeaderboard();
+}
+
+function renderPayoutRows() {
+  const container = document.getElementById('payoutRows');
+  const summary = document.getElementById('payoutSummary');
+  if (!container) return;
+
+  const n = parseInt(document.getElementById('numWinners')?.value || 0);
+
+  // Pad or trim payouts array to match n
+  while (payouts.length < n) payouts.push(0);
+  payouts = payouts.slice(0, n);
+
+  let html = `<table style="width:100%;border-collapse:collapse;font-size:13px">
+    <thead>
+      <tr>
+        <th style="text-align:left;padding:6px 8px;color:var(--header-bg);font-weight:700;font-size:11px;text-transform:uppercase;border-bottom:1px solid rgba(139,180,225,0.2);width:60px">Place</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--header-bg);font-weight:700;font-size:11px;text-transform:uppercase;border-bottom:1px solid rgba(139,180,225,0.2)">Payout</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--header-bg);font-weight:700;font-size:11px;text-transform:uppercase;border-bottom:1px solid rgba(139,180,225,0.2);width:60px">%</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  const total = parseInt(document.getElementById('totalPayout')?.value || 0);
+
+  payouts.forEach((amt, i) => {
+    const pct = total > 0 ? ((amt / total) * 100).toFixed(1) : '0.0';
+    const placeLabel = i === 0 ? '🥇 1st' : i === 1 ? '🥈 2nd' : i === 2 ? '🥉 3rd' : `${i+1}th`;
+    html += `<tr style="border-bottom:1px solid rgba(139,180,225,0.08)">
+      <td style="padding:5px 8px;color:var(--header-bg);font-weight:600">${placeLabel}</td>
+      <td style="padding:5px 8px;text-align:right">
+        <span style="color:var(--white)">$</span>
+        <input type="number"
+          value="${amt}"
+          min="0"
+          step="1"
+          inputmode="numeric"
+          data-place="${i}"
+          onchange="updatePayoutRow(${i}, this.value)"
+          style="width:90px;padding:4px 6px;background:rgba(255,255,255,0.08);border:1px solid rgba(139,180,225,0.3);border-radius:5px;color:var(--white);font-size:13px;text-align:right;font-weight:600" />
+      </td>
+      <td style="padding:5px 8px;text-align:right;color:var(--header-bg);font-size:12px">${pct}%</td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+
+  // Summary
+  const rowTotal = payouts.reduce((a, b) => a + b, 0);
+  const diff = total - rowTotal;
+  const diffColor = diff === 0 ? '#4CAF50' : diff > 0 ? '#ffb450' : '#ff6b6b';
+  const diffLabel = diff === 0 ? '✔ Balanced' : diff > 0 ? `$${diff} unallocated` : `$${Math.abs(diff)} over budget`;
+  if (summary) {
+    summary.innerHTML = `<span style="color:var(--header-bg)">Total allocated:</span>
+      <strong style="color:var(--white)"> $${rowTotal.toLocaleString()}</strong>
+      &nbsp;&nbsp;
+      <span style="color:${diffColor};font-weight:600">${diffLabel}</span>`;
+  }
+}
+
+function updatePayoutRow(place, value) {
+  payouts[place] = parseInt(value) || 0;
+  renderPayoutRows();
+  saveData();
+  renderLeaderboard();
+}
+
+function clearPayouts() {
+  payouts = [];
+  document.getElementById('totalPayout').value = 0;
+  document.getElementById('numWinners').value = 10;
+  renderPayoutRows();
+  saveData();
+  renderLeaderboard();
+}
+
 // ── THEME ────────────────────────────────────────────────────────────────────
 function applyTheme(theme) {
   if (theme === 'light') {
@@ -497,6 +639,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadData();
   sortRows('totalWeight', 'desc');
   renderTable();
+  renderPayoutRows();
 
   // Tab navigation
   document.querySelectorAll('.nav-tab').forEach(btn => {
@@ -536,3 +679,6 @@ window.exportCSV = exportCSV;
 window.printLeaderboard = printLeaderboard;
 window.switchTab = switchTab;
 window.toggleTheme = toggleTheme;
+window.recalcPayouts = recalcPayouts;
+window.updatePayoutRow = updatePayoutRow;
+window.clearPayouts = clearPayouts;
