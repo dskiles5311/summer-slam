@@ -302,16 +302,13 @@ function renderLeaderboard() {
     div.className = `lb-card ${cardClass}`;
     div.innerHTML = `
       <div class="lb-rank ${rankClass}">${rankDisplay}</div>
+      <div class="lb-boatno">
+        <div class="lb-boatno-num">${escHtml(row.boatNo) || '—'}</div>
+        <div class="lb-boatno-lbl">Boat #</div>
+      </div>
       <div class="lb-anglers">
-        <div class="lb-angler-row">
-          <span class="lb-angler-label">Boater</span>
-          <span class="lb-angler-name">${escHtml(row.boaterFirst)} ${escHtml(row.boaterLast)}</span>
-        </div>
-        <div class="lb-angler-row">
-          <span class="lb-angler-label">Co-Angler</span>
-          <span class="lb-angler-name lb-co">${escHtml(coName)}</span>
-        </div>
-        <div class="lb-boat-badge">Boat #${escHtml(row.boatNo)}</div>
+        <div class="lb-angler-name">${escHtml(row.boaterFirst)} ${escHtml(row.boaterLast)}</div>
+        <div class="lb-angler-name lb-co">${escHtml(coName)}</div>
       </div>
       <div class="lb-stats">
         <div class="lb-stat-item">

@@ -319,10 +319,10 @@ td input[type="number"]:focus {
 
 .lb-card {
   display: grid;
-  grid-template-columns: 70px 1fr auto auto;
+  grid-template-columns: 64px 56px 1fr auto auto;
   align-items: center;
-  gap: 16px;
-  padding: 16px 18px;
+  gap: 14px;
+  padding: 14px 18px;
   border-radius: 12px;
   margin-bottom: 10px;
   border: 1px solid rgba(139,180,225,0.15);
@@ -348,24 +348,32 @@ td input[type="number"]:focus {
 .lb-rank.r3 { color: #CD7F32; }
 .lb-rank.rn { color: var(--header-bg); font-size: 22px; font-weight: 800; }
 
-/* Angler names — side by side */
-.lb-anglers { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-
-.lb-angler-row {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
+/* Boat number column */
+.lb-boatno {
+  text-align: center;
+  border-right: 1px solid rgba(139,180,225,0.2);
+  padding-right: 14px;
 }
 
-.lb-angler-label {
-  font-size: 10px;
+.lb-boatno-num {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--header-bg);
+  line-height: 1;
+}
+
+.lb-boatno-lbl {
+  font-size: 9px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--header-bg);
-  min-width: 64px;
-  flex-shrink: 0;
+  opacity: 0.7;
+  margin-top: 2px;
 }
+
+/* Angler names stacked */
+.lb-anglers { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 
 .lb-angler-name {
   font-size: 17px;
@@ -374,25 +382,19 @@ td input[type="number"]:focus {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.3;
 }
 
 .lb-angler-name.lb-co {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--header-bg);
 }
 
-.lb-boat-badge {
-  display: inline-block;
-  margin-top: 4px;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--navy);
-  background: var(--header-bg);
-  border-radius: 4px;
-  padding: 2px 8px;
-  letter-spacing: 0.3px;
-}
+/* kept for any legacy references */
+.lb-boat-badge { display: none; }
+.lb-angler-row { display: flex; align-items: baseline; gap: 8px; }
+.lb-angler-label { display: none; }
 
 /* Stats cluster */
 .lb-stats {
@@ -433,15 +435,18 @@ td input[type="number"]:focus {
 /* Light mode */
 body.light .lb-payout .val { color: #276221; }
 body.light .lb-boat-badge { color: #ffffff; background: #2a5298; }
+body.light .lb-boatno-num { color: #2a4a7a; }
+body.light .lb-boatno { border-right-color: #aac0dd; }
 body.light .lb-angler-name.lb-co { color: #2a4a7a; }
 body.light .lb-stat-item .val { color: #1a5f9e; }
 
 /* Responsive */
 @media (max-width: 700px) {
-  .lb-card { grid-template-columns: 50px 1fr; grid-template-rows: auto auto; }
+  .lb-card { grid-template-columns: 46px 46px 1fr auto; gap: 10px; padding: 12px 12px; }
   .lb-stats { display: none; }
-  .lb-payout { text-align: right; }
+  .lb-boatno-num { font-size: 18px; }
   .lb-angler-name { font-size: 15px; }
+  .lb-angler-name.lb-co { font-size: 13px; }
 }
 
 /* ── SUMMARY PANEL ── */
