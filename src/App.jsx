@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import RosterTab from './components/RosterTab';
+import BoatCheckTab from './components/BoatCheckTab';
 import LeaderboardTab from './components/LeaderboardTab';
 import SettingsTab from './components/SettingsTab';
 import EditModal from './components/EditModal';
@@ -16,6 +17,7 @@ const DEFAULT_SETTINGS = {
   fees:            { entryFee: 249, lunkerFee: 10, optFee: 20 },
   payoutSettings:  { totalPayout: 0, numWinners: 10, payouts: [] },
   theme:           'dark',
+  boatCheck:       {},
 };
 
 export default function App() {
@@ -115,6 +117,15 @@ export default function App() {
     }
   }
 
+  async function handleToggleBoatCheck(id) {
+    const current = settings.boatCheck || {};
+    await handleUpdateSettings({ boatCheck: { ...current, [id]: !current[id] } });
+  }
+
+  async function handleResetBoatCheck() {
+    await handleUpdateSettings({ boatCheck: {} });
+  }
+
   async function handleClearAll() {
     if (!confirm('Clear ALL data? This cannot be undone!')) return;
     try {
@@ -168,6 +179,15 @@ export default function App() {
             onDelete={handleDeleteEntry}
             onClearAll={handleClearAll}
             onImport={handleImport}
+          />
+        )}
+        {activeTab === 'boatcheck' && (
+          <BoatCheckTab
+            entries={rankedEntries}
+            settings={settings}
+            isUnlocked={isUnlocked}
+            onToggle={handleToggleBoatCheck}
+            onReset={handleResetBoatCheck}
           />
         )}
         {activeTab === 'leaderboard' && (
