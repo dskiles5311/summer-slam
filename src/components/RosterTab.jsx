@@ -35,8 +35,9 @@ const SORT_BUTTONS = [
   { label: 'Weight ↓',     field: 'totalWeight',  dir: 'desc' },
 ];
 
-export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd, onDelete, onClearAll, onImport }) {
+export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd, onDelete, onClearAll, onImport, onToggleBoatCheck }) {
   const entryFee = parseFloat(settings.fees?.entryFee) || 249;
+  const boatCheck = settings.boatCheck || {};
   const [sortConfig, setSortConfig] = useState({ field: '_rank', dir: 'asc' });
 
   const sorted = useMemo(() => sortEntries(entries, sortConfig), [entries, sortConfig]);
@@ -90,6 +91,7 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
               <th style={{ textAlign: 'center' }}>Option</th>
               <th style={{ textAlign: 'center' }}>Paid</th>
               <th style={{ textAlign: 'center' }}>App Signed</th>
+              <th style={{ textAlign: 'center' }}>⚓ Checked</th>
               <th style={{ textAlign: 'right' }}>Buy-In</th>
               {isUnlocked && <th style={{ textAlign: 'center' }}>Actions</th>}
             </tr>
@@ -126,6 +128,25 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
                   <td style={{ textAlign: 'center' }}><StatusCell val={row.option} /></td>
                   <td style={{ textAlign: 'center' }}><StatusCell val={row.paid} /></td>
                   <td style={{ textAlign: 'center' }}><StatusCell val={row.appSigned} /></td>
+                  <td
+                    style={{ textAlign: 'center', cursor: isUnlocked ? 'pointer' : undefined }}
+                    onClick={e => { e.stopPropagation(); isUnlocked && onToggleBoatCheck(row.id); }}
+                  >
+                    <span style={{
+                      display: 'inline-block',
+                      width: 24,
+                      height: 24,
+                      lineHeight: '24px',
+                      borderRadius: '50%',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      background: boatCheck[row.id] ? 'rgba(76,175,80,0.2)' : 'rgba(255,255,255,0.06)',
+                      border: `2px solid ${boatCheck[row.id] ? '#4CAF50' : 'rgba(255,255,255,0.15)'}`,
+                      color: boatCheck[row.id] ? '#4CAF50' : 'rgba(255,255,255,0.3)',
+                    }}>
+                      {boatCheck[row.id] ? '✓' : ''}
+                    </span>
+                  </td>
                   <td style={{ textAlign: 'right' }}>
                     <span className={buyInClass}>${buyIn.toFixed(2)}</span>
                   </td>

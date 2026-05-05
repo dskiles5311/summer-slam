@@ -179,6 +179,7 @@ export default function App() {
             onDelete={handleDeleteEntry}
             onClearAll={handleClearAll}
             onImport={handleImport}
+            onToggleBoatCheck={handleToggleBoatCheck}
           />
         )}
         {activeTab === 'boatcheck' && (
