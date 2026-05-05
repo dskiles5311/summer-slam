@@ -4,7 +4,14 @@
       "Bash(npm install *)",
       "Bash(npm run *)",
       "Bash(Test-Path \"C:\\\\Users\\\\dskiles\\\\src\")",
-      "Bash(Test-Path \"C:\\\\Users\\\\dskiles\\\\src\\\\summer-slam\")"
+      "Bash(Test-Path \"C:\\\\Users\\\\dskiles\\\\src\\\\summer-slam\")",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\dskiles\\\\src\\\\summer-slam\" -Force)",
+      "Bash(Select-Object Name, PSIsContainer)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(npx wrangler *)",
+      "Bash(git merge *)"
     ]
   }
 }
