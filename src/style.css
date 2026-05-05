@@ -439,6 +439,8 @@ tbody td { padding: 6px 8px; color: var(--white); vertical-align: middle; }
 
 .form-field input,
 .form-field select {
+  width: 100%;
+  box-sizing: border-box;
   padding: 10px 12px;
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(168,200,160,0.3);
