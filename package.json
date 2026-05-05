@@ -1,0 +1,22 @@
+{
+  "name": "summer-slam",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "pages:dev": "wrangler pages dev --proxy 5173 --compatibility-date=2024-09-23"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@libsql/client": "^0.14.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.3.0",
+    "wrangler": "^3.100.0"
+  }
+}

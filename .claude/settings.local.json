@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(Test-Path \"C:\\\\Users\\\\dskiles\\\\src\")",
+      "Bash(Test-Path \"C:\\\\Users\\\\dskiles\\\\src\\\\summer-slam\")"
+    ]
+  }
+}

@@ -1,0 +1,67 @@
+const BASE = '/api';
+
+function parseEntry(raw) {
+  return {
+    id: Number(raw.id),
+    boaterFirst:   raw.boater_first    ?? raw.boaterFirst    ?? '',
+    boaterLast:    raw.boater_last     ?? raw.boaterLast     ?? '',
+    coAnglerFirst: raw.co_angler_first ?? raw.coAnglerFirst  ?? '',
+    coAnglerLast:  raw.co_angler_last  ?? raw.coAnglerLast   ?? '',
+    boatNo:        raw.boat_no         ?? raw.boatNo         ?? '',
+    numFish:       raw.num_fish        ?? raw.numFish        ?? 0,
+    lunkerWeight:  raw.lunker_weight   ?? raw.lunkerWeight   ?? 0,
+    totalWeight:   raw.total_weight    ?? raw.totalWeight    ?? 0,
+    lunker:        raw.lunker          ?? 0,
+    option:        raw.option_field    ?? raw.option         ?? 0,
+    paid:          raw.paid            ?? 0,
+    appSigned:     raw.app_signed      ?? raw.appSigned      ?? 0,
+    buyIn:         raw.buy_in          ?? raw.buyIn          ?? 0,
+  };
+}
+
+export async function fetchEntries() {
+  const res = await fetch(`${BASE}/entries`);
+  if (!res.ok) throw new Error('Failed to fetch entries');
+  const data = await res.json();
+  return data.map(parseEntry);
+}
+
+export async function createEntry(entry) {
+  const res = await fetch(`${BASE}/entries`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(entry),
+  });
+  if (!res.ok) throw new Error('Failed to create entry');
+  return parseEntry(await res.json());
+}
+
+export async function updateEntry(id, entry) {
+  const res = await fetch(`${BASE}/entries/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(entry),
+  });
+  if (!res.ok) throw new Error('Failed to update entry');
+  return parseEntry(await res.json());
+}
+
+export async function deleteEntry(id) {
+  const res = await fetch(`${BASE}/entries/${id}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error('Failed to delete entry');
+}
+
+export async function fetchSettings() {
+  const res = await fetch(`${BASE}/settings`);
+  if (!res.ok) throw new Error('Failed to fetch settings');
+  return res.json();
+}
+
+export async function saveSettings(updates) {
+  const res = await fetch(`${BASE}/settings`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updates),
+  });
+  if (!res.ok) throw new Error('Failed to save settings');
+}
