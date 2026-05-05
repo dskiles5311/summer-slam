@@ -1,4 +1,5 @@
 import { createClient } from '@libsql/client/web';
+import { checkAuth } from '../_auth.js';
 
 function getDb(env) {
   return createClient({
@@ -27,6 +28,7 @@ function toJS(row) {
 }
 
 export async function onRequestPut({ params, request, env }) {
+  if (!checkAuth(request, env)) return Response.json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const db   = getDb(env);
     const body = await request.json();
@@ -63,7 +65,8 @@ export async function onRequestPut({ params, request, env }) {
   }
 }
 
-export async function onRequestDelete({ params, env }) {
+export async function onRequestDelete({ params, request, env }) {
+  if (!checkAuth(request, env)) return Response.json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const db = getDb(env);
     await db.execute({ sql: 'DELETE FROM entries WHERE id = ?', args: [params.id] });

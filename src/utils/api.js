@@ -1,4 +1,14 @@
 const BASE = '/api';
+const SESSION_PW_KEY = 'ss_password';
+
+export function storePassword(pw) { sessionStorage.setItem(SESSION_PW_KEY, pw); }
+export function clearPassword() { sessionStorage.removeItem(SESSION_PW_KEY); }
+export function isPasswordStored() { return !!sessionStorage.getItem(SESSION_PW_KEY); }
+
+function authHeaders() {
+  const pw = sessionStorage.getItem(SESSION_PW_KEY);
+  return pw ? { Authorization: `Bearer ${pw}` } : {};
+}
 
 function parseEntry(raw) {
   return {
@@ -19,6 +29,15 @@ function parseEntry(raw) {
   };
 }
 
+export async function verifyPassword(password) {
+  const res = await fetch(`${BASE}/auth/verify`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password }),
+  });
+  if (!res.ok) throw new Error('Invalid password');
+}
+
 export async function fetchEntries() {
   const res = await fetch(`${BASE}/entries`);
   if (!res.ok) throw new Error('Failed to fetch entries');
@@ -29,7 +48,7 @@ export async function fetchEntries() {
 export async function createEntry(entry) {
   const res = await fetch(`${BASE}/entries`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify(entry),
   });
   if (!res.ok) throw new Error('Failed to create entry');
@@ -39,7 +58,7 @@ export async function createEntry(entry) {
 export async function updateEntry(id, entry) {
   const res = await fetch(`${BASE}/entries/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify(entry),
   });
   if (!res.ok) throw new Error('Failed to update entry');
@@ -47,7 +66,10 @@ export async function updateEntry(id, entry) {
 }
 
 export async function deleteEntry(id) {
-  const res = await fetch(`${BASE}/entries/${id}`, { method: 'DELETE' });
+  const res = await fetch(`${BASE}/entries/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
   if (!res.ok) throw new Error('Failed to delete entry');
 }
 
@@ -60,7 +82,7 @@ export async function fetchSettings() {
 export async function saveSettings(updates) {
   const res = await fetch(`${BASE}/settings`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify(updates),
   });
   if (!res.ok) throw new Error('Failed to save settings');

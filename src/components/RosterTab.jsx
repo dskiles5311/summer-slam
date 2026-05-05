@@ -6,25 +6,27 @@ function StatusCell({ val }) {
   return <span className="cell-neutral">—</span>;
 }
 
-export default function RosterTab({ entries, settings, onEdit, onAdd, onDelete, onClearAll, onImport }) {
+export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd, onDelete, onClearAll, onImport }) {
   const entryFee = parseFloat(settings.fees?.entryFee) || 249;
 
   return (
     <div className="tab-panel active">
       <div className="toolbar">
-        <button className="btn btn-gold" onClick={onAdd}>+ Add Entry</button>
+        {isUnlocked && <button className="btn btn-gold" onClick={onAdd}>+ Add Entry</button>}
         <div style={{ flex: 1 }} />
-        <label className="btn btn-outline" style={{ cursor: 'pointer' }}>
-          📂 Import CSV
-          <input type="file" accept=".csv" style={{ display: 'none' }}
-                 onChange={e => {
-                   const f = e.target.files[0];
-                   if (f) importCSV(f).then(onImport).catch(() => {});
-                   e.target.value = '';
-                 }} />
-        </label>
+        {isUnlocked && (
+          <label className="btn btn-outline" style={{ cursor: 'pointer' }}>
+            📂 Import CSV
+            <input type="file" accept=".csv" style={{ display: 'none' }}
+                   onChange={e => {
+                     const f = e.target.files[0];
+                     if (f) importCSV(f).then(onImport).catch(() => {});
+                     e.target.value = '';
+                   }} />
+          </label>
+        )}
         <button className="btn btn-primary" onClick={() => exportCSV(entries)}>💾 Export CSV</button>
-        <button className="btn btn-danger" onClick={onClearAll}>🗑️ Clear All</button>
+        {isUnlocked && <button className="btn btn-danger" onClick={onClearAll}>🗑️ Clear All</button>}
       </div>
 
       <div className="table-wrapper">
@@ -45,7 +47,7 @@ export default function RosterTab({ entries, settings, onEdit, onAdd, onDelete, 
               <th style={{ textAlign: 'center' }}>Paid</th>
               <th style={{ textAlign: 'center' }}>App Signed</th>
               <th style={{ textAlign: 'right' }}>Buy-In</th>
-              <th style={{ textAlign: 'center' }}>Actions</th>
+              {isUnlocked && <th style={{ textAlign: 'center' }}>Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -79,16 +81,18 @@ export default function RosterTab({ entries, settings, onEdit, onAdd, onDelete, 
                   <td style={{ textAlign: 'right' }}>
                     <span className={buyInClass}>${buyIn.toFixed(2)}</span>
                   </td>
-                  <td style={{ textAlign: 'center' }}>
-                    <button className="btn btn-outline btn-sm" onClick={() => onEdit(row)}>Edit</button>
-                    <button className="btn btn-danger btn-sm" onClick={() => onDelete(row.id)} style={{ marginLeft: 4 }}>Del</button>
-                  </td>
+                  {isUnlocked && (
+                    <td style={{ textAlign: 'center' }}>
+                      <button className="btn btn-outline btn-sm" onClick={() => onEdit(row)}>Edit</button>
+                      <button className="btn btn-danger btn-sm" onClick={() => onDelete(row.id)} style={{ marginLeft: 4 }}>Del</button>
+                    </td>
+                  )}
                 </tr>
               );
             })}
           </tbody>
         </table>
-        <button className="add-row-btn" onClick={onAdd}>＋ Add New Entry</button>
+        {isUnlocked && <button className="add-row-btn" onClick={onAdd}>＋ Add New Entry</button>}
       </div>
     </div>
   );

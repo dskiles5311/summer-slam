@@ -4,10 +4,11 @@ import RosterTab from './components/RosterTab';
 import LeaderboardTab from './components/LeaderboardTab';
 import SettingsTab from './components/SettingsTab';
 import EditModal from './components/EditModal';
+import UnlockModal from './components/UnlockModal';
 import Toast from './components/Toast';
 import {
   fetchEntries, createEntry, updateEntry, deleteEntry,
-  fetchSettings, saveSettings,
+  fetchSettings, saveSettings, verifyPassword, storePassword, clearPassword, isPasswordStored,
 } from './utils/api';
 import { calcRanks } from './utils/calculations';
 
@@ -24,6 +25,8 @@ export default function App() {
   const [loading, setLoading]           = useState(true);
   const [toast, setToast]               = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
+  const [isUnlocked, setIsUnlocked]     = useState(() => isPasswordStored());
+  const [showUnlock, setShowUnlock]     = useState(false);
 
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type, id: Date.now() });
@@ -56,6 +59,18 @@ export default function App() {
   useEffect(() => {
     document.body.classList.toggle('light', settings.theme === 'light');
   }, [settings.theme]);
+
+  async function handleUnlock(password) {
+    await verifyPassword(password);
+    storePassword(password);
+    setIsUnlocked(true);
+    setShowUnlock(false);
+  }
+
+  function handleLock() {
+    clearPassword();
+    setIsUnlocked(false);
+  }
 
   async function handleSaveEntry(entryData) {
     try {
@@ -138,6 +153,8 @@ export default function App() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onThemeToggle={() => handleUpdateSettings({ theme: settings.theme === 'dark' ? 'light' : 'dark' })}
+        isUnlocked={isUnlocked}
+        onToggleLock={() => isUnlocked ? handleLock() : setShowUnlock(true)}
       />
 
       <main>
@@ -145,6 +162,7 @@ export default function App() {
           <RosterTab
             entries={rankedEntries}
             settings={settings}
+            isUnlocked={isUnlocked}
             onEdit={setEditingEntry}
             onAdd={() => setEditingEntry({})}
             onDelete={handleDeleteEntry}
@@ -159,6 +177,7 @@ export default function App() {
           <SettingsTab
             settings={settings}
             entries={rankedEntries}
+            isUnlocked={isUnlocked}
             onUpdateSettings={handleUpdateSettings}
             onClearAll={handleClearAll}
             onImport={handleImport}
@@ -171,6 +190,13 @@ export default function App() {
           entry={editingEntry}
           onSave={handleSaveEntry}
           onCancel={() => setEditingEntry(null)}
+        />
+      )}
+
+      {showUnlock && (
+        <UnlockModal
+          onUnlock={handleUnlock}
+          onCancel={() => setShowUnlock(false)}
         />
       )}
 

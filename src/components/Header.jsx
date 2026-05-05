@@ -1,6 +1,6 @@
 import { getStats } from '../utils/calculations';
 
-export default function Header({ entries, settings, activeTab, onTabChange, onThemeToggle }) {
+export default function Header({ entries, settings, activeTab, onTabChange, onThemeToggle, isUnlocked, onToggleLock }) {
   const stats = getStats(entries, settings.fees);
 
   return (
@@ -13,9 +13,19 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
             <p>Bass Tournament Management</p>
           </div>
         </div>
-        <button className="theme-toggle" onClick={onThemeToggle}>
-          {settings.theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode'}
-        </button>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <button className="theme-toggle" onClick={onThemeToggle}>
+            {settings.theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode'}
+          </button>
+          <button
+            className="theme-toggle"
+            onClick={onToggleLock}
+            title={isUnlocked ? 'Lock editing' : 'Unlock editing'}
+            style={{ opacity: isUnlocked ? 1 : 0.7 }}
+          >
+            {isUnlocked ? '🔓 Unlocked' : '🔒 Locked'}
+          </button>
+        </div>
         <div className="header-stats">
           <div className="stat-chip">
             <span className="val">{stats.totalBoats}</span>
