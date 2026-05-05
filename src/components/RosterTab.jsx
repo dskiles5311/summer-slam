@@ -1,3 +1,4 @@
+import { useState, useMemo } from 'react';
 import { importCSV, exportCSV } from '../utils/csv';
 
 function StatusCell({ val }) {
@@ -6,13 +7,56 @@ function StatusCell({ val }) {
   return <span className="cell-neutral">—</span>;
 }
 
+const NUMERIC = ['totalWeight', 'lunkerWeight', 'numFish', 'boatNo', 'buyIn', '_rank'];
+
+function sortEntries(entries, { field, dir }) {
+  return [...entries].sort((a, b) => {
+    let va = a[field], vb = b[field];
+    if (NUMERIC.includes(field)) {
+      va = parseFloat(va) || 0;
+      vb = parseFloat(vb) || 0;
+    } else {
+      va = (va || '').toLowerCase();
+      vb = (vb || '').toLowerCase();
+    }
+    if (va < vb) return dir === 'asc' ? -1 : 1;
+    if (va > vb) return dir === 'asc' ? 1 : -1;
+    return 0;
+  });
+}
+
+const SORT_BUTTONS = [
+  { label: '🏆 Rank',      field: '_rank',        dir: 'asc'  },
+  { label: 'Boater ↑',     field: 'boaterLast',   dir: 'asc'  },
+  { label: 'Co-Angler ↑',  field: 'coAnglerLast', dir: 'asc'  },
+  { label: 'Boat # ↑',     field: 'boatNo',       dir: 'asc'  },
+  { label: 'Fish ↓',       field: 'numFish',      dir: 'desc' },
+  { label: 'Lunker ↓',     field: 'lunkerWeight', dir: 'desc' },
+  { label: 'Weight ↓',     field: 'totalWeight',  dir: 'desc' },
+];
+
 export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd, onDelete, onClearAll, onImport }) {
   const entryFee = parseFloat(settings.fees?.entryFee) || 249;
+  const [sortConfig, setSortConfig] = useState({ field: '_rank', dir: 'asc' });
+
+  const sorted = useMemo(() => sortEntries(entries, sortConfig), [entries, sortConfig]);
 
   return (
     <div className="tab-panel active">
       <div className="toolbar">
         {isUnlocked && <button className="btn btn-gold" onClick={onAdd}>+ Add Entry</button>}
+        <div className="sort-group">
+          <label>Sort:</label>
+          {SORT_BUTTONS.map(({ label, field, dir }) => (
+            <button
+              key={label}
+              className={`btn btn-outline btn-sm${sortConfig.field === field ? ' active' : ''}`}
+              onClick={() => setSortConfig({ field, dir })}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
         <div style={{ flex: 1 }} />
         {isUnlocked && (
           <label className="btn btn-outline" style={{ cursor: 'pointer' }}>
@@ -51,14 +95,18 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
             </tr>
           </thead>
           <tbody>
-            {entries.map(row => {
+            {sorted.map(row => {
               const rank = row._rank;
               const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : '';
               const buyIn = parseFloat(row.buyIn) || 0;
               const buyInClass = buyIn > 0 && buyIn < entryFee ? 'cell-red' : buyIn >= entryFee ? 'cell-green' : 'cell-neutral';
 
               return (
-                <tr key={row.id}>
+                <tr
+                  key={row.id}
+                  onClick={() => isUnlocked && onEdit(row)}
+                  style={isUnlocked ? { cursor: 'pointer' } : undefined}
+                >
                   <td className={`rank-cell ${rankClass}`}>{rank || ''}</td>
                   <td>{row.boaterFirst}</td>
                   <td>{row.boaterLast}</td>
@@ -82,7 +130,7 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
                     <span className={buyInClass}>${buyIn.toFixed(2)}</span>
                   </td>
                   {isUnlocked && (
-                    <td style={{ textAlign: 'center' }}>
+                    <td style={{ textAlign: 'center' }} onClick={e => e.stopPropagation()}>
                       <button className="btn btn-outline btn-sm" onClick={() => onEdit(row)}>Edit</button>
                       <button className="btn btn-danger btn-sm" onClick={() => onDelete(row.id)} style={{ marginLeft: 4 }}>Del</button>
                     </td>

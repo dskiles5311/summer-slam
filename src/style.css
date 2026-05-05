@@ -170,6 +170,12 @@ main { flex: 1; padding: 16px 20px; overflow: hidden; }
   align-items: center;
 }
 
+.sort-group .btn.active {
+  background: var(--header-bg);
+  color: var(--bg);
+  border-color: var(--header-bg);
+}
+
 .sort-group label {
   font-size: 11px;
   color: var(--header-bg);
