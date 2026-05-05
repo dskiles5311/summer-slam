@@ -117,6 +117,18 @@ export default function App() {
     }
   }
 
+  async function handleToggleEntryField(entryId, field) {
+    const entry = entries.find(e => e.id === entryId);
+    if (!entry) return;
+    const next = (entry[field] === 1 || entry[field] === '1') ? 0 : 1;
+    try {
+      const updated = await updateEntry(entryId, { ...entry, [field]: next });
+      setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
+    } catch {
+      showToast('Failed to update', 'error');
+    }
+  }
+
   async function handleToggleBoatCheck(id) {
     const current = settings.boatCheck || {};
     await handleUpdateSettings({ boatCheck: { ...current, [id]: !current[id] } });
@@ -180,6 +192,7 @@ export default function App() {
             onClearAll={handleClearAll}
             onImport={handleImport}
             onToggleBoatCheck={handleToggleBoatCheck}
+            onToggleField={handleToggleEntryField}
           />
         )}
         {activeTab === 'boatcheck' && (

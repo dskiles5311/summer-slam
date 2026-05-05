@@ -390,6 +390,7 @@ tbody td { padding: 6px 8px; color: var(--white); vertical-align: middle; }
   max-width: 680px;
   max-height: 90vh;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 @keyframes slideDown {
@@ -533,6 +534,23 @@ tbody td { padding: 6px 8px; color: var(--white); vertical-align: middle; }
   .header-stats { display: none; }
   .summary-grid-top { grid-template-columns: repeat(2, 1fr); }
   .lb-card { grid-template-columns: 50px 1fr auto; }
+
+  /* Nav tabs: scroll horizontally, never wrap */
+  .nav-tabs {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    padding: 0 12px;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab { white-space: nowrap; padding: 10px 14px; }
+
+  /* Sort buttons: scroll horizontally on small screens */
+  .sort-group { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .sort-group::-webkit-scrollbar { display: none; }
+
+  main { padding: 12px 10px; }
 }
 
 @media (max-width: 700px) {
@@ -544,6 +562,17 @@ tbody td { padding: 6px 8px; color: var(--white); vertical-align: middle; }
 }
 
 @media (max-width: 600px) {
+  /* Header: compact */
+  .header-top { padding: 8px 12px; gap: 8px; }
+  .logo-icon { font-size: 22px; }
+  .logo-text h1 { font-size: 17px; letter-spacing: 1px; }
+  .logo-text p { display: none; }
+  .theme-toggle { font-size: 11px; padding: 5px 8px; }
+
+  /* Edit modal: bottom sheet */
+  .edit-overlay { padding: 0; align-items: flex-end; }
+  .edit-panel { border-radius: 16px 16px 0 0; max-height: 93vh; }
+
   .edit-grid-2 { grid-template-columns: 1fr 1fr; }
   .edit-grid-3 { grid-template-columns: 1fr 1fr; }
   .edit-grid-4 { grid-template-columns: 1fr 1fr; }

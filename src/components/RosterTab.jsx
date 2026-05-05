@@ -35,7 +35,7 @@ const SORT_BUTTONS = [
   { label: 'Weight ↓',     field: 'totalWeight',  dir: 'desc' },
 ];
 
-export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd, onDelete, onClearAll, onImport, onToggleBoatCheck }) {
+export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd, onDelete, onClearAll, onImport, onToggleBoatCheck, onToggleField }) {
   const entryFee = parseFloat(settings.fees?.entryFee) || 249;
   const boatCheck = settings.boatCheck || {};
   const [sortConfig, setSortConfig] = useState({ field: '_rank', dir: 'asc' });
@@ -124,10 +124,15 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
                   <td style={{ textAlign: 'right', fontWeight: 700, color: '#e8c876' }}>
                     {parseFloat(row.totalWeight) > 0 ? parseFloat(row.totalWeight).toFixed(2) : '—'}
                   </td>
-                  <td style={{ textAlign: 'center' }}><StatusCell val={row.lunker} /></td>
-                  <td style={{ textAlign: 'center' }}><StatusCell val={row.option} /></td>
-                  <td style={{ textAlign: 'center' }}><StatusCell val={row.paid} /></td>
-                  <td style={{ textAlign: 'center' }}><StatusCell val={row.appSigned} /></td>
+                  {['lunker', 'option', 'paid', 'appSigned'].map(field => (
+                    <td
+                      key={field}
+                      style={{ textAlign: 'center', cursor: isUnlocked ? 'pointer' : undefined }}
+                      onClick={e => { e.stopPropagation(); isUnlocked && onToggleField(row.id, field); }}
+                    >
+                      <StatusCell val={row[field]} />
+                    </td>
+                  ))}
                   <td
                     style={{ textAlign: 'center', cursor: isUnlocked ? 'pointer' : undefined }}
                     onClick={e => { e.stopPropagation(); isUnlocked && onToggleBoatCheck(row.id); }}

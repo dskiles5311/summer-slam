@@ -10,6 +10,7 @@ const EMPTY = {
 export default function EditModal({ entry, onSave, onCancel }) {
   const [form, setForm] = useState({ ...EMPTY });
   const firstInputRef = useRef(null);
+  const overlayDownRef = useRef(false);
 
   useEffect(() => {
     setForm({
@@ -60,7 +61,11 @@ export default function EditModal({ entry, onSave, onCancel }) {
   const isNew = !entry?.id;
 
   return (
-    <div className="edit-overlay" onClick={e => e.target === e.currentTarget && onCancel()}>
+    <div
+      className="edit-overlay"
+      onPointerDown={e => { overlayDownRef.current = e.target === e.currentTarget; }}
+      onPointerUp={e => { if (overlayDownRef.current && e.target === e.currentTarget) onCancel(); }}
+    >
       <div className="edit-panel">
         <div className="edit-panel-inner">
           <div className="edit-panel-header">

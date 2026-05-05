@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 export default function UnlockModal({ onUnlock, onCancel }) {
   const [password, setPassword] = useState('');
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
   const inputRef = useRef(null);
+  const overlayDownRef = useRef(false);
 
   useEffect(() => {
     setTimeout(() => inputRef.current?.focus(), 100);
@@ -32,7 +33,11 @@ export default function UnlockModal({ onUnlock, onCancel }) {
   }
 
   return (
-    <div className="edit-overlay" onClick={e => e.target === e.currentTarget && onCancel()}>
+    <div
+      className="edit-overlay"
+      onPointerDown={e => { overlayDownRef.current = e.target === e.currentTarget; }}
+      onPointerUp={e => { if (overlayDownRef.current && e.target === e.currentTarget) onCancel(); }}
+    >
       <div className="edit-panel" style={{ maxWidth: 360 }}>
         <div className="edit-panel-inner">
           <div className="edit-panel-header">
