@@ -15,7 +15,10 @@ export default function LeaderboardTab({ entries, settings }) {
     : null;
   const lunkerToBeat = lunkerRow ? parseFloat(lunkerRow.lunkerWeight).toFixed(2) : '0.00';
 
-  const bagRow = lbEntries[0] || null;
+  const bagRows = entries.filter(r => r.paid === 1 && r.appSigned === 1 && parseFloat(r.totalWeight) > 0);
+  const bagRow = bagRows.length
+    ? bagRows.reduce((best, r) => parseFloat(r.totalWeight) > parseFloat(best.totalWeight) ? r : best)
+    : null;
   const largestBag = bagRow ? parseFloat(bagRow.totalWeight).toFixed(2) : '0.00';
 
   return (
