@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getLeaderboardEntries } from '../utils/calculations';
+import { getLeaderboardEntries, getStats } from '../utils/calculations';
 
 export default function LeaderboardTab({ entries, settings }) {
   const [topN, setTopN] = useState(10);
@@ -8,6 +8,7 @@ export default function LeaderboardTab({ entries, settings }) {
   const { payoutSettings } = settings;
 
   const totalWeight = lbEntries.reduce((s, e) => s + (parseFloat(e.totalWeight) || 0), 0).toFixed(2);
+  const { totalBoats } = getStats(entries, settings.fees);
 
   const lunkerRows = entries.filter(r => r.lunker === 1 && parseFloat(r.lunkerWeight) > 0);
   const lunkerRow = lunkerRows.length
@@ -43,7 +44,7 @@ export default function LeaderboardTab({ entries, settings }) {
       <div className="summary-grid-top" style={{ marginBottom: 10 }}>
         <div className="summary-chip">
           <span className="sc-lbl">Total Boats</span>
-          <span className="sc-val">{lbEntries.length}</span>
+          <span className="sc-val">{totalBoats}</span>
         </div>
         <div className="summary-chip">
           <span className="sc-lbl">Lunker to Beat</span>
