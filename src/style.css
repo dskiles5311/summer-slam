@@ -575,8 +575,8 @@ tbody td { padding: 6px 8px; color: var(--white); vertical-align: middle; }
 }
 
 @media (max-width: 700px) {
-  .lb-card { grid-template-columns: 46px 46px 1fr auto; gap: 10px; padding: 12px 12px; }
-  .lb-stats { display: none; }
+  .lb-card { grid-template-columns: 46px 46px 1fr auto auto; gap: 10px; padding: 12px 12px; }
+  .lb-stat-item:not(.highlight) { display: none; }
   .lb-boatno-num { font-size: 18px; }
   .lb-angler-name { font-size: 15px; }
   .lb-angler-name.lb-co { font-size: 13px; }

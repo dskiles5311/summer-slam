@@ -10,7 +10,7 @@ export default function LeaderboardTab({ entries, settings }) {
   const totalWeight = lbEntries.reduce((s, e) => s + (parseFloat(e.totalWeight) || 0), 0).toFixed(2);
   const { totalBoats } = getStats(entries, settings.fees);
 
-  const lunkerRows = entries.filter(r => r.lunker === 1 && parseFloat(r.lunkerWeight) > 0);
+  const lunkerRows = entries.filter(r => r.lunker === 1 && r.boatNo && parseFloat(r.lunkerWeight) > 0);
   const lunkerRow = lunkerRows.length
     ? lunkerRows.reduce((best, r) => parseFloat(r.lunkerWeight) > parseFloat(best.lunkerWeight) ? r : best)
     : null;
@@ -137,7 +137,12 @@ export default function LeaderboardTab({ entries, settings }) {
           const cardClass = r === 1 ? 'gold-card' : r === 2 ? 'silver-card' : r === 3 ? 'bronze-card' : 'normal-card';
           const rankClass = r === 1 ? 'r1' : r === 2 ? 'r2' : r === 3 ? 'r3' : 'rn';
           const rankDisplay = r === 1 ? '🥇' : r === 2 ? '🥈' : r === 3 ? '🥉' : `#${r}`;
-          const payoutAmt = payoutSettings?.payouts?.[r - 1] || 0;
+          const payouts = payoutSettings?.payouts || [];
+          const tiedCount = lbEntries.filter(e => e._lbRank === r).length;
+          const payoutSlice = payouts.slice(r - 1, r - 1 + tiedCount);
+          const payoutAmt = tiedCount > 1
+            ? Math.round(payoutSlice.reduce((s, p) => s + (p || 0), 0) / tiedCount)
+            : (payouts[r - 1] || 0);
           const coName = [row.coAnglerFirst, row.coAnglerLast].filter(Boolean).join(' ') || '—';
 
           return (

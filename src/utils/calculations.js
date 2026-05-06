@@ -5,12 +5,25 @@ export function calcRanks(entries) {
     if (wa === 0 && wb === 0) return 0;
     if (wa === 0) return 1;
     if (wb === 0) return -1;
-    return wb - wa;
+    if (wb !== wa) return wb - wa;
+    // Tiebreaker: heaviest lunker wins
+    return (parseFloat(b.lunkerWeight) || 0) - (parseFloat(a.lunkerWeight) || 0);
   });
-  return sorted.map((entry, i) => ({
-    ...entry,
-    _rank: parseFloat(entry.totalWeight) > 0 ? i + 1 : null,
-  }));
+
+  const ranked = [];
+  for (let i = 0; i < sorted.length; i++) {
+    const entry = sorted[i];
+    if (!(parseFloat(entry.totalWeight) > 0)) {
+      ranked.push({ ...entry, _rank: null });
+      continue;
+    }
+    if (i === 0) { ranked.push({ ...entry, _rank: 1 }); continue; }
+    const prev = sorted[i - 1];
+    const sameWeight = parseFloat(entry.totalWeight) === parseFloat(prev.totalWeight);
+    const sameLunker = (parseFloat(entry.lunkerWeight) || 0) === (parseFloat(prev.lunkerWeight) || 0);
+    ranked.push({ ...entry, _rank: sameWeight && sameLunker ? ranked[i - 1]._rank : i + 1 });
+  }
+  return ranked;
 }
 
 export function getStats(entries, fees) {
@@ -22,7 +35,7 @@ export function getStats(entries, fees) {
     ? lunkerRows.reduce((best, r) => parseFloat(r.lunkerWeight) > parseFloat(best.lunkerWeight) ? r : best)
     : null;
 
-  const bagRows = named.filter(r => parseFloat(r.totalWeight) > 0);
+  const bagRows = named.filter(r => r.paid === 1 && r.appSigned === 1 && parseFloat(r.totalWeight) > 0);
   const topBagRow = bagRows.length
     ? bagRows.reduce((best, r) => parseFloat(r.totalWeight) > parseFloat(best.totalWeight) ? r : best)
     : null;
@@ -69,8 +82,18 @@ export function calcWeightedPayouts(total, n) {
 }
 
 export function getLeaderboardEntries(entries) {
-  return entries
+  const filtered = entries
     .filter(r => (r.boaterFirst || r.boaterLast) && r.paid === 1 && r.appSigned === 1 && r._rank)
-    .sort((a, b) => (a._rank || 999) - (b._rank || 999))
-    .map((entry, i) => ({ ...entry, _lbRank: i + 1 }));
+    .sort((a, b) => (a._rank || 999) - (b._rank || 999));
+
+  const result = [];
+  for (let i = 0; i < filtered.length; i++) {
+    const entry = filtered[i];
+    if (i === 0) { result.push({ ...entry, _lbRank: 1 }); continue; }
+    const prev = filtered[i - 1];
+    const sameWeight = parseFloat(entry.totalWeight) === parseFloat(prev.totalWeight);
+    const sameLunker = (parseFloat(entry.lunkerWeight) || 0) === (parseFloat(prev.lunkerWeight) || 0);
+    result.push({ ...entry, _lbRank: sameWeight && sameLunker ? result[i - 1]._lbRank : i + 1 });
+  }
+  return result;
 }
