@@ -499,6 +499,7 @@ tbody td { padding: 6px 8px; color: var(--white); vertical-align: middle; }
 .toast.success { background: #276221; border: 1px solid #4CAF50; color: #fff; }
 .toast.error   { background: #9c0006; border: 1px solid #f44336; color: #fff; }
 .toast.info    { background: #1a3320; border: 1px solid var(--gold); color: var(--gold-light); }
+.toast.warning { background: #5a3a00; border: 1px solid #ffb450; color: #ffb450; }
 
 /* ── THEME TOGGLE ── */
 .theme-toggle {

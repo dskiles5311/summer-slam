@@ -91,14 +91,18 @@ export default function App() {
 
   async function handleSaveEntry(entryData) {
     try {
+      const duplicate = entryData.boatNo && entries.some(e =>
+        String(e.boatNo) === String(entryData.boatNo) && e.id !== editingEntry?.id
+      );
+
       if (editingEntry?.id) {
         const updated = await updateEntry(editingEntry.id, entryData);
         setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
-        showToast('Entry saved!', 'success');
+        showToast(duplicate ? `Warning: Boat #${entryData.boatNo} is already in use!` : 'Entry saved!', duplicate ? 'warning' : 'success');
       } else {
         const created = await createEntry(entryData);
         setEntries(prev => [...prev, created]);
-        showToast('Entry added!', 'success');
+        showToast(duplicate ? `Warning: Boat #${entryData.boatNo} is already in use!` : 'Entry added!', duplicate ? 'warning' : 'success');
       }
       setEditingEntry(null);
     } catch {
