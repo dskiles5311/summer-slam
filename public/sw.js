@@ -1,4 +1,4 @@
-const CACHE_NAME = 'summer-slam-v2';
+const CACHE_NAME = 'summer-slam-v3';
 const PRECACHE = ['/'];
 
 self.addEventListener('install', e =>

@@ -7,10 +7,10 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
     <header>
       <div className="header-top">
         <div className="logo">
-          <img src="/SFT%20logo%20color.jpg" alt="SFT" className="logo-icon" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+          <img src="/SFT%20logo%20color.jpg" alt="SFT" className="logo-icon" style={{ width: 80, height: 80, objectFit: 'contain' }} />
           <div className="logo-text">
             <h1>Summer Slam!</h1>
-            <p>Bass Tournament Management</p>
+            <p>Susquehanna Fishing Tackle</p>
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -49,10 +49,12 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
             <span className="lbl">⚡ Option Pot</span>
             <span className="lbl" style={{ color: 'rgba(120,200,255,0.7)' }}>{stats.optionPaidCount} paid</span>
           </div>
-          <div className="stat-chip">
-            <span className="val">${stats.totalBuyIn}</span>
-            <span className="lbl">Total Buy-In</span>
-          </div>
+          {isUnlocked && (
+            <div className="stat-chip">
+              <span className="val">${stats.totalBuyIn}</span>
+              <span className="lbl">Total Buy-In</span>
+            </div>
+          )}
         </div>
       </div>
       <nav className="nav-tabs">
