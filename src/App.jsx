@@ -59,6 +59,10 @@ export default function App() {
   }, [showToast]);
 
   useEffect(() => {
+    document.body.classList.toggle('light', settings.theme === 'light');
+  }, [settings.theme]);
+
+  useEffect(() => {
     const interval = setInterval(async () => {
       try {
         const [entriesData, settingsData] = await Promise.all([fetchEntries(), fetchSettings()]);
