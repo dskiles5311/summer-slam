@@ -18,6 +18,7 @@ const DEFAULT_SETTINGS = {
   payoutSettings:  { totalPayout: 0, numWinners: 10, payouts: [] },
   theme:           'dark',
   boatCheck:       {},
+  offWater:        {},
 };
 
 export default function App() {
@@ -158,8 +159,13 @@ export default function App() {
     await handleUpdateSettings({ boatCheck: { ...current, [id]: !current[id] } });
   }
 
+  async function handleToggleOffWater(id) {
+    const current = settings.offWater || {};
+    await handleUpdateSettings({ offWater: { ...current, [id]: !current[id] } });
+  }
+
   async function handleResetBoatCheck() {
-    await handleUpdateSettings({ boatCheck: {} });
+    await handleUpdateSettings({ boatCheck: {}, offWater: {} });
   }
 
   async function handleClearAll() {
@@ -225,6 +231,7 @@ export default function App() {
             settings={settings}
             isUnlocked={isUnlocked}
             onToggle={handleToggleBoatCheck}
+            onToggleOffWater={handleToggleOffWater}
             onReset={handleResetBoatCheck}
           />
         )}

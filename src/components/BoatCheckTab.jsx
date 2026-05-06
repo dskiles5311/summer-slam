@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
 
-export default function BoatCheckTab({ entries, settings, isUnlocked, onToggle, onReset }) {
+export default function BoatCheckTab({ entries, settings, isUnlocked, onToggle, onToggleOffWater, onReset }) {
   const boatCheck = settings.boatCheck || {};
+  const offWater = settings.offWater || {};
   const checkedCount = entries.filter(e => boatCheck[e.id]).length;
+  const offWaterCount = entries.filter(e => offWater[e.id]).length;
   const allClear = entries.length > 0 && checkedCount === entries.length;
 
   const sorted = useMemo(() =>
@@ -21,14 +23,20 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggle, 
   return (
     <div className="tab-panel active">
       <div className="toolbar">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ fontSize: 22, fontWeight: 700, color: allClear ? '#4CAF50' : 'var(--gold-light)' }}>
-            {checkedCount} / {entries.length}
-          </span>
-          <span style={{ color: 'var(--header-bg)', fontSize: 13 }}>boats checked in</span>
-          {allClear && (
-            <span style={{ color: '#4CAF50', fontWeight: 700, fontSize: 14 }}>✔ All Clear!</span>
-          )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 22, fontWeight: 700, color: allClear ? '#4CAF50' : 'var(--gold-light)' }}>
+              {checkedCount} / {entries.length}
+            </span>
+            <span style={{ color: 'var(--header-bg)', fontSize: 13 }}>checked in</span>
+            {allClear && <span style={{ color: '#4CAF50', fontWeight: 700, fontSize: 14 }}>✔ All Clear!</span>}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 22, fontWeight: 700, color: offWaterCount === entries.length && entries.length > 0 ? '#4CAF50' : '#78c8ff' }}>
+              {offWaterCount} / {entries.length}
+            </span>
+            <span style={{ color: 'var(--header-bg)', fontSize: 13 }}>off water</span>
+          </div>
         </div>
         <div style={{ flex: 1 }} />
         {isUnlocked && checkedCount > 0 && (
@@ -46,7 +54,8 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggle, 
         <table>
           <thead>
             <tr>
-              <th style={{ textAlign: 'center', width: 80 }}>Status</th>
+              <th style={{ textAlign: 'center', width: 80 }}>Checked In</th>
+              <th style={{ textAlign: 'center', width: 80 }}>Off Water</th>
               <th style={{ width: 80 }}>Boat #</th>
               <th>Boater</th>
               <th>Co-Angler</th>
@@ -55,17 +64,17 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggle, 
           <tbody>
             {sorted.map(row => {
               const checked = !!boatCheck[row.id];
+              const isOffWater = !!offWater[row.id];
               return (
                 <tr
                   key={row.id}
-                  onClick={() => isUnlocked && onToggle(row.id)}
                   style={{
-                    cursor: isUnlocked ? 'pointer' : undefined,
-                    background: checked ? 'rgba(76,175,80,0.08)' : undefined,
+                    background: isOffWater ? 'rgba(120,200,255,0.06)' : checked ? 'rgba(76,175,80,0.08)' : undefined,
                     transition: 'background 0.15s',
                   }}
                 >
-                  <td style={{ textAlign: 'center' }}>
+                  <td style={{ textAlign: 'center', cursor: isUnlocked ? 'pointer' : undefined }}
+                      onClick={() => isUnlocked && onToggle(row.id)}>
                     <span style={{
                       display: 'inline-block',
                       width: 28,
@@ -79,6 +88,23 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggle, 
                       color: checked ? '#4CAF50' : 'rgba(255,255,255,0.3)',
                     }}>
                       {checked ? '✓' : ''}
+                    </span>
+                  </td>
+                  <td style={{ textAlign: 'center', cursor: isUnlocked ? 'pointer' : undefined }}
+                      onClick={() => isUnlocked && onToggleOffWater(row.id)}>
+                    <span style={{
+                      display: 'inline-block',
+                      width: 28,
+                      height: 28,
+                      lineHeight: '28px',
+                      borderRadius: '50%',
+                      fontSize: 16,
+                      fontWeight: 700,
+                      background: isOffWater ? 'rgba(120,200,255,0.2)' : 'rgba(255,255,255,0.06)',
+                      border: `2px solid ${isOffWater ? '#78c8ff' : 'rgba(255,255,255,0.15)'}`,
+                      color: isOffWater ? '#78c8ff' : 'rgba(255,255,255,0.3)',
+                    }}>
+                      {isOffWater ? '✓' : ''}
                     </span>
                   </td>
                   <td style={{ fontWeight: 700, fontSize: 16 }}>{row.boatNo || '—'}</td>
