@@ -33,7 +33,25 @@ export default function LeaderboardTab({ entries, settings }) {
   const option2Payout = (optionPot * 0.3).toFixed(2);
 
   return (
-    <div className="tab-panel active">
+    <div className="tab-panel active" style={{ position: 'relative' }}>
+      <img
+        src="/SFT%20logo%20color%20no%20background.png"
+        alt=""
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '60vmin',
+          height: '60vmin',
+          objectFit: 'contain',
+          opacity: 0.07,
+          pointerEvents: 'none',
+          zIndex: 0,
+          mixBlendMode: 'normal',
+        }}
+      />
       <div className="leaderboard-header">
         <h2>🎣 Summer Slam! 🎣</h2>
         <p style={{ color: 'var(--header-bg)', fontSize: 12, letterSpacing: 2, textTransform: 'uppercase', marginTop: 4 }}>
