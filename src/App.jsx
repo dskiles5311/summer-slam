@@ -3,6 +3,7 @@ import Header from './components/Header';
 import RosterTab from './components/RosterTab';
 import BoatCheckTab from './components/BoatCheckTab';
 import LeaderboardTab from './components/LeaderboardTab';
+import RulesTab from './components/RulesTab';
 import SettingsTab from './components/SettingsTab';
 import EditModal from './components/EditModal';
 import UnlockModal from './components/UnlockModal';
@@ -92,7 +93,7 @@ export default function App() {
   function handleLock() {
     clearPassword();
     setIsUnlocked(false);
-    setActiveTab('leaderboard');
+    setActiveTab(prev => (prev === 'rules' ? 'rules' : 'leaderboard'));
   }
 
   async function handleSaveEntry(entryData) {
@@ -207,8 +208,8 @@ export default function App() {
       <Header
         entries={rankedEntries}
         settings={settings}
-        activeTab={isUnlocked ? activeTab : 'leaderboard'}
-        onTabChange={isUnlocked ? setActiveTab : () => {}}
+        activeTab={isUnlocked || activeTab === 'rules' ? activeTab : 'leaderboard'}
+        onTabChange={tab => { if (isUnlocked || tab === 'rules') setActiveTab(tab); }}
         onThemeToggle={() => handleUpdateSettings({ theme: settings.theme === 'dark' ? 'light' : 'dark' })}
         isUnlocked={isUnlocked}
         onToggleLock={() => isUnlocked ? handleLock() : setShowUnlock(true)}
@@ -242,6 +243,7 @@ export default function App() {
         {activeTab === 'leaderboard' && (
           <LeaderboardTab entries={rankedEntries} settings={settings} />
         )}
+        {activeTab === 'rules' && <RulesTab />}
         {activeTab === 'settings' && (
           <SettingsTab
             settings={settings}

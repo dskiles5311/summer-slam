@@ -80,6 +80,12 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
         >
           🏆 Leaderboard
         </button>
+        <button
+          className={`nav-tab ${activeTab === 'rules' ? 'active' : ''}`}
+          onClick={() => onTabChange('rules')}
+        >
+          📋 Rules
+        </button>
         {isUnlocked && (
           <button
             className={`nav-tab ${activeTab === 'settings' ? 'active' : ''}`}
