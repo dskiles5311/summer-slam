@@ -7,7 +7,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
     <header>
       <div className="header-top">
         <div className="logo">
-          <img src="/sft-logo.jpg" alt="SFT" className="logo-icon" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+          <img src="/SFT%20logo%20color.jpg" alt="SFT" className="logo-icon" style={{ width: 32, height: 32, objectFit: 'contain' }} />
           <div className="logo-text">
             <h1>Summer Slam!</h1>
             <p>Bass Tournament Management</p>
