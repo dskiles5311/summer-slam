@@ -21,10 +21,10 @@ function parseEntry(raw) {
     numFish:       raw.num_fish        ?? raw.numFish        ?? 0,
     lunkerWeight:  raw.lunker_weight   ?? raw.lunkerWeight   ?? 0,
     totalWeight:   raw.total_weight    ?? raw.totalWeight    ?? 0,
-    lunker:        raw.lunker          ?? 0,
-    option:        raw.option_field    ?? raw.option         ?? 0,
-    paid:          raw.paid            ?? 0,
-    appSigned:     raw.app_signed      ?? raw.appSigned      ?? 0,
+    lunker:        Number(raw.lunker          ?? 0),
+    option:        Number(raw.option_field    ?? raw.option         ?? 0),
+    paid:          Number(raw.paid            ?? 0),
+    appSigned:     Number(raw.app_signed      ?? raw.appSigned      ?? 0),
     buyIn:         raw.buy_in          ?? raw.buyIn          ?? 0,
   };
 }
