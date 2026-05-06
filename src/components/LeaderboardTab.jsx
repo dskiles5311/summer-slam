@@ -21,6 +21,16 @@ export default function LeaderboardTab({ entries, settings }) {
     : null;
   const largestBag = bagRow ? parseFloat(bagRow.totalWeight).toFixed(2) : '0.00';
 
+  const optFee = parseFloat(settings.fees?.optFee) || 0;
+  const optionPot = entries.filter(r => r.option === 1).length * optFee;
+  const optionEligible = entries
+    .filter(r => r.option === 1 && r.paid === 1 && r.appSigned === 1 && parseFloat(r.totalWeight) > 0)
+    .sort((a, b) => parseFloat(b.totalWeight) - parseFloat(a.totalWeight));
+  const option1Row = optionEligible[0] || null;
+  const option2Row = optionEligible[1] || null;
+  const option1Payout = (optionPot * 0.7).toFixed(2);
+  const option2Payout = (optionPot * 0.3).toFixed(2);
+
   return (
     <div className="tab-panel active">
       <div className="leaderboard-header">
@@ -67,6 +77,26 @@ export default function LeaderboardTab({ entries, settings }) {
               <span className="s-boat">{bagRow.boatNo ? `Boat #${bagRow.boatNo}` : ''}</span>
               <span className="s-name">{`${bagRow.boaterFirst} ${bagRow.boaterLast}`.trim() || '—'}</span>
               <span className="s-name s-co">{`${bagRow.coAnglerFirst || ''} ${bagRow.coAnglerLast || ''}`.trim() || ''}</span>
+            </>
+          ) : <span className="s-name">—</span>}
+        </div>
+        <div className="summary-card">
+          <span className="s-lbl">⚡ Option 1 — ${option1Payout}</span>
+          {option1Row ? (
+            <>
+              <span className="s-boat">{option1Row.boatNo ? `Boat #${option1Row.boatNo}` : ''}</span>
+              <span className="s-name">{`${option1Row.boaterFirst} ${option1Row.boaterLast}`.trim() || '—'}</span>
+              <span className="s-name s-co">{`${option1Row.coAnglerFirst || ''} ${option1Row.coAnglerLast || ''}`.trim() || ''}</span>
+            </>
+          ) : <span className="s-name">—</span>}
+        </div>
+        <div className="summary-card">
+          <span className="s-lbl">⚡ Option 2 — ${option2Payout}</span>
+          {option2Row ? (
+            <>
+              <span className="s-boat">{option2Row.boatNo ? `Boat #${option2Row.boatNo}` : ''}</span>
+              <span className="s-name">{`${option2Row.boaterFirst} ${option2Row.boaterLast}`.trim() || '—'}</span>
+              <span className="s-name s-co">{`${option2Row.coAnglerFirst || ''} ${option2Row.coAnglerLast || ''}`.trim() || ''}</span>
             </>
           ) : <span className="s-name">—</span>}
         </div>
