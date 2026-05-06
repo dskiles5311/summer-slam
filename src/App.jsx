@@ -169,6 +169,32 @@ export default function App() {
     await handleUpdateSettings({ offWater: { ...current, [id]: !current[id] } });
   }
 
+  async function handleUpdateInlineField(entryId, field, value) {
+    const entry = entries.find(e => e.id === entryId);
+    if (!entry) return;
+
+    let parsed = value;
+    if (field === 'numFish') {
+      parsed = Math.max(0, Math.min(10, parseInt(value) || 0));
+    } else if (field === 'lunkerWeight' || field === 'totalWeight') {
+      parsed = parseFloat(value) || 0;
+    } else if (field === 'boatNo') {
+      parsed = String(value).trim();
+    }
+
+    try {
+      const updated = await updateEntry(entryId, { ...entry, [field]: parsed });
+      setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
+
+      const duplicate = parsed && field === 'boatNo' && entries.some(e =>
+        String(e.boatNo) === String(parsed) && e.id !== entryId
+      );
+      showToast(duplicate ? `Warning: Boat #${parsed} is already in use!` : 'Updated!', duplicate ? 'warning' : 'success');
+    } catch {
+      showToast('Failed to update', 'error');
+    }
+  }
+
   async function handleResetBoatCheck() {
     await handleUpdateSettings({ boatCheck: {}, offWater: {} });
   }
@@ -228,6 +254,7 @@ export default function App() {
             onImport={handleImport}
             onToggleBoatCheck={handleToggleBoatCheck}
             onToggleField={handleToggleEntryField}
+            onUpdateInlineField={handleUpdateInlineField}
           />
         )}
         {activeTab === 'boatcheck' && (

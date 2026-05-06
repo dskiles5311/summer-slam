@@ -35,10 +35,12 @@ const SORT_BUTTONS = [
   { label: 'Weight ↓',     field: 'totalWeight',  dir: 'desc' },
 ];
 
-export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd, onDelete, onClearAll, onImport, onToggleBoatCheck, onToggleField }) {
+export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd, onDelete, onClearAll, onImport, onToggleBoatCheck, onToggleField, onUpdateInlineField }) {
   const entryFee = parseFloat(settings.fees?.entryFee) || 249;
   const boatCheck = settings.boatCheck || {};
   const [sortConfig, setSortConfig] = useState({ field: '_rank', dir: 'asc' });
+  const [editingId, setEditingId] = useState(null);
+  const [editValues, setEditValues] = useState({});
 
   const sorted = useMemo(() => sortEntries(entries, sortConfig), [entries, sortConfig]);
 
@@ -47,6 +49,25 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
     entries.forEach(e => { if (e.boatNo) counts[e.boatNo] = (counts[e.boatNo] || 0) + 1; });
     return new Set(Object.keys(counts).filter(k => counts[k] > 1));
   }, [entries]);
+
+  function handleStartEdit(row, field) {
+    setEditingId(row.id);
+    setEditValues({ [field]: row[field] || '' });
+  }
+
+  function handleSaveInline(rowId, field) {
+    const value = editValues[field];
+    if (onUpdateInlineField) {
+      onUpdateInlineField(rowId, field, value);
+    }
+    setEditingId(null);
+    setEditValues({});
+  }
+
+  function handleCancelEdit() {
+    setEditingId(null);
+    setEditValues({});
+  }
 
   return (
     <div className="tab-panel active">
@@ -120,20 +141,100 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
                   <td>{row.boaterLast}</td>
                   <td>{row.coAnglerFirst}</td>
                   <td>{row.coAnglerLast}</td>
-                  <td>
-                    {row.boatNo}
-                    {duplicateBoatNos.has(String(row.boatNo)) && (
-                      <span title="Duplicate boat number" style={{ marginLeft: 4, color: '#ffb450', fontWeight: 700 }}>!</span>
+                  <td
+                    onClick={e => { e.stopPropagation(); isUnlocked && handleStartEdit(row, 'boatNo'); }}
+                    style={isUnlocked ? { cursor: 'pointer', padding: 0 } : undefined}
+                  >
+                    {editingId === row.id && editValues.hasOwnProperty('boatNo') ? (
+                      <input
+                        type="text"
+                        value={editValues.boatNo}
+                        onChange={e => setEditValues({ ...editValues, boatNo: e.target.value })}
+                        onBlur={() => handleSaveInline(row.id, 'boatNo')}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') handleSaveInline(row.id, 'boatNo');
+                          if (e.key === 'Escape') handleCancelEdit();
+                        }}
+                        onClick={e => e.stopPropagation()}
+                        autoFocus
+                        style={{ width: '100%', padding: 8, border: 'none', background: 'transparent', color: 'inherit', fontSize: 'inherit' }}
+                      />
+                    ) : (
+                      <>
+                        {row.boatNo}
+                        {duplicateBoatNos.has(String(row.boatNo)) && (
+                          <span title="Duplicate boat number" style={{ marginLeft: 4, color: '#ffb450', fontWeight: 700 }}>!</span>
+                        )}
+                      </>
                     )}
                   </td>
-                  <td style={{ textAlign: 'center' }}>
-                    {row.numFish > 0 ? row.numFish : '—'}
+                  <td
+                    style={{ textAlign: 'center', cursor: isUnlocked ? 'pointer' : undefined, padding: isUnlocked ? 0 : undefined }}
+                    onClick={e => { e.stopPropagation(); isUnlocked && handleStartEdit(row, 'numFish'); }}
+                  >
+                    {editingId === row.id && editValues.hasOwnProperty('numFish') ? (
+                      <input
+                        type="number"
+                        value={editValues.numFish}
+                        onChange={e => setEditValues({ ...editValues, numFish: e.target.value })}
+                        onBlur={() => handleSaveInline(row.id, 'numFish')}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') handleSaveInline(row.id, 'numFish');
+                          if (e.key === 'Escape') handleCancelEdit();
+                        }}
+                        onClick={e => e.stopPropagation()}
+                        autoFocus
+                        style={{ width: '100%', padding: 8, border: 'none', background: 'transparent', color: 'inherit', fontSize: 'inherit', textAlign: 'center' }}
+                      />
+                    ) : (
+                      row.numFish > 0 ? row.numFish : '—'
+                    )}
                   </td>
-                  <td style={{ textAlign: 'right', fontWeight: 600 }}>
-                    {parseFloat(row.lunkerWeight) > 0 ? parseFloat(row.lunkerWeight).toFixed(2) : '—'}
+                  <td
+                    style={{ textAlign: 'right', fontWeight: 600, cursor: isUnlocked ? 'pointer' : undefined, padding: isUnlocked ? 0 : undefined }}
+                    onClick={e => { e.stopPropagation(); isUnlocked && handleStartEdit(row, 'lunkerWeight'); }}
+                  >
+                    {editingId === row.id && editValues.hasOwnProperty('lunkerWeight') ? (
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={editValues.lunkerWeight}
+                        onChange={e => setEditValues({ ...editValues, lunkerWeight: e.target.value })}
+                        onBlur={() => handleSaveInline(row.id, 'lunkerWeight')}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') handleSaveInline(row.id, 'lunkerWeight');
+                          if (e.key === 'Escape') handleCancelEdit();
+                        }}
+                        onClick={e => e.stopPropagation()}
+                        autoFocus
+                        style={{ width: '100%', padding: 8, border: 'none', background: 'transparent', color: 'inherit', fontSize: 'inherit', textAlign: 'right' }}
+                      />
+                    ) : (
+                      parseFloat(row.lunkerWeight) > 0 ? parseFloat(row.lunkerWeight).toFixed(2) : '—'
+                    )}
                   </td>
-                  <td style={{ textAlign: 'right', fontWeight: 700, color: '#e8c876' }}>
-                    {parseFloat(row.totalWeight) > 0 ? parseFloat(row.totalWeight).toFixed(2) : '—'}
+                  <td
+                    style={{ textAlign: 'right', fontWeight: 700, color: '#e8c876', cursor: isUnlocked ? 'pointer' : undefined, padding: isUnlocked ? 0 : undefined }}
+                    onClick={e => { e.stopPropagation(); isUnlocked && handleStartEdit(row, 'totalWeight'); }}
+                  >
+                    {editingId === row.id && editValues.hasOwnProperty('totalWeight') ? (
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={editValues.totalWeight}
+                        onChange={e => setEditValues({ ...editValues, totalWeight: e.target.value })}
+                        onBlur={() => handleSaveInline(row.id, 'totalWeight')}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') handleSaveInline(row.id, 'totalWeight');
+                          if (e.key === 'Escape') handleCancelEdit();
+                        }}
+                        onClick={e => e.stopPropagation()}
+                        autoFocus
+                        style={{ width: '100%', padding: 8, border: 'none', background: 'transparent', color: 'inherit', fontSize: 'inherit', textAlign: 'right' }}
+                      />
+                    ) : (
+                      parseFloat(row.totalWeight) > 0 ? parseFloat(row.totalWeight).toFixed(2) : '—'
+                    )}
                   </td>
                   {['lunker', 'option', 'paid', 'appSigned'].map(field => (
                     <td
