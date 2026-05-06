@@ -156,7 +156,11 @@ export default function App() {
 
   async function handleToggleBoatCheck(id) {
     const current = settings.boatCheck || {};
-    await handleUpdateSettings({ boatCheck: { ...current, [id]: !current[id] } });
+    const nowChecked = !current[id];
+    const offWater = settings.offWater || {};
+    const updates = { boatCheck: { ...current, [id]: nowChecked } };
+    if (!nowChecked) updates.offWater = { ...offWater, [id]: false };
+    await handleUpdateSettings(updates);
   }
 
   async function handleToggleOffWater(id) {

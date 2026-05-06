@@ -124,8 +124,7 @@ export default function LeaderboardTab({ entries, settings }) {
         <input type="number" value={topN} min="1" max="500"
                onChange={e => setTopN(parseInt(e.target.value) || 10)} />
         <label>anglers</label>
-        <button className="btn btn-primary btn-sm" onClick={() => setTopN(topN)}>Refresh</button>
-        <button className="btn btn-gold btn-sm" onClick={() => window.print()}>🖨️ Print / PDF</button>
+<button className="btn btn-gold btn-sm" onClick={() => window.print()}>🖨️ Print / PDF</button>
       </div>
 
       <div id="lbContainer">

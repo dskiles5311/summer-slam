@@ -127,7 +127,7 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
                     )}
                   </td>
                   <td style={{ textAlign: 'center' }}>
-                    {row.numFish !== '' && row.numFish !== null ? row.numFish : '—'}
+                    {row.numFish > 0 ? row.numFish : '—'}
                   </td>
                   <td style={{ textAlign: 'right', fontWeight: 600 }}>
                     {parseFloat(row.lunkerWeight) > 0 ? parseFloat(row.lunkerWeight).toFixed(2) : '—'}

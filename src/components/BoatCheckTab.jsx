@@ -117,7 +117,7 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggle, 
             })}
             {entries.length === 0 && (
               <tr>
-                <td colSpan={4} style={{ textAlign: 'center', color: 'var(--header-bg)', padding: 40 }}>
+                <td colSpan={5} style={{ textAlign: 'center', color: 'var(--header-bg)', padding: 40 }}>
                   No entries yet. Add anglers in the Roster tab.
                 </td>
               </tr>

@@ -172,7 +172,7 @@ main { flex: 1; padding: 16px 20px; overflow: hidden; }
 
 .sort-group .btn.active {
   background: var(--header-bg);
-  color: var(--bg);
+  color: var(--gold-light);
   border-color: var(--header-bg);
 }
 
@@ -545,6 +545,9 @@ tbody td { padding: 6px 8px; color: var(--white); vertical-align: middle; }
     margin-bottom: 12px;
     padding: 10px !important;
   }
+  .lb-rank, .lb-boatno-num, .lb-angler-name, .lb-stat-item .val,
+  .lb-stat-item .lbl, .lb-payout .val, .lb-payout .lbl,
+  .sc-lbl, .sc-val, .s-lbl, .s-boat, .s-name { color: black !important; }
 }
 
 /* ── RESPONSIVE ── */
