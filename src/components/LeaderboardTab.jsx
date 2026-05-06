@@ -49,18 +49,26 @@ export default function LeaderboardTab({ entries, settings }) {
           <span className="sc-lbl">Lunker to Beat</span>
           <span className="sc-val">{lunkerToBeat} lbs</span>
           {lunkerRow && (
-            <span className="sc-detail">
-              {lunkerRow.boatNo ? `Boat #${lunkerRow.boatNo} · ` : ''}{`${lunkerRow.boaterFirst} ${lunkerRow.boaterLast}`.trim()}
-            </span>
+            <>
+              {lunkerRow.boatNo && <span className="sc-boat">Boat #{lunkerRow.boatNo}</span>}
+              <span className="sc-name">{`${lunkerRow.boaterFirst} ${lunkerRow.boaterLast}`.trim() || '—'}</span>
+              {`${lunkerRow.coAnglerFirst || ''} ${lunkerRow.coAnglerLast || ''}`.trim() && (
+                <span className="sc-co">{`${lunkerRow.coAnglerFirst || ''} ${lunkerRow.coAnglerLast || ''}`.trim()}</span>
+              )}
+            </>
           )}
         </div>
         <div className="summary-chip">
           <span className="sc-lbl">Largest Bag</span>
           <span className="sc-val">{largestBag} lbs</span>
           {bagRow && (
-            <span className="sc-detail">
-              {bagRow.boatNo ? `Boat #${bagRow.boatNo} · ` : ''}{`${bagRow.boaterFirst} ${bagRow.boaterLast}`.trim()}
-            </span>
+            <>
+              {bagRow.boatNo && <span className="sc-boat">Boat #{bagRow.boatNo}</span>}
+              <span className="sc-name">{`${bagRow.boaterFirst} ${bagRow.boaterLast}`.trim() || '—'}</span>
+              {`${bagRow.coAnglerFirst || ''} ${bagRow.coAnglerLast || ''}`.trim() && (
+                <span className="sc-co">{`${bagRow.coAnglerFirst || ''} ${bagRow.coAnglerLast || ''}`.trim()}</span>
+              )}
+            </>
           )}
         </div>
         <div className="summary-chip">
