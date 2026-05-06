@@ -48,10 +48,20 @@ export default function LeaderboardTab({ entries, settings }) {
         <div className="summary-chip">
           <span className="sc-lbl">Lunker to Beat</span>
           <span className="sc-val">{lunkerToBeat} lbs</span>
+          {lunkerRow && (
+            <span className="sc-detail">
+              {lunkerRow.boatNo ? `Boat #${lunkerRow.boatNo} · ` : ''}{`${lunkerRow.boaterFirst} ${lunkerRow.boaterLast}`.trim()}
+            </span>
+          )}
         </div>
         <div className="summary-chip">
           <span className="sc-lbl">Largest Bag</span>
           <span className="sc-val">{largestBag} lbs</span>
+          {bagRow && (
+            <span className="sc-detail">
+              {bagRow.boatNo ? `Boat #${bagRow.boatNo} · ` : ''}{`${bagRow.boaterFirst} ${bagRow.boaterLast}`.trim()}
+            </span>
+          )}
         </div>
         <div className="summary-chip">
           <span className="sc-lbl">Total Weight</span>
@@ -60,26 +70,6 @@ export default function LeaderboardTab({ entries, settings }) {
       </div>
 
       <div className="summary-grid" style={{ marginBottom: 16 }}>
-        <div className="summary-card">
-          <span className="s-lbl">🎣 Lunker Holder</span>
-          {lunkerRow ? (
-            <>
-              <span className="s-boat">{lunkerRow.boatNo ? `Boat #${lunkerRow.boatNo}` : ''}</span>
-              <span className="s-name">{`${lunkerRow.boaterFirst} ${lunkerRow.boaterLast}`.trim() || '—'}</span>
-              <span className="s-name s-co">{`${lunkerRow.coAnglerFirst || ''} ${lunkerRow.coAnglerLast || ''}`.trim() || ''}</span>
-            </>
-          ) : <span className="s-name">—</span>}
-        </div>
-        <div className="summary-card">
-          <span className="s-lbl">🏆 Bag Leader</span>
-          {bagRow ? (
-            <>
-              <span className="s-boat">{bagRow.boatNo ? `Boat #${bagRow.boatNo}` : ''}</span>
-              <span className="s-name">{`${bagRow.boaterFirst} ${bagRow.boaterLast}`.trim() || '—'}</span>
-              <span className="s-name s-co">{`${bagRow.coAnglerFirst || ''} ${bagRow.coAnglerLast || ''}`.trim() || ''}</span>
-            </>
-          ) : <span className="s-name">—</span>}
-        </div>
         <div className="summary-card">
           <span className="s-lbl">⚡ Option 1 — ${option1Payout}</span>
           {option1Row ? (
