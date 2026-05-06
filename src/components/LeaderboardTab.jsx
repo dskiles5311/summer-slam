@@ -38,18 +38,18 @@ export default function LeaderboardTab({ entries, settings }) {
         src="/SFT%20logo%20color%20no%20background.png"
         alt=""
         aria-hidden="true"
+        className="lb-watermark"
         style={{
           position: 'fixed',
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          width: '60vmin',
-          height: '60vmin',
+          width: '80vmin',
+          height: '80vmin',
           objectFit: 'contain',
-          opacity: 0.07,
+          opacity: 0.1,
           pointerEvents: 'none',
           zIndex: 0,
-          mixBlendMode: 'normal',
         }}
       />
       <div className="leaderboard-header">

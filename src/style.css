@@ -680,6 +680,10 @@ body.light .form-field select:focus { border-color: #2d6e38; background: #ffffff
 body.light .edit-panel-close   { background: rgba(0,0,0,0.05); border-color: #b8ccb4; color: #3d5c40; }
 body.light .edit-panel-header h3 { color: #6b5018; }
 
+/* Leaderboard watermark — white in dark mode, dark in light mode */
+.lb-watermark { filter: brightness(0) invert(1); }
+body.light .lb-watermark { filter: brightness(0); }
+
 body.light .nav-tab.active     { color: #e0c48a; border-bottom-color: #e0c48a; }
 body.light .logo-text h1       { color: #f0ede6; }
 body.light .stat-chip .val     { color: #f0ede6; }
