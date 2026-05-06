@@ -7,9 +7,14 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggle, 
 
   const sorted = useMemo(() =>
     [...entries].sort((a, b) => {
-      const an = parseInt(a.boatNo) || 0;
-      const bn = parseInt(b.boatNo) || 0;
-      return an !== bn ? an - bn : String(a.boaterLast).localeCompare(String(b.boaterLast));
+      const an = parseInt(a.boatNo);
+      const bn = parseInt(b.boatNo);
+      const aValid = !isNaN(an) && a.boatNo !== '' && a.boatNo != null;
+      const bValid = !isNaN(bn) && b.boatNo !== '' && b.boatNo != null;
+      if (aValid && bValid) return an !== bn ? an - bn : String(a.boaterLast).localeCompare(String(b.boaterLast));
+      if (aValid) return -1;
+      if (bValid) return 1;
+      return String(a.boaterLast).localeCompare(String(b.boaterLast));
     }),
   [entries]);
 
