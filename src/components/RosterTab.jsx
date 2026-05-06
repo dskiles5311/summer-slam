@@ -42,6 +42,12 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
 
   const sorted = useMemo(() => sortEntries(entries, sortConfig), [entries, sortConfig]);
 
+  const duplicateBoatNos = useMemo(() => {
+    const counts = {};
+    entries.forEach(e => { if (e.boatNo) counts[e.boatNo] = (counts[e.boatNo] || 0) + 1; });
+    return new Set(Object.keys(counts).filter(k => counts[k] > 1));
+  }, [entries]);
+
   return (
     <div className="tab-panel active">
       <div className="toolbar">
@@ -114,7 +120,12 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
                   <td>{row.boaterLast}</td>
                   <td>{row.coAnglerFirst}</td>
                   <td>{row.coAnglerLast}</td>
-                  <td>{row.boatNo}</td>
+                  <td>
+                    {row.boatNo}
+                    {duplicateBoatNos.has(String(row.boatNo)) && (
+                      <span title="Duplicate boat number" style={{ marginLeft: 4, color: '#ffb450', fontWeight: 700 }}>!</span>
+                    )}
+                  </td>
                   <td style={{ textAlign: 'center' }}>
                     {row.numFish !== '' && row.numFish !== null ? row.numFish : '—'}
                   </td>
