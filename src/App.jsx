@@ -23,7 +23,7 @@ const DEFAULT_SETTINGS = {
 export default function App() {
   const [entries, setEntries]           = useState([]);
   const [settings, setSettings]         = useState(DEFAULT_SETTINGS);
-  const [activeTab, setActiveTab]       = useState('roster');
+  const [activeTab, setActiveTab]       = useState(() => 'leaderboard');
   const [loading, setLoading]           = useState(true);
   const [toast, setToast]               = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
@@ -59,8 +59,23 @@ export default function App() {
   }, [showToast]);
 
   useEffect(() => {
-    document.body.classList.toggle('light', settings.theme === 'light');
-  }, [settings.theme]);
+    const interval = setInterval(async () => {
+      try {
+        const [entriesData, settingsData] = await Promise.all([fetchEntries(), fetchSettings()]);
+        setEntries(prev => JSON.stringify(prev) !== JSON.stringify(entriesData) ? entriesData : prev);
+        if (settingsData && Object.keys(settingsData).length > 0) {
+          const merged = {
+            ...DEFAULT_SETTINGS,
+            ...settingsData,
+            fees:           { ...DEFAULT_SETTINGS.fees,           ...(settingsData.fees           || {}) },
+            payoutSettings: { ...DEFAULT_SETTINGS.payoutSettings, ...(settingsData.payoutSettings || {}) },
+          };
+          setSettings(prev => JSON.stringify(prev) !== JSON.stringify(merged) ? merged : prev);
+        }
+      } catch { /* silently skip if fetch fails */ }
+    }, 20000);
+    return () => clearInterval(interval);
+  }, []);
 
   async function handleUnlock(password) {
     await verifyPassword(password);
@@ -173,8 +188,8 @@ export default function App() {
       <Header
         entries={rankedEntries}
         settings={settings}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
+        activeTab={isUnlocked ? activeTab : 'leaderboard'}
+        onTabChange={isUnlocked ? setActiveTab : () => {}}
         onThemeToggle={() => handleUpdateSettings({ theme: settings.theme === 'dark' ? 'light' : 'dark' })}
         isUnlocked={isUnlocked}
         onToggleLock={() => isUnlocked ? handleLock() : setShowUnlock(true)}

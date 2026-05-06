@@ -7,7 +7,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
     <header>
       <div className="header-top">
         <div className="logo">
-          <span className="logo-icon">🎣</span>
+          <img src="/sft-logo.jpg" alt="SFT" className="logo-icon" style={{ width: 32, height: 32, objectFit: 'contain' }} />
           <div className="logo-text">
             <h1>Summer Slam!</h1>
             <p>Bass Tournament Management</p>
@@ -41,7 +41,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
           </div>
           <div className="stat-chip" style={{ borderColor: 'rgba(255,180,80,0.4)' }}>
             <span className="val" style={{ color: '#ffb450' }}>${stats.lunkerPot}</span>
-            <span className="lbl">🎣 Lunker Pot</span>
+            <span className="lbl">🎯 Lunker Pot</span>
             <span className="lbl" style={{ color: 'rgba(255,180,80,0.7)' }}>{stats.lunkerPaidCount} paid</span>
           </div>
           <div className="stat-chip" style={{ borderColor: 'rgba(120,200,255,0.4)' }}>
@@ -56,30 +56,36 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
         </div>
       </div>
       <nav className="nav-tabs">
-        <button
-          className={`nav-tab ${activeTab === 'roster' ? 'active' : ''}`}
-          onClick={() => onTabChange('roster')}
-        >
-          📋 Roster
-        </button>
-        <button
-          className={`nav-tab ${activeTab === 'boatcheck' ? 'active' : ''}`}
-          onClick={() => onTabChange('boatcheck')}
-        >
-          ⚓ Boat Check
-        </button>
+        {isUnlocked && (
+          <>
+            <button
+              className={`nav-tab ${activeTab === 'roster' ? 'active' : ''}`}
+              onClick={() => onTabChange('roster')}
+            >
+              📋 Roster
+            </button>
+            <button
+              className={`nav-tab ${activeTab === 'boatcheck' ? 'active' : ''}`}
+              onClick={() => onTabChange('boatcheck')}
+            >
+              ⚓ Boat Check
+            </button>
+          </>
+        )}
         <button
           className={`nav-tab ${activeTab === 'leaderboard' ? 'active' : ''}`}
           onClick={() => onTabChange('leaderboard')}
         >
           🏆 Leaderboard
         </button>
-        <button
-          className={`nav-tab ${activeTab === 'settings' ? 'active' : ''}`}
-          onClick={() => onTabChange('settings')}
-        >
-          ⚙️ Settings
-        </button>
+        {isUnlocked && (
+          <button
+            className={`nav-tab ${activeTab === 'settings' ? 'active' : ''}`}
+            onClick={() => onTabChange('settings')}
+          >
+            ⚙️ Settings
+          </button>
+        )}
       </nav>
     </header>
   );

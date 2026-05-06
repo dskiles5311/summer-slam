@@ -519,14 +519,28 @@ tbody td { padding: 6px 8px; color: var(--white); vertical-align: middle; }
 
 /* ── PRINT / PDF ── */
 @media print {
-  body { background: white; color: black; }
-  header { background: #1a3a6e !important; }
-  .nav-tabs, .toolbar, .add-row-btn, .edit-overlay, .toast { display: none !important; }
-  .tab-panel { display: block !important; }
-  table { font-size: 10px; }
-  thead th { background: #8cb4e1 !important; color: black !important; }
-  tbody td { color: black !important; }
-  .lb-card { border: 1px solid #ccc; }
+  * { margin: 0; padding: 0; }
+  body { background: white; color: black; font-size: 11px; }
+  header { display: none; }
+  main { padding: 20px; background: white; }
+
+  .tab-panel { display: none !important; }
+  .tab-panel.active { display: block !important; }
+
+  .nav-tabs, .toolbar, .add-row-btn, .edit-overlay, .toast, .sort-group { display: none !important; }
+
+  table { font-size: 10px; width: 100%; border-collapse: collapse; }
+  thead { background: #1a3a6e !important; color: white !important; page-break-after: avoid; }
+  thead th { background: #1a3a6e !important; color: white !important; padding: 8px 4px; }
+  tbody tr { page-break-inside: avoid; }
+  tbody td { color: black !important; padding: 6px 4px; border-bottom: 1px solid #ddd; }
+
+  .lb-card {
+    page-break-inside: avoid;
+    border: 1px solid #999;
+    margin-bottom: 12px;
+    padding: 10px !important;
+  }
 }
 
 /* ── RESPONSIVE ── */
