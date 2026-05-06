@@ -87,6 +87,7 @@ export default function App() {
   function handleLock() {
     clearPassword();
     setIsUnlocked(false);
+    setActiveTab('leaderboard');
   }
 
   async function handleSaveEntry(entryData) {
