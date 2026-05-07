@@ -59,17 +59,32 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
     return Array(n).fill(Math.floor(total / n));
   }
 
-  // Finds the smallest n >= minCount where calcWithMin(budget, n, floor)[0] <= maxFirst.
-  // Expanding n spreads the budget across more winners, naturally lowering the top amount.
+  // Finds the optimal n for positions below the edited row.
+  // - Contracts n below minCount when budget can't sustain floor for all positions.
+  // - Expands n above minCount when first redistributed position would exceed maxFirst.
+  // Both constraints are respected; floor takes priority as the hard upper bound on n.
   function redistributeBelow(budget, minCount, maxFirst, floor) {
-    if (budget <= 0 || minCount <= 0) return { dist: Array(Math.max(minCount, 0)).fill(0), count: Math.max(minCount, 0) };
-    if (maxFirst <= 0) return { dist: calcWithMin(budget, minCount, floor), count: minCount };
-    for (let n = Math.max(minCount, 1); n <= minCount + 200; n++) {
+    if (budget <= 0) return { dist: [], count: 0 };
+    if (minCount <= 0) return { dist: [], count: 0 };
+
+    // Hard ceiling: budget can't guarantee the floor for more than this many positions
+    const floorCap = floor > 0 ? Math.max(1, Math.floor(budget / floor)) : minCount + 200;
+
+    // Start from min(requested, floor-limited) — may be less than minCount (contraction)
+    const startN = Math.max(1, Math.min(minCount, floorCap));
+
+    if (maxFirst <= 0) {
+      return { dist: calcWithMin(budget, startN, floor), count: startN };
+    }
+
+    // Expand toward floorCap until first redistributed position fits under maxFirst
+    for (let n = startN; n <= floorCap; n++) {
       const dist = calcWithMin(budget, n, floor);
       if (dist[0] <= maxFirst) return { dist, count: n };
     }
-    const n = minCount + 200;
-    return { dist: calcWithMin(budget, n, floor), count: n };
+
+    // Still violates maxFirst at floorCap — budget too small to spread further, use floorCap
+    return { dist: calcWithMin(budget, floorCap, floor), count: floorCap };
   }
 
   function syncPayouts(next, n = numWinners, min = minPayout) {
