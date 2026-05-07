@@ -10,20 +10,24 @@ function getDb(env) {
 
 function toJS(row) {
   return {
-    id:            Number(row.id),
-    boaterFirst:   row.boater_first   ?? '',
-    boaterLast:    row.boater_last    ?? '',
-    coAnglerFirst: row.co_angler_first ?? '',
-    coAnglerLast:  row.co_angler_last  ?? '',
-    boatNo:        row.boat_no        ?? '',
-    numFish:       row.num_fish       ?? 0,
-    lunkerWeight:  row.lunker_weight  ?? 0,
-    totalWeight:   row.total_weight   ?? 0,
-    lunker:        row.lunker         ?? 0,
-    option:        row.option_field   ?? 0,
-    paid:          row.paid           ?? 0,
-    appSigned:     row.app_signed     ?? 0,
-    buyIn:         row.buy_in         ?? 0,
+    id:             Number(row.id),
+    boaterFirst:    row.boater_first    ?? '',
+    boaterLast:     row.boater_last     ?? '',
+    coAnglerFirst:  row.co_angler_first ?? '',
+    coAnglerLast:   row.co_angler_last  ?? '',
+    boatNo:         row.boat_no         ?? '',
+    numFish:        row.num_fish        ?? 0,
+    lunkerWeight:   row.lunker_weight   ?? 0,
+    totalWeight:    row.total_weight    ?? 0,
+    lunker:         row.lunker          ?? 0,
+    option:         row.option_field    ?? 0,
+    paid:           row.paid            ?? 0,
+    appSigned:      row.app_signed      ?? 0,
+    buyIn:          row.buy_in          ?? 0,
+    rawWeight:      row.raw_weight      ?? null,
+    deadFish:       row.dead_fish       ?? 0,
+    shortFish:      row.short_fish      ?? 0,
+    needsAttention: Boolean(row.needs_attention),
   };
 }
 
@@ -47,8 +51,9 @@ export async function onRequestPost({ request, env }) {
       sql: `INSERT INTO entries
               (boater_first, boater_last, co_angler_first, co_angler_last,
                boat_no, num_fish, lunker_weight, total_weight,
-               lunker, option_field, paid, app_signed, buy_in)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+               lunker, option_field, paid, app_signed, buy_in,
+               raw_weight, dead_fish, short_fish, needs_attention)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
         body.boaterFirst   ?? '', body.boaterLast    ?? '',
         body.coAnglerFirst ?? '', body.coAnglerLast  ?? '',
@@ -61,6 +66,10 @@ export async function onRequestPost({ request, env }) {
         body.paid      === '' ? null : Number(body.paid),
         body.appSigned === '' ? null : Number(body.appSigned),
         Number(body.buyIn) || 0,
+        body.rawWeight != null ? Number(body.rawWeight) : null,
+        Number(body.deadFish)  || 0,
+        Number(body.shortFish) || 0,
+        body.needsAttention ? 1 : 0,
       ],
     });
 

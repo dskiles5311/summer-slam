@@ -12,8 +12,18 @@ CREATE TABLE IF NOT EXISTS entries (
   option_field  INTEGER,
   paid          INTEGER,
   app_signed    INTEGER,
-  buy_in        REAL DEFAULT 0
+  buy_in        REAL DEFAULT 0,
+  raw_weight    REAL DEFAULT NULL,
+  dead_fish     INTEGER DEFAULT 0,
+  short_fish    INTEGER DEFAULT 0,
+  needs_attention INTEGER DEFAULT 0
 );
+
+-- Migration for existing databases (run once against Turso):
+-- ALTER TABLE entries ADD COLUMN raw_weight REAL DEFAULT NULL;
+-- ALTER TABLE entries ADD COLUMN dead_fish INTEGER DEFAULT 0;
+-- ALTER TABLE entries ADD COLUMN short_fish INTEGER DEFAULT 0;
+-- ALTER TABLE entries ADD COLUMN needs_attention INTEGER DEFAULT 0;
 
 CREATE TABLE IF NOT EXISTS settings (
   key   TEXT PRIMARY KEY,
