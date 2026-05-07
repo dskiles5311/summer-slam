@@ -13,8 +13,13 @@ function sortEntries(entries, { field, dir }) {
   return [...entries].sort((a, b) => {
     let va = a[field], vb = b[field];
     if (NUMERIC.includes(field)) {
-      va = parseFloat(va) || 0;
-      vb = parseFloat(vb) || 0;
+      if (field === '_rank') {
+        va = va != null ? parseFloat(va) : Infinity;
+        vb = vb != null ? parseFloat(vb) : Infinity;
+      } else {
+        va = parseFloat(va) || 0;
+        vb = parseFloat(vb) || 0;
+      }
     } else {
       va = (va || '').toLowerCase();
       vb = (vb || '').toLowerCase();
