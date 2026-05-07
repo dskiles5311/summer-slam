@@ -51,10 +51,10 @@ export function importCSV(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const lines = e.target.result.split('\n').filter(l => l.trim());
+        const lines = e.target.result.split(/\r?\n/).filter(l => l.trim());
         if (lines.length < 2) return resolve([]);
 
-        const headerVals = parseCSVLine(lines[0]).map(h => h.toLowerCase());
+        const headerVals = parseCSVLine(lines[0]).map(h => h.trim().toLowerCase());
         const fieldMap = {
           'boater first': 'boaterFirst', 'boater_first': 'boaterFirst',
           'boater last': 'boaterLast', 'boater_last': 'boaterLast',
