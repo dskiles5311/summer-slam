@@ -12,6 +12,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   const [numWinners, setNumWinners]   = useState(payoutSettings.numWinners  || 10);
   const [payouts, setPayouts]         = useState(payoutSettings.payouts      || []);
   const [rawInputs, setRawInputs]     = useState(() => (payoutSettings.payouts || []).map(v => String(v || 0)));
+  const [rowErrors, setRowErrors]     = useState([]);
 
   useEffect(() => {
     setTotalPayout(payoutSettings.totalPayout || 0);
@@ -32,6 +33,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   function syncPayouts(next, n = numWinners) {
     setPayouts(next);
     setRawInputs(Array.from({ length: n }, (_, i) => String(next[i] || 0)));
+    setRowErrors([]);
     onUpdateSettings({ payoutSettings: { totalPayout, numWinners: n, payouts: next } });
   }
 
@@ -57,17 +59,28 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
     const updated = [...rawInputs];
     updated[i] = val;
     setRawInputs(updated);
+    if (rowErrors[i]) {
+      const errs = [...rowErrors];
+      errs[i] = null;
+      setRowErrors(errs);
+    }
   }
 
   function handleInputBlur(i) {
     const evaluated = evalExpr(rawInputs[i]);
     const otherSum = payouts.reduce((s, v, j) => j !== i ? s + (v || 0) : s, 0);
-    const capped = Math.max(0, Math.min(evaluated, totalPayout - otherSum));
+    const available = totalPayout - otherSum;
+    const capped = Math.max(0, Math.min(evaluated, available));
     const updated = Array.from({ length: numWinners }, (_, j) => j === i ? capped : (payouts[j] || 0));
     setPayouts(updated);
     const newRaw = [...rawInputs];
     newRaw[i] = String(capped);
     setRawInputs(newRaw);
+    const errs = [...rowErrors];
+    errs[i] = evaluated > available
+      ? `Exceeds remaining balance — capped at $${available.toLocaleString()}`
+      : null;
+    setRowErrors(errs);
     onUpdateSettings({ payoutSettings: { totalPayout, numWinners, payouts: updated } });
   }
 
@@ -128,28 +141,38 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
                     const pct = totalPayout > 0 ? ((amt / totalPayout) * 100).toFixed(1) : '0.0';
                     const runningBalance = totalPayout - payouts.slice(0, i + 1).reduce((s, v) => s + (v || 0), 0);
                     const balColor = runningBalance === 0 ? '#4CAF50' : runningBalance < 0 ? '#ff6b6b' : 'var(--header-bg)';
+                    const err = rowErrors[i];
                     return (
-                      <tr key={i} style={{ borderBottom: '1px solid rgba(139,180,225,0.08)' }}>
-                        <td style={{ padding: '5px 8px', color: 'var(--header-bg)', fontWeight: 600 }}>{placeLabel(i)}</td>
-                        <td style={{ padding: '5px 8px', textAlign: 'right' }}>
-                          <span style={{ color: 'var(--header-bg)', marginRight: 2 }}>$</span>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            value={rawInputs[i] ?? String(amt)}
-                            disabled={locked}
-                            onChange={e => handleInputChange(i, e.target.value)}
-                            onBlur={() => handleInputBlur(i)}
-                            onFocus={e => e.target.select()}
-                            placeholder="0 or 100+50"
-                            style={{ width: 110, padding: '4px 6px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(139,180,225,0.3)', borderRadius: 5, color: 'var(--white)', fontSize: 13, textAlign: 'right', fontWeight: 600 }}
-                          />
-                        </td>
-                        <td style={{ padding: '5px 8px', textAlign: 'right', color: 'var(--header-bg)', fontSize: 12 }}>{pct}%</td>
-                        <td style={{ padding: '5px 8px', textAlign: 'right', fontSize: 12, fontWeight: 600, color: balColor }}>
-                          ${runningBalance.toLocaleString()}
-                        </td>
-                      </tr>
+                      <>
+                        <tr key={i} style={{ borderBottom: err ? 'none' : '1px solid rgba(139,180,225,0.08)' }}>
+                          <td style={{ padding: '5px 8px', color: 'var(--header-bg)', fontWeight: 600 }}>{placeLabel(i)}</td>
+                          <td style={{ padding: '5px 8px', textAlign: 'right' }}>
+                            <span style={{ color: 'var(--header-bg)', marginRight: 2 }}>$</span>
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              value={rawInputs[i] ?? String(amt)}
+                              disabled={locked}
+                              onChange={e => handleInputChange(i, e.target.value)}
+                              onBlur={() => handleInputBlur(i)}
+                              onFocus={e => e.target.select()}
+                              placeholder="0 or 100+50"
+                              style={{ width: 110, padding: '4px 6px', background: err ? 'rgba(255,107,107,0.12)' : 'rgba(255,255,255,0.08)', border: `1px solid ${err ? '#ff6b6b' : 'rgba(139,180,225,0.3)'}`, borderRadius: 5, color: 'var(--white)', fontSize: 13, textAlign: 'right', fontWeight: 600 }}
+                            />
+                          </td>
+                          <td style={{ padding: '5px 8px', textAlign: 'right', color: 'var(--header-bg)', fontSize: 12 }}>{pct}%</td>
+                          <td style={{ padding: '5px 8px', textAlign: 'right', fontSize: 12, fontWeight: 600, color: balColor }}>
+                            ${runningBalance.toLocaleString()}
+                          </td>
+                        </tr>
+                        {err && (
+                          <tr key={`err-${i}`} style={{ borderBottom: '1px solid rgba(139,180,225,0.08)' }}>
+                            <td colSpan={4} style={{ padding: '2px 8px 6px', color: '#ff6b6b', fontSize: 11, fontWeight: 600 }}>
+                              ⚠ {err}
+                            </td>
+                          </tr>
+                        )}
+                      </>
                     );
                   })}
                 </tbody>
