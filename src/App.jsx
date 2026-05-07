@@ -18,7 +18,6 @@ import { calcRanks } from './utils/calculations';
 const DEFAULT_SETTINGS = {
   fees:            { entryFee: 249, lunkerFee: 10, optFee: 20 },
   payoutSettings:  { totalPayout: 0, numWinners: 10, payouts: [] },
-  theme:           'dark',
   boatCheck:       {},
   offWater:        {},
 };
@@ -26,6 +25,7 @@ const DEFAULT_SETTINGS = {
 export default function App() {
   const [entries, setEntries]           = useState([]);
   const [settings, setSettings]         = useState(DEFAULT_SETTINGS);
+  const [theme, setTheme]               = useState(() => localStorage.getItem('ss_theme') || 'dark');
   const [activeTab, setActiveTab]       = useState(() => 'leaderboard');
   const [loading, setLoading]           = useState(true);
   const [toast, setToast]               = useState(null);
@@ -66,10 +66,8 @@ export default function App() {
 
   useEffect(() => {
     document.body.classList.remove('light', 'outdoor');
-    if (settings.theme === 'light' || settings.theme === 'outdoor') {
-      document.body.classList.add(settings.theme);
-    }
-  }, [settings.theme]);
+    if (theme === 'light' || theme === 'outdoor') document.body.classList.add(theme);
+  }, [theme]);
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -267,16 +265,19 @@ export default function App() {
     );
   }
 
+  const settingsWithTheme = { ...settings, theme };
+
   return (
     <div id="app">
       <Header
         entries={rankedEntries}
-        settings={settings}
+        settings={settingsWithTheme}
         activeTab={isUnlocked || activeTab === 'rules' ? activeTab : 'leaderboard'}
         onTabChange={tab => { if (isUnlocked || tab === 'rules') setActiveTab(tab); }}
         onThemeToggle={() => {
-          const next = settings.theme === 'dark' ? 'light' : settings.theme === 'light' ? 'outdoor' : 'dark';
-          handleUpdateSettings({ theme: next });
+          const next = theme === 'dark' ? 'light' : theme === 'light' ? 'outdoor' : 'dark';
+          setTheme(next);
+          localStorage.setItem('ss_theme', next);
         }}
         isUnlocked={isUnlocked}
         onToggleLock={() => isUnlocked ? handleLock() : setShowUnlock(true)}
@@ -286,7 +287,7 @@ export default function App() {
         {activeTab === 'roster' && (
           <RosterTab
             entries={rankedEntries}
-            settings={settings}
+            settings={settingsWithTheme}
             isUnlocked={isUnlocked}
             onEdit={setEditingEntry}
             onAdd={() => setEditingEntry({})}
@@ -301,7 +302,7 @@ export default function App() {
         {activeTab === 'boatcheck' && (
           <BoatCheckTab
             entries={rankedEntries}
-            settings={settings}
+            settings={settingsWithTheme}
             isUnlocked={isUnlocked}
             onToggle={handleToggleBoatCheck}
             onToggleOffWater={handleToggleOffWater}
@@ -312,12 +313,12 @@ export default function App() {
           <WeighInTab entries={entries} onWeighIn={handleWeighIn} onAddEntry={handleAddWeighInEntry} />
         )}
         {activeTab === 'leaderboard' && (
-          <LeaderboardTab entries={rankedEntries} settings={settings} topN={leaderboardTopN} onTopNChange={setLeaderboardTopN} />
+          <LeaderboardTab entries={rankedEntries} settings={settingsWithTheme} topN={leaderboardTopN} onTopNChange={setLeaderboardTopN} />
         )}
         {activeTab === 'rules' && <RulesTab />}
         {activeTab === 'settings' && (
           <SettingsTab
-            settings={settings}
+            settings={settingsWithTheme}
             entries={rankedEntries}
             isUnlocked={isUnlocked}
             onUpdateSettings={handleUpdateSettings}
