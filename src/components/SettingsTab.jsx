@@ -10,6 +10,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
 
   const [totalPayout, setTotalPayout] = useState(payoutSettings.totalPayout || 0);
   const [numWinners, setNumWinners]   = useState(payoutSettings.numWinners  || 10);
+  const [minPayout, setMinPayout]     = useState(payoutSettings.minPayout   || 250);
   const [payouts, setPayouts]         = useState(payoutSettings.payouts      || []);
   const [rawInputs, setRawInputs]     = useState(() => (payoutSettings.payouts || []).map(v => String(v || 0)));
   const [rowErrors, setRowErrors]     = useState([]);
@@ -17,6 +18,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   useEffect(() => {
     setTotalPayout(payoutSettings.totalPayout || 0);
     setNumWinners(payoutSettings.numWinners   || 10);
+    setMinPayout(payoutSettings.minPayout     || 250);
     setPayouts(payoutSettings.payouts         || []);
     setRawInputs((payoutSettings.payouts || []).map(v => String(v || 0)));
   }, [payoutSettings]);
@@ -30,23 +32,49 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
     } catch { return 0; }
   }
 
-  function syncPayouts(next, n = numWinners) {
+  // Weighted distribution with a guaranteed floor for the last position.
+  // If the natural last-place amount is below the floor, the deficit is
+  // taken proportionally from the positions above it.
+  function calcWithMin(total, n, floor) {
+    if (n <= 0 || total <= 0) return Array(Math.max(n, 0)).fill(0);
+    const natural = calcWeightedPayouts(total, n);
+    if (n === 1 || natural[n - 1] >= floor) return natural;
+
+    // Reserve the floor for last place and redistribute the rest
+    const budget = total - floor;
+    if (budget <= 0) return Array(n).fill(Math.floor(total / n));
+    const top = calcWeightedPayouts(budget, n - 1);
+    const result = [...top, floor];
+    // Fix any rounding gap
+    let diff = total - result.reduce((a, b) => a + b, 0);
+    for (let i = 0; diff !== 0; i++) {
+      result[i % (n - 1)] += diff > 0 ? 1 : -1;
+      diff += diff > 0 ? -1 : 1;
+    }
+    return result;
+  }
+
+  function syncPayouts(next, n = numWinners, min = minPayout) {
     setPayouts(next);
     setRawInputs(Array.from({ length: n }, (_, i) => String(next[i] || 0)));
     setRowErrors([]);
-    onUpdateSettings({ payoutSettings: { totalPayout, numWinners: n, payouts: next } });
+    onUpdateSettings({ payoutSettings: { totalPayout, numWinners: n, minPayout: min, payouts: next } });
   }
 
   function handleAutoCalc() {
-    const computed = calcWeightedPayouts(totalPayout, numWinners);
-    syncPayouts(computed);
+    syncPayouts(calcWithMin(totalPayout, numWinners, minPayout));
   }
 
   function handleNumWinnersBlur() {
     const n = Math.max(1, parseInt(numWinners) || 1);
     setNumWinners(n);
-    const resized = Array.from({ length: n }, (_, i) => payouts[i] || 0);
-    syncPayouts(resized, n);
+    // If payouts already exist, recalculate the whole distribution so the
+    // minimum floor is preserved for the new last position.
+    const hasPayouts = payouts.some(p => p > 0);
+    const next = hasPayouts
+      ? calcWithMin(totalPayout, n, minPayout)
+      : Array.from({ length: n }, (_, i) => payouts[i] || 0);
+    syncPayouts(next, n);
   }
 
   function handleClearPayouts() {
@@ -81,13 +109,16 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
       ? `Exceeds remaining balance — capped at $${available.toLocaleString()}`
       : null;
     setRowErrors(errs);
-    onUpdateSettings({ payoutSettings: { totalPayout, numWinners, payouts: updated } });
+    onUpdateSettings({ payoutSettings: { totalPayout, numWinners, minPayout, payouts: updated } });
   }
 
   const rowTotal = payouts.reduce((a, b) => a + (b || 0), 0);
   const diff = totalPayout - rowTotal;
   const diffColor = diff === 0 ? '#4CAF50' : diff > 0 ? '#ffb450' : '#ff6b6b';
   const diffLabel = diff === 0 ? '✔ Balanced' : diff > 0 ? `$${diff.toLocaleString()} unallocated` : `$${Math.abs(diff).toLocaleString()} over budget`;
+  const floorWarning = totalPayout > 0 && totalPayout < numWinners * minPayout
+    ? `⚠ Budget too low to guarantee $${minPayout.toLocaleString()} floor for all ${numWinners} positions`
+    : null;
   const placeLabel = (i) => i === 0 ? '🥇 1st' : i === 1 ? '🥈 2nd' : i === 2 ? '🥉 3rd' : `${i + 1}th`;
 
   const locked = !isUnlocked;
@@ -105,12 +136,12 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
         {/* Payout Structure */}
         <div style={PANEL}>
           <h3 style={H3}>Payout Structure</h3>
-          <div className="edit-grid-2" style={{ marginBottom: 14 }}>
+          <div className="edit-grid-3" style={{ marginBottom: 14 }}>
             <div className="form-field">
               <label>Total Payout ($)</label>
               <input type="number" value={totalPayout} min="0" step="1" inputMode="numeric" disabled={locked}
                      onChange={e => setTotalPayout(parseInt(e.target.value) || 0)}
-                     onBlur={() => onUpdateSettings({ payoutSettings: { totalPayout, numWinners, payouts } })} />
+                     onBlur={() => onUpdateSettings({ payoutSettings: { totalPayout, numWinners, minPayout, payouts } })} />
             </div>
             <div className="form-field">
               <label>Number of Winners</label>
@@ -118,7 +149,18 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
                      onChange={e => setNumWinners(parseInt(e.target.value) || 1)}
                      onBlur={handleNumWinnersBlur} />
             </div>
+            <div className="form-field">
+              <label>Min Last Place ($)</label>
+              <input type="number" value={minPayout} min="0" step="1" inputMode="numeric" disabled={locked}
+                     onChange={e => setMinPayout(parseInt(e.target.value) || 0)}
+                     onBlur={() => onUpdateSettings({ payoutSettings: { totalPayout, numWinners, minPayout, payouts } })} />
+            </div>
           </div>
+          {floorWarning && (
+            <div style={{ background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.35)', borderRadius: 6, padding: '7px 12px', marginBottom: 10, fontSize: 12, color: '#ff9090', fontWeight: 600 }}>
+              {floorWarning}
+            </div>
+          )}
           <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
             <button className="btn btn-primary btn-sm" onClick={handleAutoCalc} disabled={locked}>↻ Auto-Calculate</button>
             <button className="btn btn-outline btn-sm" onClick={handleClearPayouts} disabled={locked}>Clear Payouts</button>
