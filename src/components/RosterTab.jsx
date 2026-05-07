@@ -92,7 +92,12 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
             <input type="file" accept=".csv" style={{ display: 'none' }}
                    onChange={e => {
                      const f = e.target.files[0];
-                     if (f) importCSV(f).then(onImport).catch(() => {});
+                     if (f) {
+                       importCSV(f).then(onImport).catch(err => {
+                         console.error('Import failed:', err);
+                         alert(`Import error: ${err.message}`);
+                       });
+                     }
                      e.target.value = '';
                    }} />
           </label>
