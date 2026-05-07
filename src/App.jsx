@@ -51,6 +51,8 @@ export default function App() {
             fees:           { ...DEFAULT_SETTINGS.fees,           ...(settingsData.fees           || {}) },
             payoutSettings: { ...DEFAULT_SETTINGS.payoutSettings, ...(settingsData.payoutSettings || {}) },
           });
+          const n = settingsData.payoutSettings?.numWinners;
+          if (n) setLeaderboardTopN(n);
         }
       } catch {
         showToast('Failed to connect to database', 'error');
