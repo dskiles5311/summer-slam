@@ -11,45 +11,70 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   const [totalPayout, setTotalPayout] = useState(payoutSettings.totalPayout || 0);
   const [numWinners, setNumWinners]   = useState(payoutSettings.numWinners  || 10);
   const [payouts, setPayouts]         = useState(payoutSettings.payouts      || []);
+  const [rawInputs, setRawInputs]     = useState(() => (payoutSettings.payouts || []).map(v => String(v || 0)));
 
   useEffect(() => {
     setTotalPayout(payoutSettings.totalPayout || 0);
     setNumWinners(payoutSettings.numWinners   || 10);
     setPayouts(payoutSettings.payouts         || []);
+    setRawInputs((payoutSettings.payouts || []).map(v => String(v || 0)));
   }, [payoutSettings]);
+
+  function evalExpr(str) {
+    const cleaned = String(str).replace(/[^0-9+\-*/.() ]/g, '').trim();
+    if (!cleaned) return 0;
+    try {
+      const result = Function('"use strict"; return (' + cleaned + ')')();
+      return isFinite(result) ? Math.round(result) : 0;
+    } catch { return 0; }
+  }
+
+  function syncPayouts(next, n = numWinners) {
+    setPayouts(next);
+    setRawInputs(Array.from({ length: n }, (_, i) => String(next[i] || 0)));
+    onUpdateSettings({ payoutSettings: { totalPayout, numWinners: n, payouts: next } });
+  }
 
   function handleAutoCalc() {
     const computed = calcWeightedPayouts(totalPayout, numWinners);
-    setPayouts(computed);
-    onUpdateSettings({ payoutSettings: { totalPayout, numWinners, payouts: computed } });
+    syncPayouts(computed);
   }
 
   function handleNumWinnersBlur() {
     const n = Math.max(1, parseInt(numWinners) || 1);
     setNumWinners(n);
     const resized = Array.from({ length: n }, (_, i) => payouts[i] || 0);
-    setPayouts(resized);
-    onUpdateSettings({ payoutSettings: { totalPayout, numWinners: n, payouts: resized } });
-  }
-
-  function updatePayoutRow(i, val) {
-    const updated = Array.from({ length: numWinners }, (_, j) => payouts[j] || 0);
-    updated[i] = parseInt(val) || 0;
-    setPayouts(updated);
-    onUpdateSettings({ payoutSettings: { totalPayout, numWinners, payouts: updated } });
+    syncPayouts(resized, n);
   }
 
   function handleClearPayouts() {
-    setPayouts([]);
     setTotalPayout(0);
     setNumWinners(10);
-    onUpdateSettings({ payoutSettings: { totalPayout: 0, numWinners: 10, payouts: [] } });
+    syncPayouts(Array(10).fill(0), 10);
   }
 
-  const rowTotal = payouts.reduce((a, b) => a + b, 0);
+  function handleInputChange(i, val) {
+    const updated = [...rawInputs];
+    updated[i] = val;
+    setRawInputs(updated);
+  }
+
+  function handleInputBlur(i) {
+    const evaluated = evalExpr(rawInputs[i]);
+    const otherSum = payouts.reduce((s, v, j) => j !== i ? s + (v || 0) : s, 0);
+    const capped = Math.max(0, Math.min(evaluated, totalPayout - otherSum));
+    const updated = Array.from({ length: numWinners }, (_, j) => j === i ? capped : (payouts[j] || 0));
+    setPayouts(updated);
+    const newRaw = [...rawInputs];
+    newRaw[i] = String(capped);
+    setRawInputs(newRaw);
+    onUpdateSettings({ payoutSettings: { totalPayout, numWinners, payouts: updated } });
+  }
+
+  const rowTotal = payouts.reduce((a, b) => a + (b || 0), 0);
   const diff = totalPayout - rowTotal;
   const diffColor = diff === 0 ? '#4CAF50' : diff > 0 ? '#ffb450' : '#ff6b6b';
-  const diffLabel = diff === 0 ? '✔ Balanced' : diff > 0 ? `$${diff} unallocated` : `$${Math.abs(diff)} over budget`;
+  const diffLabel = diff === 0 ? '✔ Balanced' : diff > 0 ? `$${diff.toLocaleString()} unallocated` : `$${Math.abs(diff).toLocaleString()} over budget`;
   const placeLabel = (i) => i === 0 ? '🥇 1st' : i === 1 ? '🥈 2nd' : i === 2 ? '🥉 3rd' : `${i + 1}th`;
 
   const locked = !isUnlocked;
@@ -93,33 +118,46 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
                   <tr>
                     <th style={{ textAlign: 'left', padding: '6px 8px', color: 'var(--header-bg)', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', borderBottom: '1px solid rgba(139,180,225,0.2)', width: 70 }}>Place</th>
                     <th style={{ textAlign: 'right', padding: '6px 8px', color: 'var(--header-bg)', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', borderBottom: '1px solid rgba(139,180,225,0.2)' }}>Payout</th>
-                    <th style={{ textAlign: 'right', padding: '6px 8px', color: 'var(--header-bg)', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', borderBottom: '1px solid rgba(139,180,225,0.2)', width: 60 }}>%</th>
+                    <th style={{ textAlign: 'right', padding: '6px 8px', color: 'var(--header-bg)', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', borderBottom: '1px solid rgba(139,180,225,0.2)', width: 55 }}>%</th>
+                    <th style={{ textAlign: 'right', padding: '6px 8px', color: 'var(--header-bg)', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', borderBottom: '1px solid rgba(139,180,225,0.2)', width: 100 }}>Balance</th>
                   </tr>
                 </thead>
                 <tbody>
                   {Array.from({ length: numWinners }, (_, i) => {
                     const amt = payouts[i] || 0;
                     const pct = totalPayout > 0 ? ((amt / totalPayout) * 100).toFixed(1) : '0.0';
+                    const runningBalance = totalPayout - payouts.slice(0, i + 1).reduce((s, v) => s + (v || 0), 0);
+                    const balColor = runningBalance === 0 ? '#4CAF50' : runningBalance < 0 ? '#ff6b6b' : 'var(--header-bg)';
                     return (
                       <tr key={i} style={{ borderBottom: '1px solid rgba(139,180,225,0.08)' }}>
                         <td style={{ padding: '5px 8px', color: 'var(--header-bg)', fontWeight: 600 }}>{placeLabel(i)}</td>
                         <td style={{ padding: '5px 8px', textAlign: 'right' }}>
-                          <span style={{ color: 'var(--white)' }}>$</span>
-                          <input type="number" value={amt} min="0" step="1" inputMode="numeric" disabled={locked}
-                                 onChange={e => updatePayoutRow(i, e.target.value)}
-                                 style={{ width: 90, padding: '4px 6px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(139,180,225,0.3)', borderRadius: 5, color: 'var(--white)', fontSize: 13, textAlign: 'right', fontWeight: 600 }} />
+                          <span style={{ color: 'var(--header-bg)', marginRight: 2 }}>$</span>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={rawInputs[i] ?? String(amt)}
+                            disabled={locked}
+                            onChange={e => handleInputChange(i, e.target.value)}
+                            onBlur={() => handleInputBlur(i)}
+                            onFocus={e => e.target.select()}
+                            placeholder="0 or 100+50"
+                            style={{ width: 110, padding: '4px 6px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(139,180,225,0.3)', borderRadius: 5, color: 'var(--white)', fontSize: 13, textAlign: 'right', fontWeight: 600 }}
+                          />
                         </td>
                         <td style={{ padding: '5px 8px', textAlign: 'right', color: 'var(--header-bg)', fontSize: 12 }}>{pct}%</td>
+                        <td style={{ padding: '5px 8px', textAlign: 'right', fontSize: 12, fontWeight: 600, color: balColor }}>
+                          ${runningBalance.toLocaleString()}
+                        </td>
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
-              <div style={{ marginTop: 10, fontSize: 12, color: 'var(--header-bg)' }}>
-                <span>Total allocated:</span>
-                <strong style={{ color: 'var(--white)' }}> ${rowTotal.toLocaleString()}</strong>
-                &nbsp;&nbsp;
-                <span style={{ color: diffColor, fontWeight: 600 }}>{diffLabel}</span>
+              <div style={{ marginTop: 10, fontSize: 12, color: 'var(--header-bg)', display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+                <span>Allocated: <strong style={{ color: 'var(--white)' }}>${rowTotal.toLocaleString()}</strong></span>
+                <span style={{ color: diffColor, fontWeight: 700 }}>{diffLabel}</span>
+                {!locked && <span style={{ opacity: 0.6 }}>Tip: enter math like 500+250 in any cell</span>}
               </div>
             </>
           )}
