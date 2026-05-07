@@ -147,7 +147,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
         <div style={PANEL}>
           <h3 style={H3}>Data Management</h3>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <button className="btn btn-primary" onClick={() => exportCSV(entries)}>💾 Export CSV</button>
+            <button className="btn btn-primary" onClick={() => exportCSV(entries, payoutSettings)}>💾 Export CSV</button>
             {isUnlocked && (
               <label className="btn btn-outline" style={{ cursor: 'pointer' }}>
                 📂 Import CSV

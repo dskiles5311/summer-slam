@@ -1,4 +1,4 @@
-export function exportCSV(entries) {
+export function exportCSV(entries, payoutSettings) {
   const headers = ['Place','Boater First','Boater Last','Co-Angler First','Co-Angler Last',
     'Boat No','# Fish','Lunker Weight','Total Weight','Lunker','Option','Paid','App Signed','Buy-In'];
   const lines = [headers.join(',')];
@@ -17,6 +17,22 @@ export function exportCSV(entries) {
       r.lunker, r.option, r.paid, r.appSigned, r.buyIn,
     ].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','));
   });
+
+  if (payoutSettings) {
+    const { totalPayout = 0, numWinners = 0, payouts = [] } = payoutSettings;
+    lines.push('');
+    lines.push('Payout Settings');
+    lines.push(`Total Payout,$${totalPayout}`);
+    lines.push(`Number of Winners,${numWinners}`);
+    if (payouts.length > 0) {
+      lines.push('Place,Amount,Pct');
+      const placeLabel = i => i === 0 ? '1st' : i === 1 ? '2nd' : i === 2 ? '3rd' : `${i + 1}th`;
+      payouts.forEach((amt, i) => {
+        const pct = totalPayout > 0 ? ((amt / totalPayout) * 100).toFixed(1) : '0.0';
+        lines.push(`${placeLabel(i)},$${amt},${pct}%`);
+      });
+    }
+  }
 
   const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
