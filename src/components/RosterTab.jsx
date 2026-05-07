@@ -145,14 +145,15 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
               const buyIn = parseFloat(row.buyIn) || 0;
               const buyInClass = buyIn > 0 && buyIn < entryFee ? 'cell-red' : buyIn >= entryFee ? 'cell-green' : 'cell-neutral';
 
+              const flagged = row.needsAttention;
               return (
                 <tr
                   key={row.id}
                   onClick={() => isUnlocked && onEdit(row)}
-                  style={isUnlocked ? { cursor: 'pointer' } : undefined}
+                  style={{ ...(isUnlocked ? { cursor: 'pointer' } : {}), ...(flagged ? { background: 'rgba(255,180,80,0.08)' } : {}) }}
                 >
                   <td className={`rank-cell ${rankClass}`}>{rank || ''}</td>
-                  <td>{row.boaterFirst}</td>
+                  <td>{flagged && <span title="Needs attention" style={{ color: '#ffb450', marginRight: 4 }}>⚠️</span>}{row.boaterFirst}</td>
                   <td>{row.boaterLast}</td>
                   <td>{row.coAnglerFirst}</td>
                   <td>{row.coAnglerLast}</td>

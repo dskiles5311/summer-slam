@@ -203,6 +203,23 @@ export default function App() {
     await handleUpdateSettings({ boatCheck: {}, offWater: {} });
   }
 
+  async function handleAddWeighInEntry(boatNo, weighData) {
+    try {
+      const created = await createEntry({
+        boatNo, boaterFirst: '', boaterLast: '', coAnglerFirst: '', coAnglerLast: '',
+        lunker: 0, option: 0, paid: 0, appSigned: 0, buyIn: 0,
+        ...weighData,
+        needsAttention: true,
+      });
+      setEntries(prev => [...prev, created]);
+      showToast(`Boat #${boatNo} added and flagged for attention`, 'warning');
+      return true;
+    } catch {
+      showToast('Failed to add entry', 'error');
+      return false;
+    }
+  }
+
   async function handleWeighIn(entryId, weighData) {
     const entry = entries.find(e => e.id === entryId);
     if (!entry) return false;
@@ -286,7 +303,7 @@ export default function App() {
           />
         )}
         {activeTab === 'weighin' && (
-          <WeighInTab entries={entries} onWeighIn={handleWeighIn} />
+          <WeighInTab entries={entries} onWeighIn={handleWeighIn} onAddEntry={handleAddWeighInEntry} />
         )}
         {activeTab === 'leaderboard' && (
           <LeaderboardTab entries={rankedEntries} settings={settings} topN={leaderboardTopN} onTopNChange={setLeaderboardTopN} />

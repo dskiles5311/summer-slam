@@ -31,7 +31,7 @@ function calcPenalties(numFish, deadFish, shortFish) {
   };
 }
 
-export default function WeighInTab({ entries, onWeighIn }) {
+export default function WeighInTab({ entries, onWeighIn, onAddEntry }) {
   const [boatNo, setBoatNo]           = useState('');
   const [numFish, setNumFish]         = useState('');
   const [deadFish, setDeadFish]       = useState('');
@@ -60,7 +60,7 @@ export default function WeighInTab({ entries, onWeighIn }) {
     if (!no) { setStatus(null); return; }
     const entry = entries.find(e => String(e.boatNo) === no);
     if (!entry) {
-      setStatus({ type: 'error', message: `No entry found for boat #${no}.` });
+      setStatus({ type: 'notfound', message: `Boat #${no} is not in the roster.` });
       return;
     }
     const tw = parseFloat(entry.totalWeight) || 0;
@@ -96,9 +96,13 @@ export default function WeighInTab({ entries, onWeighIn }) {
 
     const entry = entries.find(e => String(e.boatNo) === no);
     if (!entry) {
-      setStatus({ type: 'error', message: `No entry found for boat #${no}.` });
-      boatRef.current?.focus();
-      return;
+      if (status?.type === 'adding') {
+        // confirmed add path — fall through below
+      } else {
+        setStatus({ type: 'notfound', message: `Boat #${no} is not in the roster.` });
+        boatRef.current?.focus();
+        return;
+      }
     }
 
     const lw = parseFloat(lunkerWeight) || 0;
@@ -111,11 +115,18 @@ export default function WeighInTab({ entries, onWeighIn }) {
     }
 
     setSubmitting(true);
-    const ok = await onWeighIn(entry.id, { numFish: nf, lunkerWeight: lw, totalWeight: adjustedWeight });
+    let ok, histName;
+    if (entry) {
+      ok = await onWeighIn(entry.id, { numFish: nf, lunkerWeight: lw, totalWeight: adjustedWeight });
+      histName = [entry.boaterFirst, entry.boaterLast].filter(Boolean).join(' ');
+    } else {
+      ok = await onAddEntry(no, { numFish: nf, lunkerWeight: lw, totalWeight: adjustedWeight });
+      histName = '⚠️ Needs attention';
+    }
     setSubmitting(false);
 
     if (ok) {
-      const name = [entry.boaterFirst, entry.boaterLast].filter(Boolean).join(' ');
+      const name = histName;
       setHistory(prev => [{ boatNo: no, name, nf, lw, raw: rawTw, adj: adjustedWeight, pen: pen.total }, ...prev].slice(0, 10));
       reset();
     }
@@ -127,7 +138,7 @@ export default function WeighInTab({ entries, onWeighIn }) {
     boatRef.current?.focus();
   }
 
-  const statusColors = { ok: '#4CAF50', warning: '#ffb450', error: '#ff6b6b' };
+  const statusColors = { ok: '#4CAF50', warning: '#ffb450', error: '#ff6b6b', notfound: '#ff6b6b', adding: '#ffb450' };
   const hasPenalty = pen.total > 0;
 
   return (
@@ -154,14 +165,26 @@ export default function WeighInTab({ entries, onWeighIn }) {
         {/* Status banner */}
         {status && (
           <div style={{
-            background: status.type === 'ok' ? 'rgba(76,175,80,0.12)' : status.type === 'warning' ? 'rgba(255,180,80,0.12)' : 'rgba(255,107,107,0.12)',
+            background: ['ok'].includes(status.type) ? 'rgba(76,175,80,0.12)' : ['warning','adding'].includes(status.type) ? 'rgba(255,180,80,0.12)' : 'rgba(255,107,107,0.12)',
             border: `1px solid ${statusColors[status.type]}44`,
             borderLeft: `4px solid ${statusColors[status.type]}`,
             borderRadius: 8, padding: '10px 14px', fontSize: 13,
             color: statusColors[status.type], fontWeight: 600,
           }}>
-            {status.type === 'warning' ? '⚠️ ' : status.type === 'error' ? '✖ ' : '✔ '}
-            {status.message}
+            <div>
+              {status.type === 'warning' ? '⚠️ ' : status.type === 'error' || status.type === 'notfound' ? '✖ ' : status.type === 'adding' ? '⚠️ ' : '✔ '}
+              {status.message}
+            </div>
+            {status.type === 'notfound' && (
+              <button
+                type="button"
+                className="btn btn-outline btn-sm"
+                onClick={() => setStatus({ type: 'adding', message: `Boat #${boatNo} will be added to the roster and flagged for attention.` })}
+                style={{ marginTop: 8, borderColor: '#ffb450', color: '#ffb450' }}
+              >
+                ➕ Add to roster & flag for attention
+              </button>
+            )}
           </div>
         )}
 
