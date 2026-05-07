@@ -72,6 +72,12 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
             >
               ⚓ Boat Check
             </button>
+            <button
+              className={`nav-tab ${activeTab === 'weighin' ? 'active' : ''}`}
+              onClick={() => onTabChange('weighin')}
+            >
+              🎣 Weigh In
+            </button>
           </>
         )}
         <button

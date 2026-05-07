@@ -1,0 +1,215 @@
+import { useState, useRef, useEffect } from 'react';
+
+const FIELD = {
+  background: 'rgba(255,255,255,0.06)',
+  border: '1px solid rgba(139,180,225,0.3)',
+  borderRadius: 8,
+  color: 'var(--white)',
+  fontSize: 22,
+  fontWeight: 700,
+  padding: '10px 14px',
+  width: '100%',
+  boxSizing: 'border-box',
+  outline: 'none',
+};
+
+const LABEL = { fontSize: 12, fontWeight: 700, color: 'var(--header-bg)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 5, display: 'block' };
+
+export default function WeighInTab({ entries, onWeighIn }) {
+  const [boatNo, setBoatNo]           = useState('');
+  const [lunkerWeight, setLunkerWeight] = useState('');
+  const [numFish, setNumFish]         = useState('');
+  const [totalWeight, setTotalWeight] = useState('');
+  const [status, setStatus]           = useState(null); // { type, message, entry }
+  const [history, setHistory]         = useState([]);
+  const [submitting, setSubmitting]   = useState(false);
+
+  const boatRef   = useRef();
+  const lunkerRef = useRef();
+  const fishRef   = useRef();
+  const totalRef  = useRef();
+
+  useEffect(() => { boatRef.current?.focus(); }, []);
+
+  function lookupBoat(val) {
+    const no = String(val).trim();
+    if (!no) { setStatus(null); return; }
+    const entry = entries.find(e => String(e.boatNo) === no);
+    if (!entry) {
+      setStatus({ type: 'error', message: `No entry found for boat #${no}.` });
+      return;
+    }
+    const tw = parseFloat(entry.totalWeight) || 0;
+    const nf = parseInt(entry.numFish) || 0;
+    const name = [entry.boaterFirst, entry.boaterLast].filter(Boolean).join(' ');
+    if (tw > 0 || nf > 0) {
+      setStatus({
+        type: 'warning',
+        message: `Boat #${no} (${name}) already has ${nf} fish / ${tw.toFixed(2)} lbs. Submitting will overwrite.`,
+        entry,
+      });
+    } else {
+      setStatus({ type: 'ok', message: `Boat #${no} — ${name}`, entry });
+    }
+  }
+
+  function handleBoatKeyDown(e) {
+    if (e.key === 'Enter' && boatNo.trim()) {
+      e.preventDefault();
+      lookupBoat(boatNo);
+      lunkerRef.current?.focus();
+    }
+  }
+
+  function advance(e, next) {
+    if (e.key === 'Enter') { e.preventDefault(); next?.current?.focus(); }
+  }
+
+  async function handleSubmit(e) {
+    e?.preventDefault();
+    const no = String(boatNo).trim();
+    if (!no) return;
+
+    const entry = entries.find(e => String(e.boatNo) === no);
+    if (!entry) {
+      setStatus({ type: 'error', message: `No entry found for boat #${no}.` });
+      boatRef.current?.focus();
+      return;
+    }
+
+    const lw = parseFloat(lunkerWeight) || 0;
+    const tw = parseFloat(totalWeight) || 0;
+    const nf = Math.max(0, Math.min(10, parseInt(numFish) || 0));
+
+    if (lw > tw && tw > 0) {
+      setStatus({ type: 'error', message: 'Lunker weight cannot exceed total weight.' });
+      lunkerRef.current?.focus();
+      return;
+    }
+
+    setSubmitting(true);
+    const ok = await onWeighIn(entry.id, { numFish: nf, lunkerWeight: lw, totalWeight: tw });
+    setSubmitting(false);
+
+    if (ok) {
+      const name = [entry.boaterFirst, entry.boaterLast].filter(Boolean).join(' ');
+      setHistory(prev => [{ boatNo: no, name, nf, lw, tw }, ...prev].slice(0, 10));
+      reset();
+    }
+  }
+
+  function reset() {
+    setBoatNo(''); setLunkerWeight(''); setNumFish(''); setTotalWeight(''); setStatus(null);
+    boatRef.current?.focus();
+  }
+
+  const statusColors = { ok: '#4CAF50', warning: '#ffb450', error: '#ff6b6b' };
+
+  return (
+    <div className="tab-panel active" style={{ maxWidth: 480, margin: '0 auto', padding: '8px 0' }}>
+      <h2 style={{ color: 'var(--gold-light)', fontSize: 18, marginBottom: 20, fontWeight: 800 }}>🎣 Weigh In</h2>
+
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+        {/* Boat number */}
+        <div>
+          <label style={LABEL}>Boat Number</label>
+          <input
+            ref={boatRef}
+            type="number" inputMode="numeric"
+            value={boatNo}
+            onChange={e => { setBoatNo(e.target.value); setStatus(null); }}
+            onBlur={() => lookupBoat(boatNo)}
+            onKeyDown={handleBoatKeyDown}
+            placeholder="Enter boat #"
+            style={{ ...FIELD, fontSize: 28, borderColor: status ? statusColors[status.type] : 'rgba(139,180,225,0.3)' }}
+          />
+        </div>
+
+        {/* Status / lookup result */}
+        {status && (
+          <div style={{
+            background: status.type === 'ok' ? 'rgba(76,175,80,0.12)' : status.type === 'warning' ? 'rgba(255,180,80,0.12)' : 'rgba(255,107,107,0.12)',
+            border: `1px solid ${statusColors[status.type]}44`,
+            borderLeft: `4px solid ${statusColors[status.type]}`,
+            borderRadius: 8,
+            padding: '10px 14px',
+            fontSize: 13,
+            color: statusColors[status.type],
+            fontWeight: 600,
+          }}>
+            {status.type === 'warning' ? '⚠️ ' : status.type === 'error' ? '✖ ' : '✔ '}
+            {status.message}
+          </div>
+        )}
+
+        {/* Weight fields */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+          <div>
+            <label style={LABEL}>Lunker (lbs)</label>
+            <input
+              ref={lunkerRef}
+              type="number" inputMode="decimal" step="0.01" min="0"
+              value={lunkerWeight}
+              onChange={e => setLunkerWeight(e.target.value)}
+              onKeyDown={e => advance(e, fishRef)}
+              placeholder="0.00"
+              style={FIELD}
+            />
+          </div>
+          <div>
+            <label style={LABEL}># Fish</label>
+            <input
+              ref={fishRef}
+              type="number" inputMode="numeric" min="0" max="10"
+              value={numFish}
+              onChange={e => setNumFish(e.target.value)}
+              onKeyDown={e => advance(e, totalRef)}
+              placeholder="0"
+              style={FIELD}
+            />
+          </div>
+          <div>
+            <label style={LABEL}>Total Wt (lbs)</label>
+            <input
+              ref={totalRef}
+              type="number" inputMode="decimal" step="0.01" min="0"
+              value={totalWeight}
+              onChange={e => setTotalWeight(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleSubmit(); } }}
+              placeholder="0.00"
+              style={FIELD}
+            />
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button type="submit" className="btn btn-primary" disabled={submitting || !boatNo.trim()}
+            style={{ flex: 1, fontSize: 16, padding: '12px 0' }}>
+            {submitting ? 'Saving…' : '✔ Save & Next'}
+          </button>
+          <button type="button" className="btn btn-outline" onClick={reset} style={{ padding: '12px 20px' }}>
+            Clear
+          </button>
+        </div>
+      </form>
+
+      {/* Recent entries */}
+      {history.length > 0 && (
+        <div style={{ marginTop: 28 }}>
+          <h3 style={{ color: 'var(--header-bg)', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Recent</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {history.map((h, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.04)', borderRadius: 8, padding: '8px 12px', fontSize: 13 }}>
+                <span style={{ fontWeight: 700, color: 'var(--gold-light)', minWidth: 50 }}>#{h.boatNo}</span>
+                <span style={{ flex: 1, color: 'var(--white)' }}>{h.name}</span>
+                <span style={{ color: 'var(--header-bg)', fontSize: 12 }}>{h.nf} fish &nbsp;/&nbsp; {h.tw.toFixed(2)} lbs</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

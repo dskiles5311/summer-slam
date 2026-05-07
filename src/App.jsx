@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import RosterTab from './components/RosterTab';
 import BoatCheckTab from './components/BoatCheckTab';
+import WeighInTab from './components/WeighInTab';
 import LeaderboardTab from './components/LeaderboardTab';
 import RulesTab from './components/RulesTab';
 import SettingsTab from './components/SettingsTab';
@@ -202,6 +203,20 @@ export default function App() {
     await handleUpdateSettings({ boatCheck: {}, offWater: {} });
   }
 
+  async function handleWeighIn(entryId, weighData) {
+    const entry = entries.find(e => e.id === entryId);
+    if (!entry) return false;
+    try {
+      const updated = await updateEntry(entryId, { ...entry, ...weighData });
+      setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
+      showToast(`Boat #${entry.boatNo} saved!`, 'success');
+      return true;
+    } catch {
+      showToast('Failed to save weigh-in', 'error');
+      return false;
+    }
+  }
+
   async function handleClearAll() {
     if (!confirm('Clear ALL data? This cannot be undone!')) return;
     try {
@@ -269,6 +284,9 @@ export default function App() {
             onToggleOffWater={handleToggleOffWater}
             onReset={handleResetBoatCheck}
           />
+        )}
+        {activeTab === 'weighin' && (
+          <WeighInTab entries={entries} onWeighIn={handleWeighIn} />
         )}
         {activeTab === 'leaderboard' && (
           <LeaderboardTab entries={rankedEntries} settings={settings} topN={leaderboardTopN} onTopNChange={setLeaderboardTopN} />
