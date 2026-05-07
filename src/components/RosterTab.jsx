@@ -51,6 +51,7 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
   const [sortConfig, setSortConfig] = useState({ field: '_rank', dir: 'asc' });
   const [editingId, setEditingId] = useState(null);
   const [editValues, setEditValues] = useState({});
+  const [penaltyPopup, setPenaltyPopup] = useState(null); // { row, x, y }
 
   const sorted = useMemo(() => sortEntries(entries, sortConfig), [entries, sortConfig]);
 
@@ -249,7 +250,18 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
                         style={{ width: '100%', padding: '8px 12px', border: 'none', background: 'transparent', color: 'inherit', fontSize: 'inherit', textAlign: 'right', boxSizing: 'border-box' }}
                       />
                     ) : (
-                      parseFloat(row.totalWeight) > 0 ? parseFloat(row.totalWeight).toFixed(2) : '—'
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
+                        {parseFloat(row.totalWeight) > 0 ? parseFloat(row.totalWeight).toFixed(2) : '—'}
+                        {row.rawWeight > 0 && (
+                          <span
+                            title="Deductions applied — click for details"
+                            onClick={e => { e.stopPropagation(); setPenaltyPopup(p => p?.row?.id === row.id ? null : { row, x: e.clientX, y: e.clientY }); }}
+                            style={{ fontSize: 11, background: 'rgba(255,107,107,0.25)', color: '#ff9090', borderRadius: 4, padding: '1px 5px', cursor: 'pointer', fontWeight: 700, whiteSpace: 'nowrap' }}
+                          >
+                            −{(row.rawWeight - parseFloat(row.totalWeight)).toFixed(2)}
+                          </span>
+                        )}
+                      </span>
                     )}
                   </td>
                   {['lunker', 'option', 'paid', 'appSigned'].map(field => (
@@ -296,6 +308,50 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
         </table>
         {isUnlocked && <button className="add-row-btn" onClick={onAdd}>＋ Add New Entry</button>}
       </div>
+
+      {penaltyPopup && (() => {
+        const r = penaltyPopup.row;
+        const nf = parseInt(r.numFish) || 0;
+        const dead = parseInt(r.deadFish) || 0;
+        const shrt = parseInt(r.shortFish) || 0;
+        const over = Math.max(0, nf - 5);
+        const deadPen  = dead * 0.5;
+        const shortPen = shrt * 1.0;
+        const overPen  = over * 3.0;
+        const totalPen = deadPen + shortPen + overPen;
+        const left = Math.min(penaltyPopup.x, window.innerWidth - 260);
+        const top  = penaltyPopup.y + 12;
+        return (
+          <>
+            <div onClick={() => setPenaltyPopup(null)} style={{ position: 'fixed', inset: 0, zIndex: 999 }} />
+            <div style={{
+              position: 'fixed', left, top, zIndex: 1000, minWidth: 240,
+              background: 'var(--modal-bg, #1a2a3a)', border: '1px solid rgba(255,107,107,0.4)',
+              borderRadius: 10, padding: '14px 16px', boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+              fontSize: 13,
+            }}>
+              <div style={{ fontWeight: 800, color: '#ff9090', marginBottom: 10 }}>Deduction Details</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, color: 'var(--white, #fff)' }}>
+                <span>Scale weight</span>
+                <span style={{ fontWeight: 700 }}>{parseFloat(r.rawWeight).toFixed(2)} lbs</span>
+              </div>
+              {dead > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, color: '#ff9090' }}>
+                <span>Dead fish ({dead} × 0.50)</span><span>−{deadPen.toFixed(2)} lbs</span>
+              </div>}
+              {shrt > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, color: '#ff9090' }}>
+                <span>Short fish ({shrt} × 1.00)</span><span>−{shortPen.toFixed(2)} lbs</span>
+              </div>}
+              {over > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, color: '#ff9090' }}>
+                <span>Over limit ({over} × 3.00)</span><span>−{overPen.toFixed(2)} lbs</span>
+              </div>}
+              <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', marginTop: 8, paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontWeight: 800 }}>
+                <span style={{ color: 'var(--gold-light, #e8c876)' }}>Adjusted weight</span>
+                <span style={{ color: 'var(--gold-light, #e8c876)' }}>{parseFloat(r.totalWeight).toFixed(2)} lbs</span>
+              </div>
+            </div>
+          </>
+        );
+      })()}
     </div>
   );
 }

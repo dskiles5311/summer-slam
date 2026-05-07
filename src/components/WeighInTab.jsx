@@ -114,13 +114,17 @@ export default function WeighInTab({ entries, onWeighIn, onAddEntry }) {
       return;
     }
 
+    const penaltyData = pen.total > 0
+      ? { rawWeight: rawTw, deadFish: pen.dead, shortFish: pen.shrt }
+      : { rawWeight: null, deadFish: 0, shortFish: 0 };
+
     setSubmitting(true);
     let ok, histName;
     if (entry) {
-      ok = await onWeighIn(entry.id, { numFish: nf, lunkerWeight: lw, totalWeight: adjustedWeight });
+      ok = await onWeighIn(entry.id, { numFish: nf, lunkerWeight: lw, totalWeight: adjustedWeight, ...penaltyData });
       histName = [entry.boaterFirst, entry.boaterLast].filter(Boolean).join(' ');
     } else {
-      ok = await onAddEntry(no, { numFish: nf, lunkerWeight: lw, totalWeight: adjustedWeight });
+      ok = await onAddEntry(no, { numFish: nf, lunkerWeight: lw, totalWeight: adjustedWeight, ...penaltyData });
       histName = '⚠️ Needs attention';
     }
     setSubmitting(false);
