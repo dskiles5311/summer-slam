@@ -1,6 +1,7 @@
 export function exportCSV(entries, payoutSettings) {
   const headers = ['Place','Boater First','Boater Last','Co-Angler First','Co-Angler Last',
-    'Boat No','# Fish','Lunker Weight','Total Weight','Lunker','Option','Paid','App Signed','Buy-In'];
+    'Boat No','# Fish','Lunker Weight','Total Weight','Lunker','Option','Paid','App Signed','Buy-In',
+    'Raw Weight','Dead Fish','Short Fish','Needs Attention'];
   const lines = [headers.join(',')];
 
   const sorted = [...entries]
@@ -15,6 +16,7 @@ export function exportCSV(entries, payoutSettings) {
       r.boatNo, r.numFish,
       r.lunkerWeight, r.totalWeight,
       r.lunker, r.option, r.paid, r.appSigned, r.buyIn,
+      r.rawWeight ?? '', r.deadFish || 0, r.shortFish || 0, r.needsAttention ? 1 : 0,
     ].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','));
   });
 
@@ -83,8 +85,13 @@ export function importCSV(file) {
           'lunker': 'lunker', 'option': 'option', 'paid': 'paid',
           'app signed': 'appSigned', 'app_signed': 'appSigned', 'application_signed': 'appSigned',
           'buy-in': 'buyIn', 'buy in': 'buyIn', 'buyin': 'buyIn',
+          'raw weight': 'rawWeight', 'raw_weight': 'rawWeight',
+          'dead fish': 'deadFish', 'dead_fish': 'deadFish',
+          'short fish': 'shortFish', 'short_fish': 'shortFish',
+          'needs attention': 'needsAttention', 'needs_attention': 'needsAttention',
         };
-        const numFields = ['numFish','lunkerWeight','totalWeight','lunker','option','paid','appSigned','buyIn'];
+        const numFields = ['numFish','lunkerWeight','totalWeight','lunker','option','paid','appSigned','buyIn',
+          'rawWeight','deadFish','shortFish'];
 
         const entries = [];
         for (let i = 1; i < lines.length; i++) {
@@ -93,13 +100,19 @@ export function importCSV(file) {
             boaterFirst: '', boaterLast: '', coAnglerFirst: '', coAnglerLast: '',
             boatNo: '', numFish: 0, lunkerWeight: 0, totalWeight: 0,
             lunker: 0, option: 0, paid: 0, appSigned: 0, buyIn: 0,
+            rawWeight: null, deadFish: 0, shortFish: 0, needsAttention: false,
           };
           headerVals.forEach((h, j) => {
             const field = fieldMap[h];
             if (!field) return;
             let v = vals[j]?.trim() || '';
 
-            if (numFields.includes(field)) {
+            if (field === 'needsAttention') {
+              row[field] = v === '1' || /^true$/i.test(v);
+            } else if (field === 'rawWeight') {
+              const n = parseFloat(v.replace(/[$\s]/g, '').replace(/lbs?$/i, ''));
+              row[field] = isNaN(n) || n === 0 ? null : n;
+            } else if (numFields.includes(field)) {
               v = v.replace(/[$\s]/g, '').replace(/lbs?$/i, '').trim();
               row[field] = /^x$/i.test(v) ? 1 : (parseFloat(v) || 0);
             } else {

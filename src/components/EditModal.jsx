@@ -5,6 +5,8 @@ const EMPTY = {
   coAnglerFirst: '', coAnglerLast: '',
   boatNo: '', numFish: '', lunkerWeight: '', totalWeight: '',
   lunker: '', option: '', paid: '', appSigned: '', buyIn: '',
+  needsAttention: false,
+  rawWeight: null, deadFish: 0, shortFish: 0,
 };
 
 export default function EditModal({ entry, onSave, onCancel }) {
@@ -14,19 +16,23 @@ export default function EditModal({ entry, onSave, onCancel }) {
 
   useEffect(() => {
     setForm({
-      boaterFirst:   entry.boaterFirst   ?? '',
-      boaterLast:    entry.boaterLast    ?? '',
-      coAnglerFirst: entry.coAnglerFirst ?? '',
-      coAnglerLast:  entry.coAnglerLast  ?? '',
-      boatNo:        entry.boatNo        ?? '',
-      numFish:       entry.numFish       ?? '',
-      lunkerWeight:  entry.lunkerWeight  ?? '',
-      totalWeight:   entry.totalWeight   ?? '',
-      lunker:        entry.lunker        ?? '',
-      option:        entry.option        ?? '',
-      paid:          entry.paid          ?? '',
-      appSigned:     entry.appSigned     ?? '',
-      buyIn:         entry.buyIn         ?? '',
+      boaterFirst:    entry.boaterFirst   ?? '',
+      boaterLast:     entry.boaterLast    ?? '',
+      coAnglerFirst:  entry.coAnglerFirst ?? '',
+      coAnglerLast:   entry.coAnglerLast  ?? '',
+      boatNo:         entry.boatNo        ?? '',
+      numFish:        entry.numFish       ?? '',
+      lunkerWeight:   entry.lunkerWeight  ?? '',
+      totalWeight:    entry.totalWeight   ?? '',
+      lunker:         entry.lunker        ?? '',
+      option:         entry.option        ?? '',
+      paid:           entry.paid          ?? '',
+      appSigned:      entry.appSigned     ?? '',
+      buyIn:          entry.buyIn         ?? '',
+      needsAttention: entry.needsAttention ?? false,
+      rawWeight:      entry.rawWeight     ?? null,
+      deadFish:       entry.deadFish      ?? 0,
+      shortFish:      entry.shortFish     ?? 0,
     });
     setTimeout(() => firstInputRef.current?.focus(), 100);
   }, [entry]);
@@ -45,9 +51,12 @@ export default function EditModal({ entry, onSave, onCancel }) {
     e.preventDefault();
     const numFields = ['numFish', 'lunkerWeight', 'totalWeight', 'buyIn'];
     const statusFields = ['lunker', 'option', 'paid', 'appSigned'];
+    const passthroughFields = ['rawWeight', 'deadFish', 'shortFish', 'needsAttention'];
     const data = {};
     Object.entries(form).forEach(([k, v]) => {
-      if (statusFields.includes(k)) {
+      if (passthroughFields.includes(k)) {
+        data[k] = v;
+      } else if (statusFields.includes(k)) {
         data[k] = v === '' ? '' : parseInt(v);
       } else if (numFields.includes(k)) {
         data[k] = v === '' ? '' : parseFloat(v);
@@ -164,6 +173,21 @@ export default function EditModal({ entry, onSave, onCancel }) {
                 </select>
               </div>
             </div>
+
+            {form.needsAttention && (
+              <div style={{ marginTop: 12 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer',
+                               background: 'rgba(255,180,80,0.1)', border: '1px solid rgba(255,180,80,0.35)',
+                               borderRadius: 8, padding: '10px 14px' }}>
+                  <input type="checkbox" checked={form.needsAttention}
+                         onChange={e => set('needsAttention', e.target.checked)}
+                         style={{ width: 18, height: 18, cursor: 'pointer' }} />
+                  <span style={{ color: '#ffb450', fontWeight: 700, fontSize: 13 }}>
+                    ⚠️ Flagged for attention — uncheck to clear
+                  </span>
+                </label>
+              </div>
+            )}
 
             <div className="edit-panel-actions">
               <button type="button" className="btn btn-outline btn-lg" onClick={onCancel}>Cancel</button>
