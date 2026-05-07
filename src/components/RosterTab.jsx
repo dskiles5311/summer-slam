@@ -11,6 +11,9 @@ const NUMERIC = ['totalWeight', 'lunkerWeight', 'numFish', 'boatNo', 'buyIn', '_
 
 function sortEntries(entries, { field, dir }) {
   return [...entries].sort((a, b) => {
+    // needsAttention entries always float to the top
+    if (a.needsAttention !== b.needsAttention) return a.needsAttention ? -1 : 1;
+
     let va = a[field], vb = b[field];
     if (NUMERIC.includes(field)) {
       if (field === '_rank') {
