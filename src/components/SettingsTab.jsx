@@ -63,12 +63,14 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
             <div className="form-field">
               <label>Total Payout ($)</label>
               <input type="number" value={totalPayout} min="0" step="1" inputMode="numeric" disabled={locked}
-                     onChange={e => setTotalPayout(parseInt(e.target.value) || 0)} />
+                     onChange={e => setTotalPayout(parseInt(e.target.value) || 0)}
+                     onBlur={() => onUpdateSettings({ payoutSettings: { totalPayout, numWinners, payouts } })} />
             </div>
             <div className="form-field">
               <label>Number of Winners</label>
               <input type="number" value={numWinners} min="1" max="100" step="1" inputMode="numeric" disabled={locked}
-                     onChange={e => setNumWinners(parseInt(e.target.value) || 1)} />
+                     onChange={e => setNumWinners(parseInt(e.target.value) || 1)}
+                     onBlur={() => onUpdateSettings({ payoutSettings: { totalPayout, numWinners, payouts } })} />
             </div>
           </div>
           <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
