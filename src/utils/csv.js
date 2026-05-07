@@ -81,8 +81,15 @@ export function importCSV(file) {
           headerVals.forEach((h, j) => {
             const field = fieldMap[h];
             if (!field) return;
-            const v = vals[j]?.trim() || '';
-            row[field] = numFields.includes(field) ? (parseFloat(v) || 0) : v;
+            let v = vals[j]?.trim() || '';
+
+            if (numFields.includes(field)) {
+              // Strip $ for currency, remove " lbs" suffix for weights
+              v = v.replace(/[$\s]/g, '').replace(/lbs?$/i, '').trim();
+              row[field] = parseFloat(v) || 0;
+            } else {
+              row[field] = v;
+            }
           });
           if (row.boaterFirst || row.boaterLast) entries.push(row);
         }
