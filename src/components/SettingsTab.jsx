@@ -59,6 +59,19 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
     return Array(n).fill(Math.floor(total / n));
   }
 
+  // Finds the smallest n >= minCount where calcWithMin(budget, n, floor)[0] <= maxFirst.
+  // Expanding n spreads the budget across more winners, naturally lowering the top amount.
+  function redistributeBelow(budget, minCount, maxFirst, floor) {
+    if (budget <= 0 || minCount <= 0) return { dist: Array(Math.max(minCount, 0)).fill(0), count: Math.max(minCount, 0) };
+    if (maxFirst <= 0) return { dist: calcWithMin(budget, minCount, floor), count: minCount };
+    for (let n = Math.max(minCount, 1); n <= minCount + 200; n++) {
+      const dist = calcWithMin(budget, n, floor);
+      if (dist[0] <= maxFirst) return { dist, count: n };
+    }
+    const n = minCount + 200;
+    return { dist: calcWithMin(budget, n, floor), count: n };
+  }
+
   function syncPayouts(next, n = numWinners, min = minPayout) {
     setPayouts(next);
     setRawInputs(Array.from({ length: n }, (_, i) => String(next[i] || 0)));
@@ -102,28 +115,37 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   function handleInputBlur(i) {
     const evaluated = evalExpr(rawInputs[i]);
 
-    // Positions above this row are locked; find remaining budget for this row and below
+    // Positions above this row are locked
     const lockedAbove = payouts.slice(0, i).reduce((s, v) => s + (v || 0), 0);
     const remainingForThisAndBelow = Math.max(0, totalPayout - lockedAbove);
     const capped = Math.max(0, Math.min(evaluated, remainingForThisAndBelow));
 
-    // Redistribute whatever is left after this position to positions below
     const belowBudget = remainingForThisAndBelow - capped;
-    const belowCount = numWinners - i - 1;
-    const below = belowCount > 0 && belowBudget > 0
-      ? calcWithMin(belowBudget, belowCount, minPayout)
-      : Array(Math.max(0, belowCount)).fill(0);
+    const minBelowCount = numWinners - i - 1;
 
-    const updated = [...payouts.slice(0, i), capped, ...below];
+    // Redistribute below — may expand winner count to keep positions monotonically decreasing
+    let finalBelow, finalBelowCount;
+    if (minBelowCount <= 0 || belowBudget <= 0) {
+      finalBelow = Array(Math.max(0, minBelowCount)).fill(0);
+      finalBelowCount = Math.max(0, minBelowCount);
+    } else {
+      const result = redistributeBelow(belowBudget, minBelowCount, capped, minPayout);
+      finalBelow = result.dist;
+      finalBelowCount = result.count;
+    }
 
+    const newNumWinners = i + 1 + finalBelowCount;
+    const updated = [...payouts.slice(0, i), capped, ...finalBelow];
+
+    setNumWinners(newNumWinners);
     setPayouts(updated);
-    setRawInputs(Array.from({ length: numWinners }, (_, j) => String(updated[j] || 0)));
-    const errs = Array(numWinners).fill(null);
+    setRawInputs(Array.from({ length: newNumWinners }, (_, j) => String(updated[j] || 0)));
+    const errs = Array(newNumWinners).fill(null);
     if (evaluated > remainingForThisAndBelow) {
       errs[i] = `Exceeds remaining balance — capped at $${remainingForThisAndBelow.toLocaleString()}`;
     }
     setRowErrors(errs);
-    onUpdateSettings({ payoutSettings: { totalPayout, numWinners, minPayout, payouts: updated } });
+    onUpdateSettings({ payoutSettings: { totalPayout, numWinners: newNumWinners, minPayout, payouts: updated } });
   }
 
   const rowTotal = payouts.reduce((a, b) => a + (b || 0), 0);
