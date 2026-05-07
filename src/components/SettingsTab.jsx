@@ -32,26 +32,31 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
     } catch { return 0; }
   }
 
-  // Weighted distribution with a guaranteed floor for the last position.
-  // If the natural last-place amount is below the floor, the deficit is
-  // taken proportionally from the positions above it.
+  // Weighted distribution guaranteeing the last-place floor.
+  // Finds the largest group of bottom positions that all receive exactly
+  // `floor`, such that the remaining top positions, when distributed with
+  // the weighted formula, still give their own last position >= floor.
+  // This prevents a lower place ever receiving more than the place above it.
   function calcWithMin(total, n, floor) {
     if (n <= 0 || total <= 0) return Array(Math.max(n, 0)).fill(0);
-    const natural = calcWeightedPayouts(total, n);
-    if (n === 1 || natural[n - 1] >= floor) return natural;
+    if (floor <= 0) return calcWeightedPayouts(total, n);
 
-    // Reserve the floor for last place and redistribute the rest
-    const budget = total - floor;
-    if (budget <= 0) return Array(n).fill(Math.floor(total / n));
-    const top = calcWeightedPayouts(budget, n - 1);
-    const result = [...top, floor];
-    // Fix any rounding gap
-    let diff = total - result.reduce((a, b) => a + b, 0);
-    for (let i = 0; diff !== 0; i++) {
-      result[i % (n - 1)] += diff > 0 ? 1 : -1;
-      diff += diff > 0 ? -1 : 1;
+    for (let k = 0; k < n; k++) {
+      const topCount = n - k;
+      const budget = total - k * floor;
+      if (budget <= 0) break;
+      const top = calcWeightedPayouts(budget, topCount);
+      // Boundary holds when the last top-group position is >= floor
+      if (top[topCount - 1] >= floor) {
+        const result = [...top, ...Array(k).fill(floor)];
+        // Absorb any rounding gap into first place
+        const gap = total - result.reduce((a, b) => a + b, 0);
+        if (gap !== 0) result[0] += gap;
+        return result;
+      }
     }
-    return result;
+    // Fallback: budget can't support the floor for every position
+    return Array(n).fill(Math.floor(total / n));
   }
 
   function syncPayouts(next, n = numWinners, min = minPayout) {
