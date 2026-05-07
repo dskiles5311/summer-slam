@@ -24,8 +24,16 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
     onUpdateSettings({ payoutSettings: { totalPayout, numWinners, payouts: computed } });
   }
 
+  function handleNumWinnersBlur() {
+    const n = Math.max(1, parseInt(numWinners) || 1);
+    setNumWinners(n);
+    const resized = Array.from({ length: n }, (_, i) => payouts[i] || 0);
+    setPayouts(resized);
+    onUpdateSettings({ payoutSettings: { totalPayout, numWinners: n, payouts: resized } });
+  }
+
   function updatePayoutRow(i, val) {
-    const updated = [...payouts];
+    const updated = Array.from({ length: numWinners }, (_, j) => payouts[j] || 0);
     updated[i] = parseInt(val) || 0;
     setPayouts(updated);
     onUpdateSettings({ payoutSettings: { totalPayout, numWinners, payouts: updated } });
@@ -70,7 +78,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
               <label>Number of Winners</label>
               <input type="number" value={numWinners} min="1" max="100" step="1" inputMode="numeric" disabled={locked}
                      onChange={e => setNumWinners(parseInt(e.target.value) || 1)}
-                     onBlur={() => onUpdateSettings({ payoutSettings: { totalPayout, numWinners, payouts } })} />
+                     onBlur={handleNumWinnersBlur} />
             </div>
           </div>
           <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
@@ -78,7 +86,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
             <button className="btn btn-outline btn-sm" onClick={handleClearPayouts} disabled={locked}>Clear Payouts</button>
           </div>
 
-          {payouts.length > 0 && (
+          {numWinners > 0 && (
             <>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
@@ -89,7 +97,8 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
                   </tr>
                 </thead>
                 <tbody>
-                  {payouts.map((amt, i) => {
+                  {Array.from({ length: numWinners }, (_, i) => {
+                    const amt = payouts[i] || 0;
                     const pct = totalPayout > 0 ? ((amt / totalPayout) * 100).toFixed(1) : '0.0';
                     return (
                       <tr key={i} style={{ borderBottom: '1px solid rgba(139,180,225,0.08)' }}>
