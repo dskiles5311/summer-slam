@@ -26,7 +26,7 @@ body {
   background: var(--navy);
   color: var(--white);
   min-height: 100vh;
-  font-size: 14px;
+  font-size: 16px;
   transition: background 0.25s, color 0.25s;
 }
 
@@ -77,14 +77,14 @@ header {
 }
 
 .stat-chip .val {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--gold-light);
   display: block;
 }
 
 .stat-chip .lbl {
-  font-size: 10px;
+  font-size: 12px;
   color: rgba(255,255,255,0.65);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -99,11 +99,11 @@ header {
 }
 
 .nav-tab {
-  padding: 10px 20px;
+  padding: 12px 22px;
   background: transparent;
   border: none;
   color: rgba(255,255,255,0.7);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.5px;
   cursor: pointer;
@@ -197,20 +197,20 @@ main { flex: 1; padding: 16px 20px; overflow: hidden; }
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 thead th {
   background: #254d30;
   color: #e0c48a;
-  padding: 9px 8px;
+  padding: 11px 10px;
   text-align: left;
   font-weight: 700;
   white-space: nowrap;
   position: sticky;
   top: 0;
   z-index: 2;
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 0.3px;
 }
 
@@ -220,17 +220,17 @@ thead th:last-child  { border-radius: 0 10px 0 0; }
 tbody tr { border-bottom: 1px solid rgba(168,200,160,0.12); transition: background 0.1s; }
 tbody tr:hover { background: rgba(255,255,255,0.04); }
 
-tbody td { padding: 6px 8px; color: var(--white); vertical-align: middle; }
+tbody td { padding: 8px 10px; color: var(--white); vertical-align: middle; }
 
-.rank-cell { font-weight: 800; font-size: 15px; color: var(--gold-light); text-align: center; min-width: 40px; }
-.rank-1 { color: #FFD700; font-size: 17px; }
+.rank-cell { font-weight: 800; font-size: 17px; color: var(--gold-light); text-align: center; min-width: 40px; }
+.rank-1 { color: #FFD700; font-size: 20px; }
 .rank-2 { color: #C0C0C0; }
 .rank-3 { color: #CD7F32; }
 
 /* ── STATUS CELLS ── */
-.cell-green   { background: var(--green-soft); color: var(--green-text); border-radius: 4px; padding: 2px 6px; font-weight: 600; font-size: 11px; text-align: center; }
-.cell-red     { background: var(--red-soft);   color: var(--red-text);   border-radius: 4px; padding: 2px 6px; font-weight: 600; font-size: 11px; text-align: center; }
-.cell-neutral { background: rgba(255,255,255,0.1); color: var(--header-bg); border-radius: 4px; padding: 2px 6px; font-size: 11px; text-align: center; }
+.cell-green   { background: var(--green-soft); color: var(--green-text); border-radius: 4px; padding: 2px 6px; font-weight: 600; font-size: 12px; text-align: center; }
+.cell-red     { background: var(--red-soft);   color: var(--red-text);   border-radius: 4px; padding: 2px 6px; font-weight: 600; font-size: 12px; text-align: center; }
+.cell-neutral { background: rgba(255,255,255,0.1); color: var(--header-bg); border-radius: 4px; padding: 2px 6px; font-size: 12px; text-align: center; }
 
 /* ── ADD ROW BUTTON ── */
 .add-row-btn {
@@ -242,7 +242,7 @@ tbody td { padding: 6px 8px; color: var(--white); vertical-align: middle; }
   border-radius: 0 0 10px 10px;
   color: var(--header-bg);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   transition: all 0.2s;
 }
 
@@ -276,7 +276,7 @@ tbody td { padding: 6px 8px; color: var(--white); vertical-align: middle; }
   border-radius: 6px;
   color: var(--white);
   text-align: center;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
 }
 
@@ -299,28 +299,28 @@ tbody td { padding: 6px 8px; color: var(--white); vertical-align: middle; }
 .lb-card.bronze-card { background: rgba(205,127,50,0.12);  border-color: rgba(205,127,50,0.4);  }
 .lb-card.normal-card { background: rgba(255,255,255,0.03); }
 
-.lb-rank { font-size: 32px; font-weight: 900; text-align: center; line-height: 1; }
+.lb-rank { font-size: 36px; font-weight: 900; text-align: center; line-height: 1; }
 .lb-rank.r1 { color: #FFD700; text-shadow: 0 0 20px rgba(255,215,0,0.5); }
 .lb-rank.r2 { color: #C0C0C0; }
 .lb-rank.r3 { color: #CD7F32; }
-.lb-rank.rn { color: var(--header-bg); font-size: 22px; font-weight: 800; }
+.lb-rank.rn { color: var(--header-bg); font-size: 26px; font-weight: 800; }
 
 .lb-boatno { text-align: center; border-right: 1px solid rgba(168,200,160,0.25); padding-right: 14px; }
-.lb-boatno-num { font-size: 22px; font-weight: 900; color: var(--header-bg); line-height: 1; }
+.lb-boatno-num { font-size: 26px; font-weight: 900; color: var(--header-bg); line-height: 1; }
 .lb-boatno-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--header-bg); opacity: 0.7; margin-top: 2px; }
 
 .lb-anglers { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.lb-angler-name { font-size: 17px; font-weight: 700; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
-.lb-angler-name.lb-co { font-size: 14px; font-weight: 600; color: var(--header-bg); }
+.lb-angler-name { font-size: 19px; font-weight: 700; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
+.lb-angler-name.lb-co { font-size: 16px; font-weight: 600; color: var(--header-bg); }
 
 .lb-stats { display: flex; gap: 20px; align-items: center; flex-shrink: 0; }
 .lb-stat-item { text-align: center; }
-.lb-stat-item .val { font-size: 15px; font-weight: 700; color: var(--water-light); }
+.lb-stat-item .val { font-size: 17px; font-weight: 700; color: var(--water-light); }
 .lb-stat-item .lbl { font-size: 10px; color: var(--header-bg); margin-top: 1px; }
-.lb-stat-item.highlight .val { font-size: 18px; font-weight: 800; color: var(--gold-light); }
+.lb-stat-item.highlight .val { font-size: 20px; font-weight: 800; color: var(--gold-light); }
 
 .lb-payout { text-align: center; min-width: 80px; flex-shrink: 0; }
-.lb-payout .val { font-size: 17px; font-weight: 800; color: #4CAF50; }
+.lb-payout .val { font-size: 19px; font-weight: 800; color: #4CAF50; }
 .lb-payout .lbl { font-size: 10px; color: var(--header-bg); }
 
 /* ── LEADERBOARD SUMMARY ── */
@@ -412,7 +412,7 @@ tbody td { padding: 6px 8px; color: var(--white); vertical-align: middle; }
   margin-bottom: 14px;
 }
 
-.edit-panel-header h3 { color: var(--gold-light); font-size: 16px; }
+.edit-panel-header h3 { color: var(--gold-light); font-size: 18px; }
 
 .edit-panel-close {
   background: rgba(255,255,255,0.08);
@@ -447,7 +447,7 @@ tbody td { padding: 6px 8px; color: var(--white); vertical-align: middle; }
 .edit-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr);   gap: 10px; }
 
 .form-field { display: flex; flex-direction: column; gap: 4px; }
-.form-field label { font-size: 11px; color: var(--header-bg); text-transform: uppercase; letter-spacing: 0.5px; }
+.form-field label { font-size: 12px; color: var(--header-bg); text-transform: uppercase; letter-spacing: 0.5px; }
 
 .form-field input,
 .form-field select {
@@ -458,7 +458,7 @@ tbody td { padding: 6px 8px; color: var(--white); vertical-align: middle; }
   border: 1px solid rgba(168,200,160,0.3);
   border-radius: 8px;
   color: var(--white);
-  font-size: 15px;
+  font-size: 16px;
   -webkit-appearance: none;
   appearance: none;
   min-height: 44px;
@@ -698,7 +698,6 @@ body.light .lb-weight .val              { color: #1a3320; }
 
 /* ── OUTDOOR / HIGH-CONTRAST THEME ── */
 body.outdoor {
-  font-size: 16px;
   --navy:       #f0f5f0;
   --navy-mid:   #ffffff;
   --navy-light: #deeade;
@@ -730,28 +729,26 @@ body.outdoor .table-wrapper {
   border: 2px solid #3a6e3a;
   box-shadow: 0 2px 10px rgba(0,0,0,0.15);
 }
-body.outdoor table       { font-size: 15px; }
+body.outdoor table       { font-size: 15px; } /* keep 15px — matches the bumped base */
 body.outdoor thead th    {
   background: #1a5c28;
   color: #ffffff;
-  font-size: 13px;
-  padding: 11px 10px;
   border-right: 1px solid rgba(255,255,255,0.15);
 }
 body.outdoor tbody tr        { border-bottom: 1px solid #b8ccb8; }
 body.outdoor tbody tr:hover  { background: #e6f2e6; }
-body.outdoor tbody td        { color: #0a120a; padding: 8px 10px; }
+body.outdoor tbody td        { color: #0a120a; }
 
 /* Rank cells */
-body.outdoor .rank-cell { font-size: 17px; font-weight: 900; color: #5c3c00; }
-body.outdoor .rank-1    { color: #7a5000; font-size: 20px; }
+body.outdoor .rank-cell { color: #5c3c00; }
+body.outdoor .rank-1    { color: #7a5000; }
 body.outdoor .rank-2    { color: #3a3a3a; }
 body.outdoor .rank-3    { color: #7a4010; }
 
 /* Status badges — solid, high contrast */
-body.outdoor .cell-green   { background: #c8e6cc; color: #0d4a1a; font-size: 12px; }
-body.outdoor .cell-red     { background: #f8d7da; color: #6b1219; font-size: 12px; }
-body.outdoor .cell-neutral { background: #e0e0e0; color: #333333; font-size: 12px; }
+body.outdoor .cell-green   { background: #c8e6cc; color: #0d4a1a; }
+body.outdoor .cell-red     { background: #f8d7da; color: #6b1219; }
+body.outdoor .cell-neutral { background: #e0e0e0; color: #333333; }
 
 /* Buttons */
 body.outdoor .btn-outline       { background: #ffffff; color: #1a5c28; border: 1.5px solid #3a6e3a; }
@@ -766,7 +763,7 @@ body.outdoor .sort-group .btn.active {
 body.outdoor .sort-group label  { color: #1a5c28; font-weight: 700; }
 
 /* Add-row button */
-body.outdoor .add-row-btn       { background: #f0f8f0; border-color: #3a6e3a; color: #1a5c28; font-size: 14px; }
+body.outdoor .add-row-btn       { background: #f0f8f0; border-color: #3a6e3a; color: #1a5c28; }
 body.outdoor .add-row-btn:hover { background: #ddf0dd; color: #0d3d1a; }
 
 /* Summary chips / cards */
@@ -790,24 +787,23 @@ body.outdoor .lb-card.gold-card    { background: #fff8e0;  border: 2px solid #7a
 body.outdoor .lb-card.silver-card  { background: #f5f5f5;  border: 2px solid #666; }
 body.outdoor .lb-card.bronze-card  { background: #fff4ec;  border: 2px solid #8b4513; }
 
-body.outdoor .lb-rank           { font-size: 36px; }
 body.outdoor .lb-rank.r1        { color: #7a5000; text-shadow: none; }
 body.outdoor .lb-rank.r2        { color: #444; }
 body.outdoor .lb-rank.r3        { color: #7a4010; }
-body.outdoor .lb-rank.rn        { color: #1a5c28; font-size: 26px; font-weight: 900; }
+body.outdoor .lb-rank.rn        { color: #1a5c28; }
 
 body.outdoor .lb-boatno         { border-right-color: #3a6e3a; }
-body.outdoor .lb-boatno-num     { font-size: 26px; color: #1a5c28; }
-body.outdoor .lb-boatno-lbl     { color: #2d5a2d; font-size: 10px; }
+body.outdoor .lb-boatno-num     { color: #1a5c28; }
+body.outdoor .lb-boatno-lbl     { color: #2d5a2d; }
 
-body.outdoor .lb-angler-name        { color: #0a120a; font-size: 19px; }
-body.outdoor .lb-angler-name.lb-co  { color: #1a5c28; font-size: 16px; }
+body.outdoor .lb-angler-name        { color: #0a120a; }
+body.outdoor .lb-angler-name.lb-co  { color: #1a5c28; }
 
-body.outdoor .lb-stat-item .val             { color: #1a5c28; font-size: 17px; font-weight: 800; }
-body.outdoor .lb-stat-item.highlight .val   { color: #5c3c00; font-size: 20px; font-weight: 900; }
-body.outdoor .lb-stat-item .lbl             { color: #2d5a2d; font-size: 11px; }
+body.outdoor .lb-stat-item .val             { color: #1a5c28; font-weight: 800; }
+body.outdoor .lb-stat-item.highlight .val   { color: #5c3c00; font-weight: 900; }
+body.outdoor .lb-stat-item .lbl             { color: #2d5a2d; }
 
-body.outdoor .lb-payout .val  { color: #0d4a1a; font-size: 19px; }
+body.outdoor .lb-payout .val  { color: #0d4a1a; }
 body.outdoor .lb-payout .lbl  { color: #2d5a2d; }
 
 body.outdoor .leaderboard-header h2 { color: #0d3d1a; }
@@ -816,33 +812,31 @@ body.outdoor .top-n-control input   {
   background: #ffffff;
   border: 1.5px solid #3a6e3a;
   color: #0a120a;
-  font-size: 18px;
 }
 
 /* Stat chips in header (stays on dark green header) */
 body.outdoor .stat-chip        { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.4); }
-body.outdoor .stat-chip .val   { color: #ffffff; font-size: 20px; }
-body.outdoor .stat-chip .lbl   { color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 700; }
+body.outdoor .stat-chip .val   { color: #ffffff; }
+body.outdoor .stat-chip .lbl   { color: rgba(255,255,255,0.9); font-weight: 700; }
 
 /* Nav tabs (on dark header) */
-body.outdoor .nav-tab          { color: rgba(255,255,255,0.85); font-size: 14px; padding: 12px 22px; }
+body.outdoor .nav-tab          { color: rgba(255,255,255,0.85); }
 body.outdoor .nav-tab:hover    { color: #ffffff; background: rgba(255,255,255,0.1); }
 body.outdoor .nav-tab.active   { color: #ffe08a; border-bottom-color: #ffe08a; }
 body.outdoor .logo-text h1     { color: #ffe08a; }
 
 /* Edit modal */
 body.outdoor .edit-panel             { background: #ffffff; border: 2px solid #1a5c28; }
-body.outdoor .form-field label       { color: #1a5c28; font-weight: 700; font-size: 12px; }
+body.outdoor .form-field label       { color: #1a5c28; font-weight: 700; }
 body.outdoor .form-field input,
 body.outdoor .form-field select      {
   background: #f5faf5;
   border: 1.5px solid #3a6e3a;
   color: #0a120a;
-  font-size: 16px;
 }
 body.outdoor .form-field input:focus,
 body.outdoor .form-field select:focus { border-color: #1a5c28; background: #ffffff; }
-body.outdoor .edit-panel-header h3   { color: #5c3c00; font-size: 18px; }
+body.outdoor .edit-panel-header h3   { color: #5c3c00; }
 body.outdoor .edit-panel-close       { background: #e6f2e6; border-color: #3a6e3a; color: #1a5c28; }
 body.outdoor .edit-section-label     { color: #1a5c28; border-bottom-color: #3a6e3a; font-size: 11px; }
 
