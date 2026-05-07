@@ -101,18 +101,27 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
 
   function handleInputBlur(i) {
     const evaluated = evalExpr(rawInputs[i]);
-    const otherSum = payouts.reduce((s, v, j) => j !== i ? s + (v || 0) : s, 0);
-    const available = totalPayout - otherSum;
-    const capped = Math.max(0, Math.min(evaluated, available));
-    const updated = Array.from({ length: numWinners }, (_, j) => j === i ? capped : (payouts[j] || 0));
+
+    // Positions above this row are locked; find remaining budget for this row and below
+    const lockedAbove = payouts.slice(0, i).reduce((s, v) => s + (v || 0), 0);
+    const remainingForThisAndBelow = Math.max(0, totalPayout - lockedAbove);
+    const capped = Math.max(0, Math.min(evaluated, remainingForThisAndBelow));
+
+    // Redistribute whatever is left after this position to positions below
+    const belowBudget = remainingForThisAndBelow - capped;
+    const belowCount = numWinners - i - 1;
+    const below = belowCount > 0 && belowBudget > 0
+      ? calcWithMin(belowBudget, belowCount, minPayout)
+      : Array(Math.max(0, belowCount)).fill(0);
+
+    const updated = [...payouts.slice(0, i), capped, ...below];
+
     setPayouts(updated);
-    const newRaw = [...rawInputs];
-    newRaw[i] = String(capped);
-    setRawInputs(newRaw);
-    const errs = [...rowErrors];
-    errs[i] = evaluated > available
-      ? `Exceeds remaining balance — capped at $${available.toLocaleString()}`
-      : null;
+    setRawInputs(Array.from({ length: numWinners }, (_, j) => String(updated[j] || 0)));
+    const errs = Array(numWinners).fill(null);
+    if (evaluated > remainingForThisAndBelow) {
+      errs[i] = `Exceeds remaining balance — capped at $${remainingForThisAndBelow.toLocaleString()}`;
+    }
     setRowErrors(errs);
     onUpdateSettings({ payoutSettings: { totalPayout, numWinners, minPayout, payouts: updated } });
   }
