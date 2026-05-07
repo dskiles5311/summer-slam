@@ -60,12 +60,12 @@ export function importCSV(file) {
           'boater last': 'boaterLast', 'boater_last': 'boaterLast',
           'co-angler first': 'coAnglerFirst', 'co-angler_first': 'coAnglerFirst',
           'co-angler last': 'coAnglerLast', 'co-angler_last': 'coAnglerLast',
-          'boat no': 'boatNo', 'boat_no': 'boatNo', 'boat no.': 'boatNo',
-          '# fish': 'numFish', 'num fish': 'numFish', 'number of fish': 'numFish',
+          'boat no': 'boatNo', 'boat_no': 'boatNo', 'boat no.': 'boatNo', 'boat_no.': 'boatNo',
+          '# fish': 'numFish', 'num fish': 'numFish', 'number of fish': 'numFish', 'number_of_fish': 'numFish',
           'lunker weight': 'lunkerWeight', 'lunker_weight': 'lunkerWeight',
           'total weight': 'totalWeight', 'total_weight': 'totalWeight',
           'lunker': 'lunker', 'option': 'option', 'paid': 'paid',
-          'app signed': 'appSigned', 'app_signed': 'appSigned',
+          'app signed': 'appSigned', 'app_signed': 'appSigned', 'application_signed': 'appSigned',
           'buy-in': 'buyIn', 'buy in': 'buyIn', 'buyin': 'buyIn',
         };
         const numFields = ['numFish','lunkerWeight','totalWeight','lunker','option','paid','appSigned','buyIn'];
@@ -84,9 +84,8 @@ export function importCSV(file) {
             let v = vals[j]?.trim() || '';
 
             if (numFields.includes(field)) {
-              // Strip $ for currency, remove " lbs" suffix for weights
               v = v.replace(/[$\s]/g, '').replace(/lbs?$/i, '').trim();
-              row[field] = parseFloat(v) || 0;
+              row[field] = /^x$/i.test(v) ? 1 : (parseFloat(v) || 0);
             } else {
               row[field] = v;
             }
