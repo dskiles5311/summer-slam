@@ -59,32 +59,47 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
     return Array(n).fill(Math.floor(total / n));
   }
 
-  // Finds the optimal n for positions below the edited row.
-  // - Contracts n below minCount when budget can't sustain floor for all positions.
-  // - Expands n above minCount when first redistributed position would exceed maxFirst.
-  // Both constraints are respected; floor takes priority as the hard upper bound on n.
+  // Builds the distribution for positions below the edited row using a cascade cap:
+  // each position receives min(its_natural_weighted_amount, the_position_above_it).
+  // This guarantees strict monotonic ordering regardless of how large the budget is
+  // relative to the ceiling. Winner count contracts when budget can't sustain the floor
+  // for all minCount positions, and expands when budget remains after all positions are
+  // filled and the floor would still be met by one more position.
   function redistributeBelow(budget, minCount, maxFirst, floor) {
-    if (budget <= 0) return { dist: [], count: 0 };
-    if (minCount <= 0) return { dist: [], count: 0 };
+    if (budget <= 0 || minCount <= 0) return { dist: [], count: 0 };
 
-    // Hard ceiling: budget can't guarantee the floor for more than this many positions
-    const floorCap = floor > 0 ? Math.max(1, Math.floor(budget / floor)) : minCount + 200;
+    const results = [];
+    let remaining = budget;
+    let ceiling = maxFirst > 0 ? maxFirst : Infinity;
+    // Start with floor-constrained count (contraction); expand later if budget allows
+    let targetCount = floor > 0
+      ? Math.max(1, Math.min(minCount, Math.floor(budget / floor)))
+      : minCount;
 
-    // Start from min(requested, floor-limited) — may be less than minCount (contraction)
-    const startN = Math.max(1, Math.min(minCount, floorCap));
+    for (let i = 0; remaining > 0; i++) {
+      // After filling targetCount, expand by one if remaining budget meets the floor
+      if (i >= targetCount) {
+        if (floor > 0 && remaining >= floor) targetCount++;
+        else break;
+      }
 
-    if (maxFirst <= 0) {
-      return { dist: calcWithMin(budget, startN, floor), count: startN };
+      // How many positions are left, capped by what floor can support from remaining budget
+      const posLeft = Math.max(1, Math.min(
+        targetCount - i,
+        floor > 0 ? Math.floor(remaining / floor) : targetCount - i
+      ));
+
+      const natural = calcWithMin(remaining, posLeft, floor)[0];
+      const amt = isFinite(ceiling) ? Math.min(natural, ceiling) : natural;
+
+      if (amt <= 0) break;
+
+      results.push(amt);
+      remaining -= amt;
+      ceiling = amt; // Next position must be <= this one
     }
 
-    // Expand toward floorCap until first redistributed position fits under maxFirst
-    for (let n = startN; n <= floorCap; n++) {
-      const dist = calcWithMin(budget, n, floor);
-      if (dist[0] <= maxFirst) return { dist, count: n };
-    }
-
-    // Still violates maxFirst at floorCap — budget too small to spread further, use floorCap
-    return { dist: calcWithMin(budget, floorCap, floor), count: floorCap };
+    return { dist: results, count: results.length };
   }
 
   function syncPayouts(next, n = numWinners, min = minPayout) {
