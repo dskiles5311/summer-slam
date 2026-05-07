@@ -54,7 +54,7 @@ export function importCSV(file) {
         const lines = e.target.result.split('\n').filter(l => l.trim());
         if (lines.length < 2) return resolve([]);
 
-        const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim().toLowerCase());
+        const headerVals = parseCSVLine(lines[0]).map(h => h.toLowerCase());
         const fieldMap = {
           'boater first': 'boaterFirst', 'boater_first': 'boaterFirst',
           'boater last': 'boaterLast', 'boater_last': 'boaterLast',
@@ -66,7 +66,7 @@ export function importCSV(file) {
           'total weight': 'totalWeight', 'total_weight': 'totalWeight',
           'lunker': 'lunker', 'option': 'option', 'paid': 'paid',
           'app signed': 'appSigned', 'app_signed': 'appSigned',
-          'buy-in': 'buyIn', 'buy in': 'buyIn',
+          'buy-in': 'buyIn', 'buy in': 'buyIn', 'buyin': 'buyIn',
         };
         const numFields = ['numFish','lunkerWeight','totalWeight','lunker','option','paid','appSigned','buyIn'];
 
@@ -78,7 +78,7 @@ export function importCSV(file) {
             boatNo: '', numFish: 0, lunkerWeight: 0, totalWeight: 0,
             lunker: 0, option: 0, paid: 0, appSigned: 0, buyIn: 0,
           };
-          headers.forEach((h, j) => {
+          headerVals.forEach((h, j) => {
             const field = fieldMap[h];
             if (!field) return;
             const v = vals[j]?.trim() || '';
