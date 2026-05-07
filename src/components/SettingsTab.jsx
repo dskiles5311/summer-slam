@@ -263,6 +263,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
                               disabled={locked}
                               onChange={e => handleInputChange(i, e.target.value)}
                               onBlur={() => handleInputBlur(i)}
+                              onKeyDown={e => { if (e.key === 'Enter') { e.target.blur(); } }}
                               onFocus={e => e.target.select()}
                               placeholder="0 or 100+50"
                               style={{ width: 110, padding: '4px 6px', background: err ? 'rgba(255,107,107,0.12)' : 'rgba(255,255,255,0.08)', border: `1px solid ${err ? '#ff6b6b' : 'rgba(139,180,225,0.3)'}`, borderRadius: 5, color: 'var(--white)', fontSize: 13, textAlign: 'right', fontWeight: 600 }}
