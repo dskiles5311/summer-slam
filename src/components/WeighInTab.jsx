@@ -108,6 +108,11 @@ export default function WeighInTab({ entries, onWeighIn, onAddEntry }) {
     const lw = parseFloat(lunkerWeight) || 0;
     const nf = Math.max(0, parseInt(numFish) || 0);
 
+    if (lw > 0 && rawTw === 0) {
+      setStatus({ type: 'error', message: 'Enter total weight before setting lunker weight.' });
+      totalRef.current?.focus();
+      return;
+    }
     if (lw > adjustedWeight && adjustedWeight > 0) {
       setStatus({ type: 'error', message: 'Lunker weight cannot exceed adjusted total weight.' });
       lunkerRef.current?.focus();

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { calcWeightedPayouts } from '../utils/calculations';
 import { exportCSV, importCSV } from '../utils/csv';
 
@@ -14,6 +14,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   const [payouts, setPayouts]         = useState(payoutSettings.payouts      || []);
   const [rawInputs, setRawInputs]     = useState(() => (payoutSettings.payouts || []).map(v => String(v || 0)));
   const [rowErrors, setRowErrors]     = useState([]);
+  const [localFees, setLocalFees]     = useState(fees);
 
   useEffect(() => {
     setTotalPayout(payoutSettings.totalPayout || 0);
@@ -22,6 +23,8 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
     setPayouts(payoutSettings.payouts         || []);
     setRawInputs((payoutSettings.payouts || []).map(v => String(v || 0)));
   }, [payoutSettings]);
+
+  useEffect(() => { setLocalFees(fees); }, [fees]);
 
   function evalExpr(str) {
     const cleaned = String(str).replace(/[^0-9+\-*/.() ]/g, '').trim();
@@ -56,7 +59,10 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
       }
     }
     // Fallback: budget can't support the floor for every position
-    return Array(n).fill(Math.floor(total / n));
+    const each = Math.floor(total / n);
+    const arr = Array(n).fill(each);
+    arr[0] += total - each * n;
+    return arr;
   }
 
   // Builds the distribution for positions below the edited row using a cascade cap:
@@ -251,8 +257,8 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
                     const balColor = runningBalance === 0 ? '#4CAF50' : runningBalance < 0 ? '#ff6b6b' : 'var(--header-bg)';
                     const err = rowErrors[i];
                     return (
-                      <>
-                        <tr key={i} style={{ borderBottom: err ? 'none' : '1px solid rgba(139,180,225,0.08)' }}>
+                      <Fragment key={i}>
+                        <tr style={{ borderBottom: err ? 'none' : '1px solid rgba(139,180,225,0.08)' }}>
                           <td style={{ padding: '5px 8px', color: 'var(--header-bg)', fontWeight: 600 }}>{placeLabel(i)}</td>
                           <td style={{ padding: '5px 8px', textAlign: 'right' }}>
                             <span style={{ color: 'var(--header-bg)', marginRight: 2 }}>$</span>
@@ -281,7 +287,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
                             </td>
                           </tr>
                         )}
-                      </>
+                      </Fragment>
                     );
                   })}
                 </tbody>
@@ -301,18 +307,21 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           <div className="edit-grid-3">
             <div className="form-field">
               <label>Entry Fee ($)</label>
-              <input type="number" value={fees.entryFee} min="0" step="1" disabled={locked}
-                     onChange={e => onUpdateSettings({ fees: { ...fees, entryFee: parseFloat(e.target.value) || 0 } })} />
+              <input type="number" value={localFees.entryFee} min="0" step="1" disabled={locked}
+                     onChange={e => setLocalFees(prev => ({ ...prev, entryFee: parseFloat(e.target.value) || 0 }))}
+                     onBlur={() => onUpdateSettings({ fees: localFees })} />
             </div>
             <div className="form-field">
               <label>Lunker Fee ($)</label>
-              <input type="number" value={fees.lunkerFee} min="0" step="1" disabled={locked}
-                     onChange={e => onUpdateSettings({ fees: { ...fees, lunkerFee: parseFloat(e.target.value) || 0 } })} />
+              <input type="number" value={localFees.lunkerFee} min="0" step="1" disabled={locked}
+                     onChange={e => setLocalFees(prev => ({ ...prev, lunkerFee: parseFloat(e.target.value) || 0 }))}
+                     onBlur={() => onUpdateSettings({ fees: localFees })} />
             </div>
             <div className="form-field">
               <label>Option Fee ($)</label>
-              <input type="number" value={fees.optFee} min="0" step="1" disabled={locked}
-                     onChange={e => onUpdateSettings({ fees: { ...fees, optFee: parseFloat(e.target.value) || 0 } })} />
+              <input type="number" value={localFees.optFee} min="0" step="1" disabled={locked}
+                     onChange={e => setLocalFees(prev => ({ ...prev, optFee: parseFloat(e.target.value) || 0 }))}
+                     onBlur={() => onUpdateSettings({ fees: localFees })} />
             </div>
           </div>
           <p style={{ color: 'var(--header-bg)', fontSize: 11, marginTop: 8 }}>
@@ -333,7 +342,13 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
                 <input type="file" accept=".csv" style={{ display: 'none' }}
                        onChange={e => {
                          const f = e.target.files[0];
-                         if (f) importCSV(f).then(onImport).catch(() => {});
+                         if (f) {
+                           if (!confirm('Import will ADD entries to existing data (not replace). Continue?')) {
+                             e.target.value = '';
+                             return;
+                           }
+                           importCSV(f).then(onImport).catch(() => {});
+                         }
                          e.target.value = '';
                        }} />
               </label>

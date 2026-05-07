@@ -28,7 +28,7 @@ export function calcRanks(entries) {
 
 export function getStats(entries, fees) {
   const named = entries.filter(r => r.boaterFirst || r.boaterLast);
-  const boated = named.filter(r => r.boatNo);
+  const boated = entries.filter(r => r.boatNo);
 
   const lunkerRows = boated.filter(r => r.lunker === 1 && parseFloat(r.lunkerWeight) > 0);
   const topLunkerRow = lunkerRows.length
@@ -61,7 +61,7 @@ export function getStats(entries, fees) {
     optionPaidCount,
   };
 }
-
+//Adjust this function to use weighted payouts instead of flat percentages
 export function calcWeightedPayouts(total, n) {
   if (!n || n <= 0 || !total || total <= 0) return Array(Math.max(n || 0, 0)).fill(0);
   const weights = [];

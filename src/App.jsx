@@ -17,7 +17,7 @@ import { calcRanks } from './utils/calculations';
 
 const DEFAULT_SETTINGS = {
   fees:            { entryFee: 249, lunkerFee: 10, optFee: 20 },
-  payoutSettings:  { totalPayout: 0, numWinners: 10, payouts: [] },
+  payoutSettings:  { totalPayout: 0, numWinners: 10, minPayout: 250, payouts: [] },
   boatCheck:       {},
   offWater:        {},
 };
@@ -36,6 +36,7 @@ export default function App() {
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type, id: Date.now() });
   }, []);
+  const clearToast = useCallback(() => setToast(null), []);
 
   const rankedEntries = calcRanks(entries);
 
@@ -237,6 +238,7 @@ export default function App() {
     try {
       await Promise.all(entries.map(e => deleteEntry(e.id)));
       setEntries([]);
+      await handleUpdateSettings({ boatCheck: {}, offWater: {} });
       showToast('All data cleared', 'info');
     } catch {
       showToast('Failed to clear data', 'error');
@@ -345,7 +347,7 @@ export default function App() {
           key={toast.id}
           message={toast.message}
           type={toast.type}
-          onDone={() => setToast(null)}
+          onDone={clearToast}
         />
       )}
     </div>
