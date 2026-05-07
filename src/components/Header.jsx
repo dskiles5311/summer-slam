@@ -9,7 +9,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
         <div className="logo">
           <img src="/SFT%20logo%20color.jpg" alt="SFT" className="logo-icon" style={{ width: 80, height: 80, objectFit: 'contain' }} />
           <div className="logo-text">
-            <h1>Summer Slam!</h1>
+            <h1>{new Date().getFullYear()} Summer Slam!</h1>
             <p>Susquehanna Fishing Tackle</p>
           </div>
         </div>
