@@ -30,7 +30,6 @@ export default function App() {
   const [loading, setLoading]           = useState(true);
   const [toast, setToast]               = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
-  const [leaderboardTopN, setLeaderboardTopN] = useState(10);
   const [isUnlocked, setIsUnlocked]     = useState(() => isPasswordStored());
   const [showUnlock, setShowUnlock]     = useState(false);
 
@@ -52,8 +51,6 @@ export default function App() {
             fees:           { ...DEFAULT_SETTINGS.fees,           ...(settingsData.fees           || {}) },
             payoutSettings: { ...DEFAULT_SETTINGS.payoutSettings, ...(settingsData.payoutSettings || {}) },
           });
-          const n = settingsData.payoutSettings?.numWinners;
-          if (n) setLeaderboardTopN(n);
         }
       } catch {
         showToast('Failed to connect to database', 'error');
@@ -313,7 +310,7 @@ export default function App() {
           <WeighInTab entries={entries} onWeighIn={handleWeighIn} onAddEntry={handleAddWeighInEntry} />
         )}
         {activeTab === 'leaderboard' && (
-          <LeaderboardTab entries={rankedEntries} settings={settingsWithTheme} topN={leaderboardTopN} onTopNChange={setLeaderboardTopN} />
+          <LeaderboardTab entries={rankedEntries} settings={settingsWithTheme} />
         )}
         {activeTab === 'rules' && <RulesTab />}
         {activeTab === 'settings' && (
