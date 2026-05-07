@@ -16,13 +16,18 @@ function sortEntries(entries, { field, dir }) {
       if (field === '_rank') {
         va = va != null ? parseFloat(va) : Infinity;
         vb = vb != null ? parseFloat(vb) : Infinity;
+      } else if (field === 'boatNo') {
+        va = va ? parseFloat(va) || 0 : Infinity;
+        vb = vb ? parseFloat(vb) || 0 : Infinity;
       } else {
         va = parseFloat(va) || 0;
         vb = parseFloat(vb) || 0;
       }
     } else {
-      va = (va || '').toLowerCase();
-      vb = (vb || '').toLowerCase();
+      va = (va || '').toLowerCase().trim();
+      vb = (vb || '').toLowerCase().trim();
+      if (!va && vb) return 1;
+      if (!vb && va) return -1;
     }
     if (va < vb) return dir === 'asc' ? -1 : 1;
     if (va > vb) return dir === 'asc' ? 1 : -1;
