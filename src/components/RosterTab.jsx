@@ -107,7 +107,7 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
                    }} />
           </label>
         )}
-        <button className="btn btn-primary" onClick={() => exportCSV(entries)}>💾 Export CSV</button>
+        <button className="btn btn-primary" onClick={() => exportCSV(entries, settings.payoutSettings)}>💾 Export CSV</button>
         {isUnlocked && <button className="btn btn-danger" onClick={onClearAll}>🗑️ Clear All</button>}
       </div>
 
