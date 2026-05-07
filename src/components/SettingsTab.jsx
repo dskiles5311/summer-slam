@@ -6,7 +6,7 @@ const PANEL = { background: 'var(--settings-panel-bg)', border: '1px solid rgba(
 const H3 = { color: 'var(--header-bg)', fontSize: 14, marginBottom: 14, textTransform: 'uppercase', letterSpacing: 1 };
 
 export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSettings, onClearAll, onImport }) {
-  const { fees, payoutSettings, theme } = settings;
+  const { fees, payoutSettings } = settings;
 
   const [totalPayout, setTotalPayout] = useState(payoutSettings.totalPayout || 0);
   const [numWinners, setNumWinners]   = useState(payoutSettings.numWinners  || 10);
@@ -172,19 +172,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           </div>
         </div>
 
-        {/* Appearance */}
-        <div style={PANEL}>
-          <h3 style={H3}>Appearance</h3>
-          <p style={{ color: 'var(--header-bg)', fontSize: 13, marginBottom: 12 }}>
-            Switch between dark and light mode. Your preference is saved automatically.
-          </p>
-          <button className="btn btn-outline" style={{ fontSize: 14, padding: '8px 20px' }} disabled={locked}
-                  onClick={() => onUpdateSettings({ theme: theme === 'dark' ? 'light' : 'dark' })}>
-            {theme === 'dark' ? '☀️ Switch to Light Mode' : '🌙 Switch to Dark Mode'}
-          </button>
-        </div>
-
-        {/* Install as App */}
+{/* Install as App */}
         <div style={PANEL}>
           <h3 style={H3}>Install as App</h3>
           <p style={{ color: 'var(--header-bg)', fontSize: 13, lineHeight: 1.7, marginBottom: 12 }}>
