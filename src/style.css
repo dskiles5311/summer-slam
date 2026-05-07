@@ -695,3 +695,156 @@ body.light .stat-chip .val     { color: #f0ede6; }
 
 body.light .lb-stat-item.highlight .val { color: #1a3320; }
 body.light .lb-weight .val              { color: #1a3320; }
+
+/* ── OUTDOOR / HIGH-CONTRAST THEME ── */
+body.outdoor {
+  font-size: 16px;
+  --navy:       #f0f5f0;
+  --navy-mid:   #ffffff;
+  --navy-light: #deeade;
+  --gold:       #7a5000;
+  --gold-light: #5c3c00;
+  --water:      #1a5c28;
+  --water-light:#256b34;
+  --red-soft:   #f8d7da;
+  --red-text:   #6b1219;
+  --green-soft: #c8e6cc;
+  --green-text: #0d4a1a;
+  --header-bg:  #1a5c28;
+  --white:      #0a120a;
+  --header-text:#ffffff;
+  --border:     #5a7a5a;
+  --text:       #0a120a;
+  --text-muted: #2d5a2d;
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  --settings-panel-bg: #ffffff;
+}
+
+body.outdoor header    { background: #163d20; }
+body.outdoor .nav-tabs { background: #0d2914; }
+body.outdoor main      { background: #f0f5f0; }
+
+/* Table — solid borders, larger text, white background */
+body.outdoor .table-wrapper {
+  background: #ffffff;
+  border: 2px solid #3a6e3a;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+body.outdoor table       { font-size: 15px; }
+body.outdoor thead th    {
+  background: #1a5c28;
+  color: #ffffff;
+  font-size: 13px;
+  padding: 11px 10px;
+  border-right: 1px solid rgba(255,255,255,0.15);
+}
+body.outdoor tbody tr        { border-bottom: 1px solid #b8ccb8; }
+body.outdoor tbody tr:hover  { background: #e6f2e6; }
+body.outdoor tbody td        { color: #0a120a; padding: 8px 10px; }
+
+/* Rank cells */
+body.outdoor .rank-cell { font-size: 17px; font-weight: 900; color: #5c3c00; }
+body.outdoor .rank-1    { color: #7a5000; font-size: 20px; }
+body.outdoor .rank-2    { color: #3a3a3a; }
+body.outdoor .rank-3    { color: #7a4010; }
+
+/* Status badges — solid, high contrast */
+body.outdoor .cell-green   { background: #c8e6cc; color: #0d4a1a; font-size: 12px; }
+body.outdoor .cell-red     { background: #f8d7da; color: #6b1219; font-size: 12px; }
+body.outdoor .cell-neutral { background: #e0e0e0; color: #333333; font-size: 12px; }
+
+/* Buttons */
+body.outdoor .btn-outline       { background: #ffffff; color: #1a5c28; border: 1.5px solid #3a6e3a; }
+body.outdoor .btn-outline:hover { background: #e6f2e6; color: #0d3d1a; }
+body.outdoor .btn-primary       { background: #1a5c28; color: #ffffff; }
+body.outdoor .btn-primary:hover { background: #0d3d1a; }
+body.outdoor .sort-group .btn.active {
+  background: #1a5c28;
+  color: #ffffff;
+  border-color: #1a5c28;
+}
+body.outdoor .sort-group label  { color: #1a5c28; font-weight: 700; }
+
+/* Add-row button */
+body.outdoor .add-row-btn       { background: #f0f8f0; border-color: #3a6e3a; color: #1a5c28; font-size: 14px; }
+body.outdoor .add-row-btn:hover { background: #ddf0dd; color: #0d3d1a; }
+
+/* Summary chips / cards */
+body.outdoor .summary-chip { background: #ffffff; border: 1.5px solid #3a6e3a; }
+body.outdoor .summary-chip .sc-lbl  { color: #0a120a; }
+body.outdoor .summary-chip .sc-val  { color: #5c3c00; }
+body.outdoor .summary-chip .sc-boat { color: #5c3c00; }
+body.outdoor .summary-chip .sc-name { color: #0a120a; }
+body.outdoor .summary-chip .sc-co   { color: #1a5c28; }
+
+body.outdoor .summary-card         { background: #ffffff; border: 1.5px solid #3a6e3a; }
+body.outdoor .summary-card .s-lbl  { color: #0a120a; }
+body.outdoor .summary-card .s-name { color: #0a120a; }
+body.outdoor .summary-card .s-name.s-co { color: #1a5c28; }
+body.outdoor .summary-card .s-boat { color: #5c3c00; }
+body.outdoor .summary-card .s-val  { color: #5c3c00; }
+
+/* Leaderboard cards — white, solid borders, bigger text */
+body.outdoor .lb-card.normal-card  { background: #ffffff;  border: 1.5px solid #3a6e3a; }
+body.outdoor .lb-card.gold-card    { background: #fff8e0;  border: 2px solid #7a5000; }
+body.outdoor .lb-card.silver-card  { background: #f5f5f5;  border: 2px solid #666; }
+body.outdoor .lb-card.bronze-card  { background: #fff4ec;  border: 2px solid #8b4513; }
+
+body.outdoor .lb-rank           { font-size: 36px; }
+body.outdoor .lb-rank.r1        { color: #7a5000; text-shadow: none; }
+body.outdoor .lb-rank.r2        { color: #444; }
+body.outdoor .lb-rank.r3        { color: #7a4010; }
+body.outdoor .lb-rank.rn        { color: #1a5c28; font-size: 26px; font-weight: 900; }
+
+body.outdoor .lb-boatno         { border-right-color: #3a6e3a; }
+body.outdoor .lb-boatno-num     { font-size: 26px; color: #1a5c28; }
+body.outdoor .lb-boatno-lbl     { color: #2d5a2d; font-size: 10px; }
+
+body.outdoor .lb-angler-name        { color: #0a120a; font-size: 19px; }
+body.outdoor .lb-angler-name.lb-co  { color: #1a5c28; font-size: 16px; }
+
+body.outdoor .lb-stat-item .val             { color: #1a5c28; font-size: 17px; font-weight: 800; }
+body.outdoor .lb-stat-item.highlight .val   { color: #5c3c00; font-size: 20px; font-weight: 900; }
+body.outdoor .lb-stat-item .lbl             { color: #2d5a2d; font-size: 11px; }
+
+body.outdoor .lb-payout .val  { color: #0d4a1a; font-size: 19px; }
+body.outdoor .lb-payout .lbl  { color: #2d5a2d; }
+
+body.outdoor .leaderboard-header h2 { color: #0d3d1a; }
+body.outdoor .top-n-control label   { color: #1a5c28; font-weight: 700; }
+body.outdoor .top-n-control input   {
+  background: #ffffff;
+  border: 1.5px solid #3a6e3a;
+  color: #0a120a;
+  font-size: 18px;
+}
+
+/* Stat chips in header (stays on dark green header) */
+body.outdoor .stat-chip        { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.4); }
+body.outdoor .stat-chip .val   { color: #ffffff; font-size: 20px; }
+body.outdoor .stat-chip .lbl   { color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 700; }
+
+/* Nav tabs (on dark header) */
+body.outdoor .nav-tab          { color: rgba(255,255,255,0.85); font-size: 14px; padding: 12px 22px; }
+body.outdoor .nav-tab:hover    { color: #ffffff; background: rgba(255,255,255,0.1); }
+body.outdoor .nav-tab.active   { color: #ffe08a; border-bottom-color: #ffe08a; }
+body.outdoor .logo-text h1     { color: #ffe08a; }
+
+/* Edit modal */
+body.outdoor .edit-panel             { background: #ffffff; border: 2px solid #1a5c28; }
+body.outdoor .form-field label       { color: #1a5c28; font-weight: 700; font-size: 12px; }
+body.outdoor .form-field input,
+body.outdoor .form-field select      {
+  background: #f5faf5;
+  border: 1.5px solid #3a6e3a;
+  color: #0a120a;
+  font-size: 16px;
+}
+body.outdoor .form-field input:focus,
+body.outdoor .form-field select:focus { border-color: #1a5c28; background: #ffffff; }
+body.outdoor .edit-panel-header h3   { color: #5c3c00; font-size: 18px; }
+body.outdoor .edit-panel-close       { background: #e6f2e6; border-color: #3a6e3a; color: #1a5c28; }
+body.outdoor .edit-section-label     { color: #1a5c28; border-bottom-color: #3a6e3a; font-size: 11px; }
+
+/* Watermark */
+body.outdoor .lb-watermark { filter: brightness(0); }

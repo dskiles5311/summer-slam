@@ -65,7 +65,10 @@ export default function App() {
   }, [showToast]);
 
   useEffect(() => {
-    document.body.classList.toggle('light', settings.theme === 'light');
+    document.body.classList.remove('light', 'outdoor');
+    if (settings.theme === 'light' || settings.theme === 'outdoor') {
+      document.body.classList.add(settings.theme);
+    }
   }, [settings.theme]);
 
   useEffect(() => {
@@ -271,7 +274,10 @@ export default function App() {
         settings={settings}
         activeTab={isUnlocked || activeTab === 'rules' ? activeTab : 'leaderboard'}
         onTabChange={tab => { if (isUnlocked || tab === 'rules') setActiveTab(tab); }}
-        onThemeToggle={() => handleUpdateSettings({ theme: settings.theme === 'dark' ? 'light' : 'dark' })}
+        onThemeToggle={() => {
+          const next = settings.theme === 'dark' ? 'light' : settings.theme === 'light' ? 'outdoor' : 'dark';
+          handleUpdateSettings({ theme: next });
+        }}
         isUnlocked={isUnlocked}
         onToggleLock={() => isUnlocked ? handleLock() : setShowUnlock(true)}
       />
