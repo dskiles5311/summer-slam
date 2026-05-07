@@ -1,8 +1,6 @@
-import { useState } from 'react';
 import { getLeaderboardEntries, getStats } from '../utils/calculations';
 
-export default function LeaderboardTab({ entries, settings }) {
-  const [topN, setTopN] = useState(10);
+export default function LeaderboardTab({ entries, settings, topN, onTopNChange }) {
   const lbEntries = getLeaderboardEntries(entries);
   const displayed = lbEntries.slice(0, topN);
   const { payoutSettings } = settings;
@@ -122,7 +120,7 @@ export default function LeaderboardTab({ entries, settings }) {
       <div className="top-n-control">
         <label>Show Top</label>
         <input type="number" value={topN} min="1" max="500"
-               onChange={e => setTopN(parseInt(e.target.value) || 10)} />
+               onChange={e => onTopNChange(parseInt(e.target.value) || 10)} />
         <label>anglers</label>
 <button className="btn btn-gold btn-sm" onClick={() => window.print()}>🖨️ Print / PDF</button>
       </div>

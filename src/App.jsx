@@ -29,6 +29,7 @@ export default function App() {
   const [loading, setLoading]           = useState(true);
   const [toast, setToast]               = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
+  const [leaderboardTopN, setLeaderboardTopN] = useState(10);
   const [isUnlocked, setIsUnlocked]     = useState(() => isPasswordStored());
   const [showUnlock, setShowUnlock]     = useState(false);
 
@@ -268,7 +269,7 @@ export default function App() {
           />
         )}
         {activeTab === 'leaderboard' && (
-          <LeaderboardTab entries={rankedEntries} settings={settings} />
+          <LeaderboardTab entries={rankedEntries} settings={settings} topN={leaderboardTopN} onTopNChange={setLeaderboardTopN} />
         )}
         {activeTab === 'rules' && <RulesTab />}
         {activeTab === 'settings' && (
