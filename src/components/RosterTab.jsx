@@ -143,7 +143,7 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
                   <td>{row.coAnglerLast}</td>
                   <td
                     onClick={e => { e.stopPropagation(); isUnlocked && handleStartEdit(row, 'boatNo'); }}
-                    style={isUnlocked ? { cursor: 'pointer', padding: 0 } : undefined}
+                    style={isUnlocked ? { cursor: 'pointer', padding: '8px 0' } : undefined}
                   >
                     {editingId === row.id && editValues.hasOwnProperty('boatNo') ? (
                       <input
@@ -157,19 +157,19 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
                         }}
                         onClick={e => e.stopPropagation()}
                         autoFocus
-                        style={{ width: '100%', padding: 8, border: 'none', background: 'transparent', color: 'inherit', fontSize: 'inherit' }}
+                        style={{ width: '100%', padding: '8px 12px', border: 'none', background: 'transparent', color: 'inherit', fontSize: 'inherit', boxSizing: 'border-box' }}
                       />
                     ) : (
-                      <>
+                      <div style={{ padding: '0 12px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {row.boatNo}
                         {duplicateBoatNos.has(String(row.boatNo)) && (
                           <span title="Duplicate boat number" style={{ marginLeft: 4, color: '#ffb450', fontWeight: 700 }}>!</span>
                         )}
-                      </>
+                      </div>
                     )}
                   </td>
                   <td
-                    style={{ textAlign: 'center', cursor: isUnlocked ? 'pointer' : undefined, padding: isUnlocked ? 0 : undefined }}
+                    style={{ textAlign: 'center', cursor: isUnlocked ? 'pointer' : undefined }}
                     onClick={e => { e.stopPropagation(); isUnlocked && handleStartEdit(row, 'numFish'); }}
                   >
                     {editingId === row.id && editValues.hasOwnProperty('numFish') ? (
@@ -184,14 +184,14 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
                         }}
                         onClick={e => e.stopPropagation()}
                         autoFocus
-                        style={{ width: '100%', padding: 8, border: 'none', background: 'transparent', color: 'inherit', fontSize: 'inherit', textAlign: 'center' }}
+                        style={{ width: '100%', padding: '8px 12px', border: 'none', background: 'transparent', color: 'inherit', fontSize: 'inherit', textAlign: 'center', boxSizing: 'border-box' }}
                       />
                     ) : (
                       row.numFish > 0 ? row.numFish : '—'
                     )}
                   </td>
                   <td
-                    style={{ textAlign: 'right', fontWeight: 600, cursor: isUnlocked ? 'pointer' : undefined, padding: isUnlocked ? 0 : undefined }}
+                    style={{ textAlign: 'right', fontWeight: 600, cursor: isUnlocked ? 'pointer' : undefined }}
                     onClick={e => { e.stopPropagation(); isUnlocked && handleStartEdit(row, 'lunkerWeight'); }}
                   >
                     {editingId === row.id && editValues.hasOwnProperty('lunkerWeight') ? (
@@ -207,14 +207,14 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
                         }}
                         onClick={e => e.stopPropagation()}
                         autoFocus
-                        style={{ width: '100%', padding: 8, border: 'none', background: 'transparent', color: 'inherit', fontSize: 'inherit', textAlign: 'right' }}
+                        style={{ width: '100%', padding: '8px 12px', border: 'none', background: 'transparent', color: 'inherit', fontSize: 'inherit', textAlign: 'right', boxSizing: 'border-box' }}
                       />
                     ) : (
                       parseFloat(row.lunkerWeight) > 0 ? parseFloat(row.lunkerWeight).toFixed(2) : '—'
                     )}
                   </td>
                   <td
-                    style={{ textAlign: 'right', fontWeight: 700, color: '#e8c876', cursor: isUnlocked ? 'pointer' : undefined, padding: isUnlocked ? 0 : undefined }}
+                    style={{ textAlign: 'right', fontWeight: 700, color: '#e8c876', cursor: isUnlocked ? 'pointer' : undefined }}
                     onClick={e => { e.stopPropagation(); isUnlocked && handleStartEdit(row, 'totalWeight'); }}
                   >
                     {editingId === row.id && editValues.hasOwnProperty('totalWeight') ? (
@@ -230,7 +230,7 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
                         }}
                         onClick={e => e.stopPropagation()}
                         autoFocus
-                        style={{ width: '100%', padding: 8, border: 'none', background: 'transparent', color: 'inherit', fontSize: 'inherit', textAlign: 'right' }}
+                        style={{ width: '100%', padding: '8px 12px', border: 'none', background: 'transparent', color: 'inherit', fontSize: 'inherit', textAlign: 'right', boxSizing: 'border-box' }}
                       />
                     ) : (
                       parseFloat(row.totalWeight) > 0 ? parseFloat(row.totalWeight).toFixed(2) : '—'
