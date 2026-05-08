@@ -28,8 +28,9 @@ export default function LeaderboardTab({ entries, settings }) {
     .sort((a, b) => parseFloat(b.totalWeight) - parseFloat(a.totalWeight));
   const option1Row = optionEligible[0] || null;
   const option2Row = optionEligible[1] || null;
-  const option1Payout = (optionPot * 0.7).toFixed(2);
-  const option2Payout = (optionPot * 0.3).toFixed(2);
+  const option1Pct = (settings.fees?.option1Pct ?? 70) / 100;
+  const option1Payout = (optionPot * option1Pct).toFixed(2);
+  const option2Payout = (optionPot * (1 - option1Pct)).toFixed(2);
 
   return (
     <div className="tab-panel active" style={{ position: 'relative' }}>

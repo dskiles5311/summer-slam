@@ -19,7 +19,7 @@ import {
 import { calcRanks } from './utils/calculations';
 
 const DEFAULT_SETTINGS = {
-  fees:            { entryFee: 249, lunkerFee: 10, optFee: 20 },
+  fees:            { entryFee: 249, lunkerFee: 10, optFee: 20, option1Pct: 70 },
   payoutSettings:  {
     totalPayout: 10500,
     numWinners:  17,

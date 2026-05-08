@@ -305,7 +305,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
         {/* Fee Structure */}
         <div style={PANEL}>
           <h3 style={H3}>Fee Structure</h3>
-          <div className="edit-grid-3">
+          <div className="edit-grid-3" style={{ marginBottom: 12 }}>
             <div className="form-field">
               <label>Entry Fee ($)</label>
               <input type="number" value={localFees.entryFee} min="0" step="1" disabled={locked}
@@ -325,9 +325,23 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
                      onBlur={() => onUpdateSettings({ fees: localFees })} />
             </div>
           </div>
+          <div className="edit-grid-2">
+            <div className="form-field">
+              <label>Option 1 Payout (%)</label>
+              <input type="number" value={localFees.option1Pct ?? 70} min="0" max="100" step="1" disabled={locked}
+                     onChange={e => setLocalFees(prev => ({ ...prev, option1Pct: Math.min(100, Math.max(0, parseFloat(e.target.value) || 0)) }))}
+                     onBlur={() => onUpdateSettings({ fees: localFees })} />
+            </div>
+            <div className="form-field">
+              <label>Option 2 Payout (%)</label>
+              <input type="number" value={100 - (localFees.option1Pct ?? 70)} disabled
+                     style={{ opacity: 0.6 }} />
+            </div>
+          </div>
           <p style={{ color: 'var(--header-bg)', fontSize: 11, marginTop: 8 }}>
             Lunker Pot = Lunker Fee × number of "Lunker Paid = Yes" entries.<br />
             Option Pot = Option Fee × number of "Option Paid = Yes" entries.<br />
+            Option 2 % is automatically set to 100 minus Option 1 %.<br />
             Buy-In cells are highlighted red if below the entry fee amount.
           </p>
         </div>
