@@ -142,17 +142,17 @@ export default function SignUpTab({ onAddEntry }) {
             </div>
           </div>
           <div>
+            <label style={LABEL}>Email</label>
+            <input type="email" value={form.boaterEmail} placeholder="angler@example.com"
+                   onChange={e => set('boaterEmail', e.target.value)}
+                   style={FIELD} />
+          </div>
+          <div>
             <label style={LABEL}>Phone *</label>
             <input type="tel" value={form.boaterPhone} placeholder="(555) 123-4567"
                    onChange={e => set('boaterPhone', e.target.value)}
                    style={fieldBorder('boaterPhone')} />
             {err('boaterPhone')}
-          </div>
-          <div>
-            <label style={LABEL}>Email</label>
-            <input type="email" value={form.boaterEmail} placeholder="angler@example.com"
-                   onChange={e => set('boaterEmail', e.target.value)}
-                   style={FIELD} />
           </div>
         </div>
 
@@ -187,6 +187,12 @@ export default function SignUpTab({ onAddEntry }) {
             </div>
           </div>
           <div>
+            <label style={LABEL}>Email</label>
+            <input type="email" value={form.coAnglerEmail} placeholder="angler@example.com"
+                   onChange={e => set('coAnglerEmail', e.target.value)}
+                   style={FIELD} />
+          </div>
+          <div>
             <label style={LABEL}>
               Phone{(form.coAnglerFirst || form.coAnglerLast) ? ' *' : ''}
             </label>
@@ -194,12 +200,6 @@ export default function SignUpTab({ onAddEntry }) {
                    onChange={e => set('coAnglerPhone', e.target.value)}
                    style={fieldBorder('coAnglerPhone')} />
             {err('coAnglerPhone')}
-          </div>
-          <div>
-            <label style={LABEL}>Email</label>
-            <input type="email" value={form.coAnglerEmail} placeholder="angler@example.com"
-                   onChange={e => set('coAnglerEmail', e.target.value)}
-                   style={FIELD} />
           </div>
         </div>
 
