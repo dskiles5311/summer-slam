@@ -102,12 +102,8 @@ export default function EditModal({ entry, onSave, onCancel }) {
               </div>
               <div className="form-field">
                 <label>Boater Last</label>
-                <ContactSuggest
-                  value={form.boaterLast}
-                  placeholder="Last"
-                  onChange={v => set('boaterLast', v)}
-                  onSelect={c => setForm(prev => ({ ...prev, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || prev.boaterEmail }))}
-                />
+                <input type="text" value={form.boaterLast} placeholder="Last"
+                       onChange={e => set('boaterLast', e.target.value)} />
               </div>
               <div className="form-field">
                 <label>Boater Phone</label>
@@ -130,12 +126,8 @@ export default function EditModal({ entry, onSave, onCancel }) {
               </div>
               <div className="form-field">
                 <label>Co-Angler Last</label>
-                <ContactSuggest
-                  value={form.coAnglerLast}
-                  placeholder="Last"
-                  onChange={v => set('coAnglerLast', v)}
-                  onSelect={c => setForm(prev => ({ ...prev, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || prev.coAnglerEmail }))}
-                />
+                <input type="text" value={form.coAnglerLast} placeholder="Last"
+                       onChange={e => set('coAnglerLast', e.target.value)} />
               </div>
               <div className="form-field">
                 <label>Co-Angler Phone</label>
