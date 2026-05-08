@@ -39,6 +39,13 @@ export default function App() {
   const [toast, setToast]               = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
   const [isUnlocked, setIsUnlocked]     = useState(() => isPasswordStored());
+  const [buyInBlurred, setBuyInBlurred] = useState(() => localStorage.getItem('ss_buyin_blur') !== 'false');
+
+  function handleToggleBuyInBlur() {
+    const next = !buyInBlurred;
+    setBuyInBlurred(next);
+    localStorage.setItem('ss_buyin_blur', String(next));
+  }
   const [showUnlock, setShowUnlock]     = useState(false);
 
   const showToast = useCallback((message, type = 'success') => {
@@ -308,6 +315,8 @@ export default function App() {
         }}
         isUnlocked={isUnlocked}
         onToggleLock={() => isUnlocked ? handleLock() : setShowUnlock(true)}
+        buyInBlurred={buyInBlurred}
+        onToggleBuyInBlur={handleToggleBuyInBlur}
       />
 
       <main>
@@ -319,6 +328,7 @@ export default function App() {
             entries={rankedEntries}
             settings={settingsWithTheme}
             isUnlocked={isUnlocked}
+            buyInBlurred={buyInBlurred}
             onEdit={setEditingEntry}
             onAdd={() => setEditingEntry({})}
             onDelete={handleDeleteEntry}

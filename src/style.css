@@ -370,6 +370,11 @@ tbody td { padding: 8px 10px; color: var(--white); vertical-align: middle; }
 .summary-card .s-name.s-co { font-size: 22px; font-weight: 500; color: var(--header-bg); margin-top: 2px; }
 .summary-card .s-val  { font-size: 20px; font-weight: 700; color: var(--gold-light); display: block; }
 
+/* ── BUY-IN BLUR ── */
+.buyin-val { transition: filter 0.25s; }
+.buyin-blurred .buyin-val { filter: blur(6px); }
+.buyin-blurred:hover .buyin-val { filter: blur(1px); }
+
 /* ── EDIT MODAL OVERLAY ── */
 .edit-overlay {
   position: fixed;

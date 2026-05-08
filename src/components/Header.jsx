@@ -1,18 +1,9 @@
 import { useState } from 'react';
 import { getStats } from '../utils/calculations';
 
-export default function Header({ entries, settings, activeTab, onTabChange, onThemeToggle, isUnlocked, onToggleLock }) {
+export default function Header({ entries, settings, activeTab, onTabChange, onThemeToggle, isUnlocked, onToggleLock, buyInBlurred, onToggleBuyInBlur }) {
   const stats = getStats(entries, settings.fees);
-  const [buyInBlurred, setBuyInBlurred] = useState(
-    () => localStorage.getItem('ss_buyin_blur') !== 'false'
-  );
   const [buyInPeeking, setBuyInPeeking] = useState(false);
-
-  function toggleBuyInBlur() {
-    const next = !buyInBlurred;
-    setBuyInBlurred(next);
-    localStorage.setItem('ss_buyin_blur', String(next));
-  }
 
   const buyInFilter = !buyInBlurred ? 'none'
     : buyInPeeking ? 'blur(1px)'
@@ -65,7 +56,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
             <span className="lbl" style={{ color: 'rgba(120,200,255,0.7)' }}>{stats.optionPaidCount} paid</span>
           </div>
           {isUnlocked && (
-            <div className="stat-chip" onClick={toggleBuyInBlur}
+            <div className="stat-chip" onClick={onToggleBuyInBlur}
                  onMouseEnter={() => setBuyInPeeking(true)}
                  onMouseLeave={() => setBuyInPeeking(false)}
                  title={buyInBlurred ? 'Hover to peek · Click to reveal' : 'Click to hide'}

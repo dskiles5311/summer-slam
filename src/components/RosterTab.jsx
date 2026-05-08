@@ -48,7 +48,7 @@ const SORT_BUTTONS = [
   { label: 'Weight ↓',     field: 'totalWeight',  dir: 'desc' },
 ];
 
-export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd, onDelete, onClearAll, onImport, onToggleBoatCheck, onToggleField, onUpdateInlineField }) {
+export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred, onEdit, onAdd, onDelete, onClearAll, onImport, onToggleBoatCheck, onToggleField, onUpdateInlineField }) {
   const entryFee = parseFloat(settings.fees?.entryFee) || 249;
   const boatCheck = settings.boatCheck || {};
   const [sortConfig, setSortConfig] = useState({ field: '_rank', dir: 'asc' });
@@ -295,8 +295,8 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
                       {boatCheck[row.id] ? '✓' : '○'}
                     </span>
                   </td>
-                  <td style={{ textAlign: 'right' }}>
-                    <span className={buyInClass}>${buyIn.toFixed(2)}</span>
+                  <td className={buyInBlurred ? 'buyin-blurred' : ''} style={{ textAlign: 'right' }}>
+                    <span className={`buyin-val ${buyInClass}`}>${buyIn.toFixed(2)}</span>
                   </td>
                   {isUnlocked && (
                     <td style={{ textAlign: 'center' }} onClick={e => e.stopPropagation()}>
