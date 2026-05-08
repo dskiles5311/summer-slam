@@ -58,23 +58,14 @@ export default function LeaderboardTab({ entries, settings }) {
         </p>
       </div>
 
-      <div className="summary-grid-top" style={{ marginBottom: 10, maxWidth: 760, marginLeft: 'auto', marginRight: 'auto' }}>
+      <div className="summary-grid-top" style={{ marginBottom: 12, maxWidth: 900, marginLeft: 'auto', marginRight: 'auto' }}>
         <div className="summary-chip">
           <span className="sc-lbl">Total Boats</span>
           <span className="sc-val">{totalBoats}</span>
         </div>
         <div className="summary-chip">
-          <span className="sc-lbl">Lunker to Beat</span>
-          <span className="sc-val">{lunkerToBeat} lbs</span>
-          {lunkerRow && (
-            <>
-              {lunkerRow.boatNo && <span className="sc-boat">Boat #{lunkerRow.boatNo}</span>}
-              <span className="sc-name">{`${lunkerRow.boaterFirst} ${lunkerRow.boaterLast}`.trim() || '—'}</span>
-              {`${lunkerRow.coAnglerFirst || ''} ${lunkerRow.coAnglerLast || ''}`.trim() && (
-                <span className="sc-co">{`${lunkerRow.coAnglerFirst || ''} ${lunkerRow.coAnglerLast || ''}`.trim()}</span>
-              )}
-            </>
-          )}
+          <span className="sc-lbl">Total Weight</span>
+          <span className="sc-val">{totalWeight} lbs</span>
         </div>
         <div className="summary-chip">
           <span className="sc-lbl">Largest Bag</span>
@@ -90,42 +81,54 @@ export default function LeaderboardTab({ entries, settings }) {
           )}
         </div>
         <div className="summary-chip">
-          <span className="sc-lbl">Total Weight</span>
-          <span className="sc-val">{totalWeight} lbs</span>
+          <span className="sc-lbl">Lunker to Beat</span>
+          <span className="sc-val">{lunkerToBeat} lbs</span>
+          {lunkerRow && (
+            <>
+              {lunkerRow.boatNo && <span className="sc-boat">Boat #{lunkerRow.boatNo}</span>}
+              <span className="sc-name">{`${lunkerRow.boaterFirst} ${lunkerRow.boaterLast}`.trim() || '—'}</span>
+              {`${lunkerRow.coAnglerFirst || ''} ${lunkerRow.coAnglerLast || ''}`.trim() && (
+                <span className="sc-co">{`${lunkerRow.coAnglerFirst || ''} ${lunkerRow.coAnglerLast || ''}`.trim()}</span>
+              )}
+            </>
+          )}
         </div>
-      </div>
-
-      <div className="summary-grid" style={{ marginBottom: 16, maxWidth: 760, marginLeft: 'auto', marginRight: 'auto' }}>
-        <div className="summary-card">
-          <span className="s-lbl">⚡ Option 1 — ${option1Payout}</span>
+        <div className="summary-chip">
+          <span className="sc-lbl">⚡ Option 1</span>
+          <span className="sc-val">${option1Payout}</span>
           {option1Row ? (
             <>
-              <span className="s-boat">{option1Row.boatNo ? `Boat #${option1Row.boatNo}` : ''}</span>
-              <span className="s-name">{`${option1Row.boaterFirst} ${option1Row.boaterLast}`.trim() || '—'}</span>
-              <span className="s-name s-co">{`${option1Row.coAnglerFirst || ''} ${option1Row.coAnglerLast || ''}`.trim() || ''}</span>
+              {option1Row.boatNo && <span className="sc-boat">Boat #{option1Row.boatNo}</span>}
+              <span className="sc-name">{`${option1Row.boaterFirst} ${option1Row.boaterLast}`.trim() || '—'}</span>
+              {`${option1Row.coAnglerFirst || ''} ${option1Row.coAnglerLast || ''}`.trim() && (
+                <span className="sc-co">{`${option1Row.coAnglerFirst || ''} ${option1Row.coAnglerLast || ''}`.trim()}</span>
+              )}
             </>
-          ) : <span className="s-name">—</span>}
+          ) : <span className="sc-name">—</span>}
         </div>
-        <div className="summary-card">
-          <span className="s-lbl">⚡ Option 2 — ${option2Payout}</span>
+        <div className="summary-chip">
+          <span className="sc-lbl">⚡ Option 2</span>
+          <span className="sc-val">${option2Payout}</span>
           {option2Row ? (
             <>
-              <span className="s-boat">{option2Row.boatNo ? `Boat #${option2Row.boatNo}` : ''}</span>
-              <span className="s-name">{`${option2Row.boaterFirst} ${option2Row.boaterLast}`.trim() || '—'}</span>
-              <span className="s-name s-co">{`${option2Row.coAnglerFirst || ''} ${option2Row.coAnglerLast || ''}`.trim() || ''}</span>
+              {option2Row.boatNo && <span className="sc-boat">Boat #{option2Row.boatNo}</span>}
+              <span className="sc-name">{`${option2Row.boaterFirst} ${option2Row.boaterLast}`.trim() || '—'}</span>
+              {`${option2Row.coAnglerFirst || ''} ${option2Row.coAnglerLast || ''}`.trim() && (
+                <span className="sc-co">{`${option2Row.coAnglerFirst || ''} ${option2Row.coAnglerLast || ''}`.trim()}</span>
+              )}
             </>
-          ) : <span className="s-name">—</span>}
+          ) : <span className="sc-name">—</span>}
         </div>
       </div>
 
-      <div className="top-n-control" style={{ maxWidth: 760, marginLeft: 'auto', marginRight: 'auto' }}>
+      <div className="top-n-control" style={{ maxWidth: 900, marginLeft: 'auto', marginRight: 'auto' }}>
         <span style={{ color: 'var(--header-bg)', fontSize: 14 }}>
           Showing top <strong style={{ color: 'var(--gold-light)' }}>{topN}</strong> positions — set in Settings
         </span>
         <button className="btn btn-gold btn-sm" onClick={() => window.print()}>🖨️ Print / PDF</button>
       </div>
 
-      <div id="lbContainer" style={{ maxWidth: 760, marginLeft: 'auto', marginRight: 'auto' }}>
+      <div id="lbContainer" style={{ maxWidth: 900, marginLeft: 'auto', marginRight: 'auto' }}>
         {displayed.length === 0 ? (
           <p style={{ textAlign: 'center', color: 'var(--header-bg)', padding: 40 }}>
             No entries yet. Add anglers in the Roster tab.

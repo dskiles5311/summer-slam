@@ -329,7 +329,7 @@ tbody td { padding: 8px 10px; color: var(--white); vertical-align: middle; }
 /* ── LEADERBOARD SUMMARY ── */
 .summary-grid-top {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 10px;
 }
 
@@ -337,17 +337,17 @@ tbody td { padding: 8px 10px; color: var(--white); vertical-align: middle; }
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(168,200,160,0.25);
   border-radius: 10px;
-  padding: 14px 16px;
+  padding: 12px 10px;
   text-align: center;
   overflow-wrap: break-word;
   min-width: 0;
 }
 
-.summary-chip .sc-lbl    { font-size: 26px; font-weight: 800; color: var(--white); display: block; line-height: 1.1; margin-bottom: 6px; }
-.summary-chip .sc-val    { font-size: 24px; font-weight: 700; color: var(--gold-light); display: block; line-height: 1.1; }
-.summary-chip .sc-boat   { font-size: 24px; font-weight: 700; color: var(--gold-light); display: block; margin-top: 6px; }
-.summary-chip .sc-name   { font-size: 22px; font-weight: 600; color: var(--white); display: block; line-height: 1.3; }
-.summary-chip .sc-co     { font-size: 22px; font-weight: 500; color: var(--header-bg); display: block; margin-top: 2px; }
+.summary-chip .sc-lbl    { font-size: 13px; font-weight: 800; color: var(--white); display: block; line-height: 1.2; margin-bottom: 4px; }
+.summary-chip .sc-val    { font-size: 20px; font-weight: 700; color: var(--gold-light); display: block; line-height: 1.1; }
+.summary-chip .sc-boat   { font-size: 13px; font-weight: 700; color: var(--gold-light); display: block; margin-top: 4px; }
+.summary-chip .sc-name   { font-size: 13px; font-weight: 600; color: var(--white); display: block; line-height: 1.3; }
+.summary-chip .sc-co     { font-size: 12px; font-weight: 500; color: var(--header-bg); display: block; margin-top: 2px; }
 
 .summary-grid {
   display: grid;
@@ -559,13 +559,14 @@ tbody td { padding: 8px 10px; color: var(--white); vertical-align: middle; }
   }
   .lb-rank, .lb-boatno-num, .lb-angler-name, .lb-stat-item .val,
   .lb-stat-item .lbl, .lb-payout .val, .lb-payout .lbl,
-  .sc-lbl, .sc-val, .s-lbl, .s-boat, .s-name { color: black !important; }
+  .sc-lbl, .sc-val, .sc-boat, .sc-name, .sc-co { color: black !important; }
+  .summary-grid-top { grid-template-columns: repeat(3, 1fr); }
 }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   .header-stats { display: none; }
-  .summary-grid-top { grid-template-columns: repeat(2, 1fr); }
+  .summary-grid-top { grid-template-columns: repeat(3, 1fr); }
   .lb-card { grid-template-columns: 46px 52px 1fr auto auto; gap: 10px; }
   .lb-stat-item:not(.highlight) { display: none; }
   .contacts-table .col-email { display: none; }
@@ -615,17 +616,17 @@ tbody td { padding: 8px 10px; color: var(--white); vertical-align: middle; }
   .edit-panel-actions .btn { width: 100%; text-align: center; }
   .btn-lg { min-height: 52px; font-size: 16px; }
 
-  /* Leaderboard: compact chip/card fonts on phones */
-  .summary-chip { padding: 10px 10px; }
-  .summary-chip .sc-lbl  { font-size: 15px; }
-  .summary-chip .sc-val  { font-size: 17px; }
-  .summary-chip .sc-boat { font-size: 15px; }
-  .summary-chip .sc-name { font-size: 13px; }
-  .summary-chip .sc-co   { font-size: 12px; }
-  .summary-card .s-lbl   { font-size: 17px; }
-  .summary-card .s-boat  { font-size: 15px; }
-  .summary-card .s-name  { font-size: 14px; }
-  .summary-card .s-name.s-co { font-size: 13px; }
+  /* Leaderboard: compact chip fonts on phones */
+  .summary-chip { padding: 8px 8px; }
+  .summary-chip .sc-lbl  { font-size: 11px; }
+  .summary-chip .sc-val  { font-size: 15px; }
+  .summary-chip .sc-boat { font-size: 11px; }
+  .summary-chip .sc-name { font-size: 11px; }
+  .summary-chip .sc-co   { font-size: 10px; }
+}
+
+@media (max-width: 480px) {
+  .summary-grid-top { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* ── LIGHT THEME ── */
