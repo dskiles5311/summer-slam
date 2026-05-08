@@ -467,13 +467,14 @@ function calcEntryPenalties(e, penalties = {}) {
   const shrt = Math.max(0, parseInt(e.shortFish) || 0);
   // numFish is stored post-adjustment (short fish already removed), so
   // reconstruct the raw count to correctly derive the over-limit count.
-  const rawNf       = Math.max(0, parseInt(e.numFish) || 0) + shrt * shortCountRate;
-  const over        = Math.max(0, rawNf - shrt * shortCountRate - maxFish);
+  const adjFish     = Math.max(0, parseInt(e.numFish) || 0);
   const shrtFishDed = shrt * shortCountRate;
+  const rawFish     = adjFish + shrtFishDed;
+  const over        = Math.max(0, adjFish - maxFish);
   const deadPen     = dead * deadRate;
   const shortPen    = shrt * shortRate;
   const overPen     = over * overRate;
-  return { dead, shrt, shrtFishDed, over, deadPen, shortPen, overPen, total: deadPen + shortPen + overPen };
+  return { dead, shrt, shrtFishDed, rawFish, adjFish, over, deadPen, shortPen, overPen, total: deadPen + shortPen + overPen };
 }
 
 function WeighInLogModal({ entries, penalties, onClose, onClearLog }) {
@@ -493,7 +494,7 @@ function WeighInLogModal({ entries, penalties, onClose, onClearLog }) {
     const pen = calcEntryPenalties(e, penalties);
     const lines = [];
     if (pen.dead > 0)  lines.push(`${pen.dead} dead −${pen.deadPen.toFixed(2)} lbs`);
-    if (pen.shrt > 0)  lines.push(`${pen.shrt} short −${pen.shortPen.toFixed(2)} lbs${pen.shrtFishDed > 0 ? `, −${pen.shrtFishDed} fish` : ''}`);
+    if (pen.shrt > 0)  lines.push(`${pen.shrt} short −${pen.shortPen.toFixed(2)} lbs${pen.shrtFishDed > 0 ? `, fish ${pen.rawFish}→${pen.adjFish}` : ''}`);
     if (pen.over > 0)  lines.push(`${pen.over} over limit −${pen.overPen.toFixed(2)} lbs`);
     if (pen.total > 0) lines.push(`Wt penalty −${pen.total.toFixed(2)} lbs`);
     return { lines, total: pen.total };
@@ -534,7 +535,7 @@ function WeighInLogModal({ entries, penalties, onClose, onClearLog }) {
       <table><thead><tr>
         <th style="text-align:right">#</th><th>Time</th><th>Boat</th>
         <th>Boater</th><th>Co-Angler</th>
-        <th style="text-align:right">Fish</th>
+        <th style="text-align:right">Fish (Adj)</th>
         <th style="text-align:right">Lunker</th>
         <th style="text-align:right">Scale Wt</th>
         <th style="text-align:right">Deductions</th>
@@ -546,7 +547,7 @@ function WeighInLogModal({ entries, penalties, onClose, onClearLog }) {
   }
 
   function handleExport() {
-    const header = ['#', 'Time', 'Boat', 'Boater', 'Co-Angler', 'Fish', 'Lunker', 'Scale Wt', 'Deductions', 'Adj Wt'];
+    const header = ['#', 'Time', 'Boat', 'Boater', 'Co-Angler', 'Fish (Adj)', 'Lunker', 'Scale Wt', 'Deductions', 'Adj Wt'];
     const csvRows = [header, ...logged.map((e, i) => {
       const lw = parseFloat(e.lunkerWeight) || 0;
       const tw = parseFloat(e.totalWeight)  || 0;
@@ -581,7 +582,7 @@ function WeighInLogModal({ entries, penalties, onClose, onClearLog }) {
     onClose();
   }
 
-  const rightAligned = new Set(['#', 'Fish', 'Lunker', 'Scale Wt', 'Deductions', 'Adj Wt']);
+  const rightAligned = new Set(['#', 'Fish (Adj)', 'Lunker', 'Scale Wt', 'Deductions', 'Adj Wt']);
 
   return (
     <div
@@ -607,7 +608,7 @@ function WeighInLogModal({ entries, penalties, onClose, onClearLog }) {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
                   <tr>
-                    {['#', 'Time', 'Boat', 'Boater', 'Co-Angler', 'Fish', 'Lunker', 'Scale Wt', 'Deductions', 'Adj Wt'].map(h => (
+                    {['#', 'Time', 'Boat', 'Boater', 'Co-Angler', 'Fish (Adj)', 'Lunker', 'Scale Wt', 'Deductions', 'Adj Wt'].map(h => (
                       <th key={h} style={{ textAlign: rightAligned.has(h) ? 'right' : 'left', padding: '6px 10px', color: 'var(--header-bg)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, borderBottom: '1px solid rgba(139,180,225,0.2)', whiteSpace: 'nowrap' }}>
                         {h}
                       </th>
