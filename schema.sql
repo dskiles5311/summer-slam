@@ -2,8 +2,10 @@ CREATE TABLE IF NOT EXISTS entries (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   boater_first  TEXT DEFAULT '',
   boater_last   TEXT DEFAULT '',
+  boater_phone  TEXT DEFAULT '',
   co_angler_first TEXT DEFAULT '',
   co_angler_last  TEXT DEFAULT '',
+  co_angler_phone TEXT DEFAULT '',
   boat_no       TEXT DEFAULT '',
   num_fish      INTEGER DEFAULT 0,
   lunker_weight REAL DEFAULT 0,
@@ -19,11 +21,15 @@ CREATE TABLE IF NOT EXISTS entries (
   needs_attention INTEGER DEFAULT 0
 );
 
--- Migration for existing databases (run once against Turso):
--- ALTER TABLE entries ADD COLUMN raw_weight REAL DEFAULT NULL;
--- ALTER TABLE entries ADD COLUMN dead_fish INTEGER DEFAULT 0;
--- ALTER TABLE entries ADD COLUMN short_fish INTEGER DEFAULT 0;
--- ALTER TABLE entries ADD COLUMN needs_attention INTEGER DEFAULT 0;
+-- Persists across tournament seasons (not cleared with entries)
+CREATE TABLE IF NOT EXISTS contacts (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  first_name TEXT NOT NULL,
+  last_name  TEXT NOT NULL,
+  phone      TEXT DEFAULT '',
+  last_seen  DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(first_name, last_name)
+);
 
 CREATE TABLE IF NOT EXISTS settings (
   key   TEXT PRIMARY KEY,
@@ -32,5 +38,5 @@ CREATE TABLE IF NOT EXISTS settings (
 
 INSERT OR IGNORE INTO settings (key, value) VALUES
   ('fees',           '{"entryFee":249,"lunkerFee":10,"optFee":20}'),
-  ('payoutSettings', '{"totalPayout":0,"numWinners":10,"payouts":[]}'),
+  ('payoutSettings', '{"totalPayout":10500,"numWinners":17,"minPayout":255,"payouts":[4000,1000,800,600,500,360,350,340,330,320,295,280,275,270,265,260,255]}'),
   ('theme',          '"dark"');

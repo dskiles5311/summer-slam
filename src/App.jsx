@@ -6,18 +6,25 @@ import WeighInTab from './components/WeighInTab';
 import LeaderboardTab from './components/LeaderboardTab';
 import RulesTab from './components/RulesTab';
 import SettingsTab from './components/SettingsTab';
+import SignUpTab from './components/SignUpTab';
 import EditModal from './components/EditModal';
 import UnlockModal from './components/UnlockModal';
 import Toast from './components/Toast';
 import {
   fetchEntries, createEntry, updateEntry, deleteEntry,
   fetchSettings, saveSettings, verifyPassword, storePassword, clearPassword, isPasswordStored,
+  upsertContacts,
 } from './utils/api';
 import { calcRanks } from './utils/calculations';
 
 const DEFAULT_SETTINGS = {
   fees:            { entryFee: 249, lunkerFee: 10, optFee: 20 },
-  payoutSettings:  { totalPayout: 0, numWinners: 10, minPayout: 250, payouts: [] },
+  payoutSettings:  {
+    totalPayout: 10500,
+    numWinners:  17,
+    minPayout:   255,
+    payouts:     [4000,1000,800,600,500,360,350,340,330,320,295,280,275,270,265,260,255],
+  },
   boatCheck:       {},
   offWater:        {},
 };
@@ -115,6 +122,10 @@ export default function App() {
         showToast(duplicate ? `Warning: Boat #${entryData.boatNo} is already in use!` : 'Entry added!', duplicate ? 'warning' : 'success');
       }
       setEditingEntry(null);
+      upsertContacts([
+        { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone },
+        { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone },
+      ]);
     } catch {
       showToast('Failed to save entry', 'error');
     }
@@ -202,6 +213,22 @@ export default function App() {
     await handleUpdateSettings({ boatCheck: {}, offWater: {} });
   }
 
+  async function handleSignUpEntry(entryData) {
+    try {
+      const created = await createEntry(entryData);
+      setEntries(prev => [...prev, created]);
+      showToast(`${entryData.boaterFirst} ${entryData.boaterLast} signed up!`, 'success');
+      upsertContacts([
+        { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone },
+        { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone },
+      ]);
+      return true;
+    } catch {
+      showToast('Failed to sign up entry', 'error');
+      return false;
+    }
+  }
+
   async function handleAddWeighInEntry(boatNo, weighData) {
     try {
       const created = await createEntry({
@@ -283,6 +310,9 @@ export default function App() {
       />
 
       <main>
+        {activeTab === 'signup' && (
+          <SignUpTab onAddEntry={handleSignUpEntry} />
+        )}
         {activeTab === 'roster' && (
           <RosterTab
             entries={rankedEntries}

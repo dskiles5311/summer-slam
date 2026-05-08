@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
+import ContactSuggest from './ContactSuggest';
 
 const EMPTY = {
-  boaterFirst: '', boaterLast: '',
-  coAnglerFirst: '', coAnglerLast: '',
+  boaterFirst: '', boaterLast: '', boaterPhone: '',
+  coAnglerFirst: '', coAnglerLast: '', coAnglerPhone: '',
   boatNo: '', numFish: '', lunkerWeight: '', totalWeight: '',
   lunker: '', option: '', paid: '', appSigned: '', buyIn: '',
   needsAttention: false,
@@ -18,8 +19,10 @@ export default function EditModal({ entry, onSave, onCancel }) {
     setForm({
       boaterFirst:    entry.boaterFirst   ?? '',
       boaterLast:     entry.boaterLast    ?? '',
+      boaterPhone:    entry.boaterPhone   ?? '',
       coAnglerFirst:  entry.coAnglerFirst ?? '',
       coAnglerLast:   entry.coAnglerLast  ?? '',
+      coAnglerPhone:  entry.coAnglerPhone ?? '',
       boatNo:         entry.boatNo        ?? '',
       numFish:        entry.numFish       ?? '',
       lunkerWeight:   entry.lunkerWeight  ?? '',
@@ -87,25 +90,56 @@ export default function EditModal({ entry, onSave, onCancel }) {
             <div className="edit-grid-2">
               <div className="form-field">
                 <label>Boater First</label>
-                <input ref={firstInputRef} type="text" value={form.boaterFirst} placeholder="First"
-                       autoComplete="given-name"
-                       onChange={e => set('boaterFirst', e.target.value)} />
+                <ContactSuggest
+                  value={form.boaterFirst}
+                  placeholder="First"
+                  inputRef={firstInputRef}
+                  onChange={v => set('boaterFirst', v)}
+                  onSelect={c => setForm(prev => ({ ...prev, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone }))}
+                />
               </div>
               <div className="form-field">
                 <label>Boater Last</label>
-                <input type="text" value={form.boaterLast} placeholder="Last"
-                       autoComplete="family-name"
-                       onChange={e => set('boaterLast', e.target.value)} />
+                <ContactSuggest
+                  value={form.boaterLast}
+                  placeholder="Last"
+                  onChange={v => set('boaterLast', v)}
+                  onSelect={c => setForm(prev => ({ ...prev, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone }))}
+                />
+              </div>
+              <div className="form-field">
+                <label>Boater Phone</label>
+                <input type="tel" value={form.boaterPhone} placeholder="(555) 123-4567"
+                       onChange={e => set('boaterPhone', e.target.value)} />
+              </div>
+              <div className="form-field">
+                <label></label>
               </div>
               <div className="form-field">
                 <label>Co-Angler First</label>
-                <input type="text" value={form.coAnglerFirst} placeholder="First"
-                       onChange={e => set('coAnglerFirst', e.target.value)} />
+                <ContactSuggest
+                  value={form.coAnglerFirst}
+                  placeholder="First"
+                  onChange={v => set('coAnglerFirst', v)}
+                  onSelect={c => setForm(prev => ({ ...prev, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone }))}
+                />
               </div>
               <div className="form-field">
                 <label>Co-Angler Last</label>
-                <input type="text" value={form.coAnglerLast} placeholder="Last"
-                       onChange={e => set('coAnglerLast', e.target.value)} />
+                <ContactSuggest
+                  value={form.coAnglerLast}
+                  placeholder="Last"
+                  onChange={v => set('coAnglerLast', v)}
+                  onSelect={c => setForm(prev => ({ ...prev, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone }))}
+                />
+              </div>
+              <div className="form-field">
+                <label>Co-Angler Phone</label>
+                <input type="tel" value={form.coAnglerPhone} placeholder="(555) 123-4567"
+                       onChange={e => set('coAnglerPhone', e.target.value)} />
+              </div>
+              <div className="form-field">
+                <label></label>
               </div>
             </div>
 

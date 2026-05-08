@@ -61,6 +61,12 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
         {isUnlocked && (
           <>
             <button
+              className={`nav-tab ${activeTab === 'signup' ? 'active' : ''}`}
+              onClick={() => onTabChange('signup')}
+            >
+              📝 Sign Up
+            </button>
+            <button
               className={`nav-tab ${activeTab === 'roster' ? 'active' : ''}`}
               onClick={() => onTabChange('roster')}
             >

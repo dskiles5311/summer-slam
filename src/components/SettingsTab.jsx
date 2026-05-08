@@ -122,6 +122,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   function handleNumWinnersBlur() {
     const n = Math.max(1, parseInt(numWinners) || 1);
     setNumWinners(n);
+    if (n === payoutSettings.numWinners) return;
     // If payouts already exist, recalculate the whole distribution so the
     // minimum floor is preserved for the new last position.
     const hasPayouts = payouts.some(p => p > 0);

@@ -1,5 +1,5 @@
 export function exportCSV(entries, payoutSettings) {
-  const headers = ['Place','Boater First','Boater Last','Co-Angler First','Co-Angler Last',
+  const headers = ['Place','Boater First','Boater Last','Boater Phone','Co-Angler First','Co-Angler Last','Co-Angler Phone',
     'Boat No','# Fish','Lunker Weight','Total Weight','Lunker','Option','Paid','App Signed','Buy-In',
     'Raw Weight','Dead Fish','Short Fish','Needs Attention'];
   const lines = [headers.join(',')];
@@ -11,8 +11,8 @@ export function exportCSV(entries, payoutSettings) {
   sorted.forEach(r => {
     lines.push([
       r._rank || '',
-      r.boaterFirst, r.boaterLast,
-      r.coAnglerFirst, r.coAnglerLast,
+      r.boaterFirst, r.boaterLast, r.boaterPhone || '',
+      r.coAnglerFirst, r.coAnglerLast, r.coAnglerPhone || '',
       r.boatNo, r.numFish,
       r.lunkerWeight, r.totalWeight,
       r.lunker, r.option, r.paid, r.appSigned, r.buyIn,
@@ -76,8 +76,10 @@ export function importCSV(file) {
         const fieldMap = {
           'boater first': 'boaterFirst', 'boater_first': 'boaterFirst',
           'boater last': 'boaterLast', 'boater_last': 'boaterLast',
+          'boater phone': 'boaterPhone', 'boater_phone': 'boaterPhone',
           'co-angler first': 'coAnglerFirst', 'co-angler_first': 'coAnglerFirst',
           'co-angler last': 'coAnglerLast', 'co-angler_last': 'coAnglerLast',
+          'co-angler phone': 'coAnglerPhone', 'co-angler_phone': 'coAnglerPhone',
           'boat no': 'boatNo', 'boat_no': 'boatNo', 'boat no.': 'boatNo', 'boat_no.': 'boatNo',
           '# fish': 'numFish', 'num fish': 'numFish', 'number of fish': 'numFish', 'number_of_fish': 'numFish',
           'lunker weight': 'lunkerWeight', 'lunker_weight': 'lunkerWeight',
@@ -97,7 +99,7 @@ export function importCSV(file) {
         for (let i = 1; i < lines.length; i++) {
           const vals = parseCSVLine(lines[i]);
           const row = {
-            boaterFirst: '', boaterLast: '', coAnglerFirst: '', coAnglerLast: '',
+            boaterFirst: '', boaterLast: '', boaterPhone: '', coAnglerFirst: '', coAnglerLast: '', coAnglerPhone: '',
             boatNo: '', numFish: 0, lunkerWeight: 0, totalWeight: 0,
             lunker: 0, option: 0, paid: 0, appSigned: 0, buyIn: 0,
             rawWeight: null, deadFish: 0, shortFish: 0, needsAttention: false,
