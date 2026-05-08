@@ -336,6 +336,8 @@ tbody td { padding: 8px 10px; color: var(--white); vertical-align: middle; }
   border-radius: 10px;
   padding: 14px 16px;
   text-align: center;
+  overflow-wrap: break-word;
+  min-width: 0;
 }
 
 .summary-chip .sc-lbl    { font-size: 26px; font-weight: 800; color: var(--white); display: block; line-height: 1.1; margin-bottom: 6px; }
@@ -556,7 +558,8 @@ tbody td { padding: 8px 10px; color: var(--white); vertical-align: middle; }
 @media (max-width: 768px) {
   .header-stats { display: none; }
   .summary-grid-top { grid-template-columns: repeat(2, 1fr); }
-  .lb-card { grid-template-columns: 50px 1fr auto; }
+  .lb-card { grid-template-columns: 46px 52px 1fr auto auto; gap: 10px; }
+  .lb-stat-item:not(.highlight) { display: none; }
 
   /* Nav tabs: scroll horizontally, never wrap */
   .nav-tabs {
@@ -602,6 +605,18 @@ tbody td { padding: 8px 10px; color: var(--white); vertical-align: middle; }
   .edit-panel-actions { flex-direction: column; }
   .edit-panel-actions .btn { width: 100%; text-align: center; }
   .btn-lg { min-height: 52px; font-size: 16px; }
+
+  /* Leaderboard: compact chip/card fonts on phones */
+  .summary-chip { padding: 10px 10px; }
+  .summary-chip .sc-lbl  { font-size: 15px; }
+  .summary-chip .sc-val  { font-size: 17px; }
+  .summary-chip .sc-boat { font-size: 15px; }
+  .summary-chip .sc-name { font-size: 13px; }
+  .summary-chip .sc-co   { font-size: 12px; }
+  .summary-card .s-lbl   { font-size: 17px; }
+  .summary-card .s-boat  { font-size: 15px; }
+  .summary-card .s-name  { font-size: 14px; }
+  .summary-card .s-name.s-co { font-size: 13px; }
 }
 
 /* ── LIGHT THEME ── */
