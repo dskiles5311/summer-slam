@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import ContactSuggest from './ContactSuggest';
 
 const EMPTY = {
-  boaterFirst: '', boaterLast: '', boaterPhone: '',
-  coAnglerFirst: '', coAnglerLast: '', coAnglerPhone: '',
+  boaterFirst: '', boaterLast: '', boaterPhone: '', boaterEmail: '',
+  coAnglerFirst: '', coAnglerLast: '', coAnglerPhone: '', coAnglerEmail: '',
   boatNo: '', numFish: '', lunkerWeight: '', totalWeight: '',
   lunker: '', option: '', paid: '', appSigned: '', buyIn: '',
   needsAttention: false,
@@ -20,9 +20,11 @@ export default function EditModal({ entry, onSave, onCancel }) {
       boaterFirst:    entry.boaterFirst   ?? '',
       boaterLast:     entry.boaterLast    ?? '',
       boaterPhone:    entry.boaterPhone   ?? '',
+      boaterEmail:    entry.boaterEmail   ?? '',
       coAnglerFirst:  entry.coAnglerFirst ?? '',
       coAnglerLast:   entry.coAnglerLast  ?? '',
       coAnglerPhone:  entry.coAnglerPhone ?? '',
+      coAnglerEmail:  entry.coAnglerEmail ?? '',
       boatNo:         entry.boatNo        ?? '',
       numFish:        entry.numFish       ?? '',
       lunkerWeight:   entry.lunkerWeight  ?? '',
@@ -95,7 +97,7 @@ export default function EditModal({ entry, onSave, onCancel }) {
                   placeholder="First"
                   inputRef={firstInputRef}
                   onChange={v => set('boaterFirst', v)}
-                  onSelect={c => setForm(prev => ({ ...prev, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone }))}
+                  onSelect={c => setForm(prev => ({ ...prev, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || prev.boaterEmail }))}
                 />
               </div>
               <div className="form-field">
@@ -104,7 +106,7 @@ export default function EditModal({ entry, onSave, onCancel }) {
                   value={form.boaterLast}
                   placeholder="Last"
                   onChange={v => set('boaterLast', v)}
-                  onSelect={c => setForm(prev => ({ ...prev, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone }))}
+                  onSelect={c => setForm(prev => ({ ...prev, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || prev.boaterEmail }))}
                 />
               </div>
               <div className="form-field">
@@ -113,7 +115,9 @@ export default function EditModal({ entry, onSave, onCancel }) {
                        onChange={e => set('boaterPhone', e.target.value)} />
               </div>
               <div className="form-field">
-                <label></label>
+                <label>Boater Email</label>
+                <input type="email" value={form.boaterEmail} placeholder="angler@example.com"
+                       onChange={e => set('boaterEmail', e.target.value)} />
               </div>
               <div className="form-field">
                 <label>Co-Angler First</label>
@@ -121,7 +125,7 @@ export default function EditModal({ entry, onSave, onCancel }) {
                   value={form.coAnglerFirst}
                   placeholder="First"
                   onChange={v => set('coAnglerFirst', v)}
-                  onSelect={c => setForm(prev => ({ ...prev, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone }))}
+                  onSelect={c => setForm(prev => ({ ...prev, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || prev.coAnglerEmail }))}
                 />
               </div>
               <div className="form-field">
@@ -130,7 +134,7 @@ export default function EditModal({ entry, onSave, onCancel }) {
                   value={form.coAnglerLast}
                   placeholder="Last"
                   onChange={v => set('coAnglerLast', v)}
-                  onSelect={c => setForm(prev => ({ ...prev, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone }))}
+                  onSelect={c => setForm(prev => ({ ...prev, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || prev.coAnglerEmail }))}
                 />
               </div>
               <div className="form-field">
@@ -139,7 +143,9 @@ export default function EditModal({ entry, onSave, onCancel }) {
                        onChange={e => set('coAnglerPhone', e.target.value)} />
               </div>
               <div className="form-field">
-                <label></label>
+                <label>Co-Angler Email</label>
+                <input type="email" value={form.coAnglerEmail} placeholder="angler@example.com"
+                       onChange={e => set('coAnglerEmail', e.target.value)} />
               </div>
             </div>
 

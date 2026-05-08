@@ -83,10 +83,13 @@ export default function ContactSuggest({ value, placeholder, onChange, onSelect,
             <div
               key={s.id}
               onMouseDown={() => select(s)}
-              style={{ ...ITEM_STYLE, background: i === active ? 'rgba(139,180,225,0.12)' : 'transparent' }}
+              style={{ ...ITEM_STYLE, background: i === active ? 'rgba(139,180,225,0.12)' : 'transparent', flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}
             >
-              <span style={{ fontWeight: 600, color: 'var(--white)' }}>{s.firstName} {s.lastName}</span>
-              {s.phone && <span style={{ color: 'var(--header-bg)', fontSize: 12 }}>{s.phone}</span>}
+              <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                <span style={{ fontWeight: 600, color: 'var(--white)' }}>{s.firstName} {s.lastName}</span>
+                {s.phone && <span style={{ color: 'var(--header-bg)', fontSize: 12 }}>{s.phone}</span>}
+              </div>
+              {s.email && <span style={{ color: 'var(--header-bg)', fontSize: 11, opacity: 0.8 }}>{s.email}</span>}
             </div>
           ))}
         </div>

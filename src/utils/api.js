@@ -16,9 +16,11 @@ function parseEntry(raw) {
     boaterFirst:    raw.boater_first    ?? raw.boaterFirst    ?? '',
     boaterLast:     raw.boater_last     ?? raw.boaterLast     ?? '',
     boaterPhone:    raw.boater_phone    ?? raw.boaterPhone    ?? '',
+    boaterEmail:    raw.boater_email    ?? raw.boaterEmail    ?? '',
     coAnglerFirst:  raw.co_angler_first ?? raw.coAnglerFirst  ?? '',
     coAnglerLast:   raw.co_angler_last  ?? raw.coAnglerLast   ?? '',
     coAnglerPhone:  raw.co_angler_phone ?? raw.coAnglerPhone  ?? '',
+    coAnglerEmail:  raw.co_angler_email ?? raw.coAnglerEmail  ?? '',
     boatNo:         raw.boat_no         ?? raw.boatNo         ?? '',
     numFish:        raw.num_fish        ?? raw.numFish        ?? 0,
     lunkerWeight:   raw.lunker_weight   ?? raw.lunkerWeight   ?? 0,
@@ -110,7 +112,7 @@ export async function upsertContacts(people) {
     fetch(`${BASE}/contacts`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify(p),
+      body: JSON.stringify({ firstName: p.firstName, lastName: p.lastName, phone: p.phone || '', email: p.email || '' }),
     }).catch(() => {})
   ));
 }

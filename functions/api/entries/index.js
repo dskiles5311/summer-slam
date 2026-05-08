@@ -14,9 +14,11 @@ function toJS(row) {
     boaterFirst:    row.boater_first    ?? '',
     boaterLast:     row.boater_last     ?? '',
     boaterPhone:    row.boater_phone    ?? '',
+    boaterEmail:    row.boater_email    ?? '',
     coAnglerFirst:  row.co_angler_first ?? '',
     coAnglerLast:   row.co_angler_last  ?? '',
     coAnglerPhone:  row.co_angler_phone ?? '',
+    coAnglerEmail:  row.co_angler_email ?? '',
     boatNo:         row.boat_no         ?? '',
     numFish:        row.num_fish        ?? 0,
     lunkerWeight:   row.lunker_weight   ?? 0,
@@ -51,14 +53,15 @@ export async function onRequestPost({ request, env }) {
 
     const result = await db.execute({
       sql: `INSERT INTO entries
-              (boater_first, boater_last, boater_phone, co_angler_first, co_angler_last, co_angler_phone,
+              (boater_first, boater_last, boater_phone, boater_email,
+               co_angler_first, co_angler_last, co_angler_phone, co_angler_email,
                boat_no, num_fish, lunker_weight, total_weight,
                lunker, option_field, paid, app_signed, buy_in,
                raw_weight, dead_fish, short_fish, needs_attention)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
-        body.boaterFirst   ?? '', body.boaterLast    ?? '', body.boaterPhone ?? '',
-        body.coAnglerFirst ?? '', body.coAnglerLast  ?? '', body.coAnglerPhone ?? '',
+        body.boaterFirst   ?? '', body.boaterLast    ?? '', body.boaterPhone ?? '', body.boaterEmail ?? '',
+        body.coAnglerFirst ?? '', body.coAnglerLast  ?? '', body.coAnglerPhone ?? '', body.coAnglerEmail ?? '',
         body.boatNo        ?? '',
         Number(body.numFish)      || 0,
         Number(body.lunkerWeight) || 0,

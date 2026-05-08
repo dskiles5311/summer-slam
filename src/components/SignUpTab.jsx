@@ -28,8 +28,8 @@ const SECTION = {
 };
 
 const EMPTY = {
-  boaterFirst: '', boaterLast: '', boaterPhone: '',
-  coAnglerFirst: '', coAnglerLast: '', coAnglerPhone: '',
+  boaterFirst: '', boaterLast: '', boaterPhone: '', boaterEmail: '',
+  coAnglerFirst: '', coAnglerLast: '', coAnglerPhone: '', coAnglerEmail: '',
   lunker: '', option: '', paid: '', appSigned: '', buyIn: '',
 };
 
@@ -68,9 +68,11 @@ export default function SignUpTab({ onAddEntry }) {
       boaterFirst:   form.boaterFirst.trim(),
       boaterLast:    form.boaterLast.trim(),
       boaterPhone:   form.boaterPhone.trim(),
+      boaterEmail:   form.boaterEmail.trim(),
       coAnglerFirst: form.coAnglerFirst.trim(),
       coAnglerLast:  form.coAnglerLast.trim(),
       coAnglerPhone: form.coAnglerPhone.trim(),
+      coAnglerEmail: form.coAnglerEmail.trim(),
       lunker:    form.lunker    === '' ? '' : parseInt(form.lunker),
       option:    form.option    === '' ? '' : parseInt(form.option),
       paid:      form.paid      === '' ? '' : parseInt(form.paid),
@@ -122,7 +124,7 @@ export default function SignUpTab({ onAddEntry }) {
                 placeholder="First"
                 inputRef={boaterFirstRef}
                 onChange={v => set('boaterFirst', v)}
-                onSelect={c => setForm(p => ({ ...p, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone }))}
+                onSelect={c => setForm(p => ({ ...p, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || p.boaterEmail }))}
                 inputProps={{ style: fieldBorder('boaterFirst') }}
               />
               {err('boaterFirst')}
@@ -133,7 +135,7 @@ export default function SignUpTab({ onAddEntry }) {
                 value={form.boaterLast}
                 placeholder="Last"
                 onChange={v => set('boaterLast', v)}
-                onSelect={c => setForm(p => ({ ...p, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone }))}
+                onSelect={c => setForm(p => ({ ...p, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || p.boaterEmail }))}
                 inputProps={{ style: fieldBorder('boaterLast') }}
               />
               {err('boaterLast')}
@@ -145,6 +147,12 @@ export default function SignUpTab({ onAddEntry }) {
                    onChange={e => set('boaterPhone', e.target.value)}
                    style={fieldBorder('boaterPhone')} />
             {err('boaterPhone')}
+          </div>
+          <div>
+            <label style={LABEL}>Email</label>
+            <input type="email" value={form.boaterEmail} placeholder="angler@example.com"
+                   onChange={e => set('boaterEmail', e.target.value)}
+                   style={FIELD} />
           </div>
         </div>
 
@@ -161,7 +169,7 @@ export default function SignUpTab({ onAddEntry }) {
                 value={form.coAnglerFirst}
                 placeholder="First"
                 onChange={v => set('coAnglerFirst', v)}
-                onSelect={c => setForm(p => ({ ...p, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone }))}
+                onSelect={c => setForm(p => ({ ...p, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || p.coAnglerEmail }))}
                 inputProps={{ style: fieldBorder('coAnglerFirst') }}
               />
               {err('coAnglerFirst')}
@@ -172,7 +180,7 @@ export default function SignUpTab({ onAddEntry }) {
                 value={form.coAnglerLast}
                 placeholder="Last"
                 onChange={v => set('coAnglerLast', v)}
-                onSelect={c => setForm(p => ({ ...p, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone }))}
+                onSelect={c => setForm(p => ({ ...p, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || p.coAnglerEmail }))}
                 inputProps={{ style: fieldBorder('coAnglerLast') }}
               />
               {err('coAnglerLast')}
@@ -186,6 +194,12 @@ export default function SignUpTab({ onAddEntry }) {
                    onChange={e => set('coAnglerPhone', e.target.value)}
                    style={fieldBorder('coAnglerPhone')} />
             {err('coAnglerPhone')}
+          </div>
+          <div>
+            <label style={LABEL}>Email</label>
+            <input type="email" value={form.coAnglerEmail} placeholder="angler@example.com"
+                   onChange={e => set('coAnglerEmail', e.target.value)}
+                   style={FIELD} />
           </div>
         </div>
 

@@ -3,9 +3,11 @@ CREATE TABLE IF NOT EXISTS entries (
   boater_first  TEXT DEFAULT '',
   boater_last   TEXT DEFAULT '',
   boater_phone  TEXT DEFAULT '',
+  boater_email  TEXT DEFAULT '',
   co_angler_first TEXT DEFAULT '',
   co_angler_last  TEXT DEFAULT '',
   co_angler_phone TEXT DEFAULT '',
+  co_angler_email TEXT DEFAULT '',
   boat_no       TEXT DEFAULT '',
   num_fish      INTEGER DEFAULT 0,
   lunker_weight REAL DEFAULT 0,
@@ -27,6 +29,7 @@ CREATE TABLE IF NOT EXISTS contacts (
   first_name TEXT NOT NULL,
   last_name  TEXT NOT NULL,
   phone      TEXT DEFAULT '',
+  email      TEXT DEFAULT '',
   last_seen  DATETIME DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(first_name, last_name)
 );
