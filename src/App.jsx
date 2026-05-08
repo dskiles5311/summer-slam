@@ -101,6 +101,7 @@ export default function App() {
             ...settingsData,
             fees:           { ...DEFAULT_SETTINGS.fees,           ...(settingsData.fees           || {}) },
             payoutSettings: { ...DEFAULT_SETTINGS.payoutSettings, ...(settingsData.payoutSettings || {}) },
+            penalties:      { ...DEFAULT_SETTINGS.penalties,      ...(settingsData.penalties      || {}) },
           };
           setSettings(prev => JSON.stringify(prev) !== JSON.stringify(merged) ? merged : prev);
         }

@@ -372,13 +372,20 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
 
       {penaltyPopup && (() => {
         const r = penaltyPopup.row;
-        const nf = parseInt(r.numFish) || 0;
-        const dead = parseInt(r.deadFish) || 0;
+        const pen = settings?.penalties || {};
+        const deadRate  = parseFloat(pen.deadFishPenalty)       || 0.5;
+        const shortRate = parseFloat(pen.shortFishPenalty)      || 1.0;
+        const countRate = parseInt(pen.shortFishCountPenalty)   ?? 1;
+        const overRate  = parseFloat(pen.overLimitPenalty)      || 3.0;
+        const maxFish   = parseInt(pen.maxFish)                 || 5;
+        const dead = parseInt(r.deadFish)  || 0;
         const shrt = parseInt(r.shortFish) || 0;
-        const over = Math.max(0, nf - 5);
-        const deadPen  = dead * 0.5;
-        const shortPen = shrt * 1.0;
-        const overPen  = over * 3.0;
+        const adjFish = Math.max(0, parseInt(r.numFish) || 0);
+        const rawFish = adjFish + shrt * countRate;
+        const over = Math.max(0, rawFish - maxFish);
+        const deadPen  = dead * deadRate;
+        const shortPen = shrt * shortRate;
+        const overPen  = over * overRate;
         const totalPen = deadPen + shortPen + overPen;
         const left = Math.min(penaltyPopup.x, window.innerWidth - 260);
         const top  = penaltyPopup.y + 12;
@@ -397,13 +404,13 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
                 <span style={{ fontWeight: 700 }}>{parseFloat(r.rawWeight).toFixed(2)} lbs</span>
               </div>
               {dead > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, color: '#ff9090' }}>
-                <span>Dead fish ({dead} × 0.50)</span><span>−{deadPen.toFixed(2)} lbs</span>
+                <span>Dead fish ({dead} × {deadRate.toFixed(2)})</span><span>−{deadPen.toFixed(2)} lbs</span>
               </div>}
               {shrt > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, color: '#ff9090' }}>
-                <span>Short fish ({shrt} × 1.00)</span><span>−{shortPen.toFixed(2)} lbs</span>
+                <span>Short fish ({shrt} × {shortRate.toFixed(2)}, fish {rawFish}→{adjFish})</span><span>−{shortPen.toFixed(2)} lbs</span>
               </div>}
               {over > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, color: '#ff9090' }}>
-                <span>Over limit ({over} × 3.00)</span><span>−{overPen.toFixed(2)} lbs</span>
+                <span>Over limit ({over} × {overRate.toFixed(2)})</span><span>−{overPen.toFixed(2)} lbs</span>
               </div>}
               <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', marginTop: 8, paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontWeight: 800 }}>
                 <span style={{ color: 'var(--gold-light, #e8c876)' }}>Adjusted weight</span>
