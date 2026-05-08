@@ -96,6 +96,32 @@ export async function saveSettings(updates) {
   if (!res.ok) throw new Error('Failed to save settings');
 }
 
+export async function fetchContacts() {
+  try {
+    const res = await fetch(`${BASE}/contacts`);
+    if (!res.ok) return [];
+    return res.json();
+  } catch { return []; }
+}
+
+export async function updateContact(id, { phone, email }) {
+  const res = await fetch(`${BASE}/contacts/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ phone, email }),
+  });
+  if (!res.ok) throw new Error('Failed to update contact');
+  return res.json();
+}
+
+export async function deleteContact(id) {
+  const res = await fetch(`${BASE}/contacts/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new Error('Failed to delete contact');
+}
+
 export async function searchContacts(q) {
   if (!q || q.length < 2) return [];
   try {

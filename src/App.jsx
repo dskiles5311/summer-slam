@@ -7,13 +7,14 @@ import LeaderboardTab from './components/LeaderboardTab';
 import RulesTab from './components/RulesTab';
 import SettingsTab from './components/SettingsTab';
 import SignUpTab from './components/SignUpTab';
+import ContactsTab from './components/ContactsTab';
 import EditModal from './components/EditModal';
 import UnlockModal from './components/UnlockModal';
 import Toast from './components/Toast';
 import {
   fetchEntries, createEntry, updateEntry, deleteEntry,
   fetchSettings, saveSettings, verifyPassword, storePassword, clearPassword, isPasswordStored,
-  upsertContacts,
+  upsertContacts, fetchContacts, updateContact, deleteContact,
 } from './utils/api';
 import { calcRanks } from './utils/calculations';
 
@@ -123,8 +124,8 @@ export default function App() {
       }
       setEditingEntry(null);
       upsertContacts([
-        { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone },
-        { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone },
+        { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone,   email: entryData.boaterEmail   },
+        { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone, email: entryData.coAnglerEmail },
       ]);
     } catch {
       showToast('Failed to save entry', 'error');
@@ -219,8 +220,8 @@ export default function App() {
       setEntries(prev => [...prev, created]);
       showToast(`${entryData.boaterFirst} ${entryData.boaterLast} signed up!`, 'success');
       upsertContacts([
-        { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone },
-        { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone },
+        { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone,   email: entryData.boaterEmail   },
+        { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone, email: entryData.coAnglerEmail },
       ]);
       return true;
     } catch {
@@ -345,6 +346,14 @@ export default function App() {
           <LeaderboardTab entries={rankedEntries} settings={settingsWithTheme} />
         )}
         {activeTab === 'rules' && <RulesTab />}
+        {activeTab === 'contacts' && (
+          <ContactsTab
+            isUnlocked={isUnlocked}
+            fetchContacts={fetchContacts}
+            updateContact={updateContact}
+            deleteContact={deleteContact}
+          />
+        )}
         {activeTab === 'settings' && (
           <SettingsTab
             settings={settingsWithTheme}

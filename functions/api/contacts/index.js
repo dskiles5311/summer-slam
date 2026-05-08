@@ -8,15 +8,21 @@ function getDb(env) {
 export async function onRequestGet({ request, env }) {
   try {
     const q = new URL(request.url).searchParams.get('q') || '';
-    if (q.length < 2) return Response.json([]);
     const db = getDb(env);
-    const like = `%${q}%`;
-    const result = await db.execute({
-      sql: `SELECT id, first_name, last_name, phone, email FROM contacts
-            WHERE first_name LIKE ? OR last_name LIKE ? OR (first_name || ' ' || last_name) LIKE ?
-            ORDER BY last_seen DESC LIMIT 10`,
-      args: [like, like, like],
-    });
+    let result;
+    if (q.length >= 2) {
+      const like = `%${q}%`;
+      result = await db.execute({
+        sql: `SELECT id, first_name, last_name, phone, email FROM contacts
+              WHERE first_name LIKE ? OR last_name LIKE ? OR (first_name || ' ' || last_name) LIKE ?
+              ORDER BY last_seen DESC LIMIT 10`,
+        args: [like, like, like],
+      });
+    } else {
+      result = await db.execute(
+        `SELECT id, first_name, last_name, phone, email FROM contacts ORDER BY last_name ASC, first_name ASC`
+      );
+    }
     return Response.json(result.rows.map(r => ({
       id:        Number(r.id),
       firstName: r.first_name,

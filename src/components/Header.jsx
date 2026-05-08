@@ -99,12 +99,20 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
           📋 Rules
         </button>
         {isUnlocked && (
-          <button
-            className={`nav-tab ${activeTab === 'settings' ? 'active' : ''}`}
-            onClick={() => onTabChange('settings')}
-          >
-            ⚙️ Settings
-          </button>
+          <>
+            <button
+              className={`nav-tab ${activeTab === 'contacts' ? 'active' : ''}`}
+              onClick={() => onTabChange('contacts')}
+            >
+              👥 Contacts
+            </button>
+            <button
+              className={`nav-tab ${activeTab === 'settings' ? 'active' : ''}`}
+              onClick={() => onTabChange('settings')}
+            >
+              ⚙️ Settings
+            </button>
+          </>
         )}
       </nav>
     </header>
