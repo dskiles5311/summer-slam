@@ -6,12 +6,17 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
   const [buyInBlurred, setBuyInBlurred] = useState(
     () => localStorage.getItem('ss_buyin_blur') !== 'false'
   );
+  const [buyInPeeking, setBuyInPeeking] = useState(false);
 
   function toggleBuyInBlur() {
     const next = !buyInBlurred;
     setBuyInBlurred(next);
     localStorage.setItem('ss_buyin_blur', String(next));
   }
+
+  const buyInFilter = !buyInBlurred ? 'none'
+    : buyInPeeking ? 'blur(2px)'
+    : 'blur(6px)';
 
   return (
     <header>
@@ -61,9 +66,11 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
           </div>
           {isUnlocked && (
             <div className="stat-chip" onClick={toggleBuyInBlur}
-                 title={buyInBlurred ? 'Click to reveal' : 'Click to hide'}
+                 onMouseEnter={() => setBuyInPeeking(true)}
+                 onMouseLeave={() => setBuyInPeeking(false)}
+                 title={buyInBlurred ? 'Hover to peek · Click to reveal' : 'Click to hide'}
                  style={{ cursor: 'pointer', userSelect: 'none' }}>
-              <span className="val" style={{ filter: buyInBlurred ? 'blur(6px)' : 'none', transition: 'filter 0.2s' }}>
+              <span className="val" style={{ filter: buyInFilter, transition: 'filter 0.25s' }}>
                 ${stats.totalBuyIn}
               </span>
               <span className="lbl">Total Buy-In</span>
