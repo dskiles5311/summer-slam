@@ -360,9 +360,15 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
                      onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
             </div>
             <div className="form-field">
-              <label>Short Fish (lbs per fish)</label>
+              <label>Short Fish — weight deduction (lbs per fish)</label>
               <input type="number" value={localPenalties?.shortFishPenalty ?? 1.0} min="0" step="0.01" disabled={locked}
                      onChange={e => setLocalPenalties(prev => ({ ...prev, shortFishPenalty: parseFloat(e.target.value) || 0 }))}
+                     onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
+            </div>
+            <div className="form-field">
+              <label>Short Fish — fish count deduction (per fish)</label>
+              <input type="number" value={localPenalties?.shortFishCountPenalty ?? 1} min="0" max="1" step="1" disabled={locked}
+                     onChange={e => setLocalPenalties(prev => ({ ...prev, shortFishCountPenalty: parseInt(e.target.value) || 0 }))}
                      onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
             </div>
             <div className="form-field">
@@ -380,7 +386,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           </div>
           <p style={{ color: 'var(--header-bg)', fontSize: 11, marginTop: 8 }}>
             Dead fish: deduct X lbs per dead fish from total weight.<br />
-            Short fish: deduct X lbs per short fish from total weight, and −1 from fish count.<br />
+            Short fish: deduct X lbs from total weight and X from fish count per short fish.<br />
             Over limit: deduct X lbs for each fish over the max limit.
           </p>
         </div>
@@ -452,20 +458,22 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
 }
 
 function calcEntryPenalties(e, penalties = {}) {
-  const deadRate  = parseFloat(penalties.deadFishPenalty)  || 0.5;
-  const shortRate = parseFloat(penalties.shortFishPenalty) || 1.0;
-  const overRate  = parseFloat(penalties.overLimitPenalty) || 3.0;
-  const maxFish   = parseInt(penalties.maxFish)            || 5;
+  const deadRate       = parseFloat(penalties.deadFishPenalty)       || 0.5;
+  const shortRate      = parseFloat(penalties.shortFishPenalty)      || 1.0;
+  const shortCountRate = parseInt(penalties.shortFishCountPenalty)   ?? 1;
+  const overRate       = parseFloat(penalties.overLimitPenalty)      || 3.0;
+  const maxFish        = parseInt(penalties.maxFish)                 || 5;
   const dead = Math.max(0, parseInt(e.deadFish)  || 0);
   const shrt = Math.max(0, parseInt(e.shortFish) || 0);
   // numFish is stored post-adjustment (short fish already removed), so
   // reconstruct the raw count to correctly derive the over-limit count.
-  const rawNf = Math.max(0, parseInt(e.numFish) || 0) + shrt;
-  const over  = Math.max(0, rawNf - shrt - maxFish);
-  const deadPen  = dead * deadRate;
-  const shortPen = shrt * shortRate;
-  const overPen  = over * overRate;
-  return { dead, shrt, over, deadPen, shortPen, overPen, total: deadPen + shortPen + overPen };
+  const rawNf       = Math.max(0, parseInt(e.numFish) || 0) + shrt * shortCountRate;
+  const over        = Math.max(0, rawNf - shrt * shortCountRate - maxFish);
+  const shrtFishDed = shrt * shortCountRate;
+  const deadPen     = dead * deadRate;
+  const shortPen    = shrt * shortRate;
+  const overPen     = over * overRate;
+  return { dead, shrt, shrtFishDed, over, deadPen, shortPen, overPen, total: deadPen + shortPen + overPen };
 }
 
 function WeighInLogModal({ entries, penalties, onClose, onClearLog }) {
@@ -485,7 +493,7 @@ function WeighInLogModal({ entries, penalties, onClose, onClearLog }) {
     const pen = calcEntryPenalties(e, penalties);
     const lines = [];
     if (pen.dead > 0)  lines.push(`${pen.dead} dead −${pen.deadPen.toFixed(2)} lbs`);
-    if (pen.shrt > 0)  lines.push(`${pen.shrt} short −${pen.shortPen.toFixed(2)} lbs, −${pen.shrt} fish`);
+    if (pen.shrt > 0)  lines.push(`${pen.shrt} short −${pen.shortPen.toFixed(2)} lbs${pen.shrtFishDed > 0 ? `, −${pen.shrtFishDed} fish` : ''}`);
     if (pen.over > 0)  lines.push(`${pen.over} over limit −${pen.overPen.toFixed(2)} lbs`);
     if (pen.total > 0) lines.push(`Wt penalty −${pen.total.toFixed(2)} lbs`);
     return { lines, total: pen.total };

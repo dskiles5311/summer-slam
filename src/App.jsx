@@ -27,7 +27,7 @@ const DEFAULT_SETTINGS = {
     minPayout:   255,
     payouts:     [4000,1000,800,600,500,360,350,340,330,320,295,280,275,270,265,260,255],
   },
-  penalties:       { deadFishPenalty: 0.5, shortFishPenalty: 1.0, overLimitPenalty: 3.0, maxFish: 5 },
+  penalties:       { deadFishPenalty: 0.5, shortFishPenalty: 1.0, shortFishCountPenalty: 1, overLimitPenalty: 3.0, maxFish: 5 },
   boatCheck:       {},
   offWater:        {},
   recentWeighCount: 2,

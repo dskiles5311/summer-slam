@@ -16,10 +16,11 @@ const FIELD = {
 const LABEL = { fontSize: 12, fontWeight: 700, color: 'var(--header-bg)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 5, display: 'block' };
 
 function calcPenalties(numFish, deadFish, shortFish, penalties = {}) {
-  const deadRate  = parseFloat(penalties.deadFishPenalty)  || 0.5;
-  const shortRate = parseFloat(penalties.shortFishPenalty) || 1.0;
-  const overRate  = parseFloat(penalties.overLimitPenalty) || 3.0;
-  const maxFish   = parseInt(penalties.maxFish)            || 5;
+  const deadRate       = parseFloat(penalties.deadFishPenalty)     || 0.5;
+  const shortRate      = parseFloat(penalties.shortFishPenalty)    || 1.0;
+  const shortCountRate = parseInt(penalties.shortFishCountPenalty) ?? 1;
+  const overRate       = parseFloat(penalties.overLimitPenalty)    || 3.0;
+  const maxFish        = parseInt(penalties.maxFish)               || 5;
   const nf   = Math.max(0, parseInt(numFish)   || 0);
   const dead = Math.max(0, parseInt(deadFish)  || 0);
   const shrt = Math.max(0, parseInt(shortFish) || 0);
@@ -27,6 +28,7 @@ function calcPenalties(numFish, deadFish, shortFish, penalties = {}) {
   return {
     dead,
     shrt,
+    shrtFishDed:  shrt * shortCountRate,
     over,
     deadPenalty:  dead * deadRate,
     shortPenalty: shrt * shortRate,
@@ -127,7 +129,7 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry })
       ? { rawWeight: rawTw, deadFish: pen.dead, shortFish: pen.shrt }
       : { rawWeight: null, deadFish: 0, shortFish: 0 };
 
-    const adjustedNumFish = Math.max(0, nf - pen.shrt);
+    const adjustedNumFish = Math.max(0, nf - pen.shrtFishDed);
 
     setSubmitting(true);
     let ok, histName;
