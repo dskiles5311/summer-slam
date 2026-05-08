@@ -1,20 +1,81 @@
 import { useState, useEffect, useRef } from 'react';
 
+const FIELD_STYLE = {
+  background: 'rgba(255,255,255,0.06)',
+  border: '1px solid rgba(139,180,225,0.3)',
+  borderRadius: 8,
+  color: 'var(--white)',
+  fontSize: 15,
+  padding: '9px 12px',
+  width: '100%',
+  boxSizing: 'border-box',
+  outline: 'none',
+};
+
+function EditModal({ contact, onSave, onCancel }) {
+  const [phone, setPhone] = useState(contact.phone);
+  const [email, setEmail] = useState(contact.email);
+  const [saving, setSaving] = useState(false);
+  const phoneRef = useRef(null);
+  const overlayDownRef = useRef(false);
+
+  useEffect(() => { phoneRef.current?.focus(); }, []);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setSaving(true);
+    await onSave(contact.id, { phone: phone.trim(), email: email.trim() });
+    setSaving(false);
+  }
+
+  return (
+    <div
+      className="edit-overlay"
+      onPointerDown={e => { overlayDownRef.current = e.target === e.currentTarget; }}
+      onPointerUp={e => { if (overlayDownRef.current && e.target === e.currentTarget) onCancel(); }}
+    >
+      <div className="edit-panel" style={{ maxWidth: 420 }}>
+        <div className="edit-panel-inner">
+          <div className="edit-panel-header">
+            <h3>Edit Contact</h3>
+            <button className="edit-panel-close" onClick={onCancel}>✕</button>
+          </div>
+          <p style={{ color: 'var(--gold-light)', fontWeight: 700, fontSize: 16, marginBottom: 20 }}>
+            {contact.firstName} {contact.lastName}
+          </p>
+          <form onSubmit={handleSubmit}>
+            <div className="form-field" style={{ marginBottom: 14 }}>
+              <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--header-bg)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 5, display: 'block' }}>Phone</label>
+              <input ref={phoneRef} type="tel" value={phone} placeholder="(555) 123-4567"
+                     onChange={e => setPhone(e.target.value)} style={FIELD_STYLE} />
+            </div>
+            <div className="form-field" style={{ marginBottom: 20 }}>
+              <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--header-bg)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 5, display: 'block' }}>Email</label>
+              <input type="email" value={email} placeholder="angler@example.com"
+                     onChange={e => setEmail(e.target.value)} style={FIELD_STYLE} />
+            </div>
+            <div className="edit-panel-actions">
+              <button type="button" className="btn btn-outline btn-lg" onClick={onCancel}>Cancel</button>
+              <button type="submit" className="btn btn-gold btn-lg" disabled={saving}>
+                {saving ? 'Saving…' : '✔ Save'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, deleteContact }) {
-  const [contacts, setContacts]   = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [filter, setFilter]       = useState('');
-  const [editing, setEditing]     = useState(null); // { id, field, value }
-  const [saving, setSaving]       = useState(false);
-  const editRef = useRef(null);
+  const [contacts, setContacts] = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [filter, setFilter]     = useState('');
+  const [editing, setEditing]   = useState(null);
 
   useEffect(() => {
     fetchContacts().then(data => { setContacts(data); setLoading(false); });
   }, [fetchContacts]);
-
-  useEffect(() => {
-    if (editing) editRef.current?.focus();
-  }, [editing]);
 
   const displayed = contacts.filter(c => {
     if (!filter) return true;
@@ -22,31 +83,10 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
     return `${c.firstName} ${c.lastName} ${c.phone} ${c.email}`.toLowerCase().includes(q);
   });
 
-  function startEdit(id, field, value) {
-    if (!isUnlocked) return;
-    setEditing({ id, field, value });
-  }
-
-  async function commitEdit() {
-    if (!editing || saving) return;
-    const { id, field, value } = editing;
-    const contact = contacts.find(c => c.id === id);
-    setSaving(true);
-    try {
-      const updated = await updateContact(id, {
-        phone: field === 'phone' ? value : contact.phone,
-        email: field === 'email' ? value : contact.email,
-      });
-      setContacts(prev => prev.map(c => c.id === id ? { ...c, ...updated } : c));
-    } finally {
-      setSaving(false);
-      setEditing(null);
-    }
-  }
-
-  function handleKeyDown(e) {
-    if (e.key === 'Enter') commitEdit();
-    else if (e.key === 'Escape') setEditing(null);
+  async function handleSave(id, updates) {
+    const updated = await updateContact(id, updates);
+    setContacts(prev => prev.map(c => c.id === id ? { ...c, ...updated } : c));
+    setEditing(null);
   }
 
   async function handleDelete(id, name) {
@@ -55,49 +95,6 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
       await deleteContact(id);
       setContacts(prev => prev.filter(c => c.id !== id));
     } catch { /* ignore */ }
-  }
-
-  function EditableCell({ contactId, field, value }) {
-    const isActive = editing?.id === contactId && editing?.field === field;
-    if (isActive) {
-      return (
-        <input
-          ref={editRef}
-          type={field === 'email' ? 'email' : 'tel'}
-          value={editing.value}
-          onChange={e => setEditing(prev => ({ ...prev, value: e.target.value }))}
-          onBlur={commitEdit}
-          onKeyDown={handleKeyDown}
-          style={{
-            background: 'rgba(255,255,255,0.08)',
-            border: '1px solid var(--gold)',
-            borderRadius: 6,
-            color: 'var(--white)',
-            fontSize: 13,
-            padding: '4px 8px',
-            width: '100%',
-            outline: 'none',
-          }}
-        />
-      );
-    }
-    return (
-      <span
-        onClick={() => startEdit(contactId, field, value)}
-        title={isUnlocked ? `Click to edit ${field}` : undefined}
-        style={{
-          cursor: isUnlocked ? 'pointer' : 'default',
-          padding: '2px 4px',
-          borderRadius: 4,
-          display: 'inline-block',
-          minWidth: 40,
-          color: value ? 'var(--white)' : 'var(--header-bg)',
-          borderBottom: isUnlocked ? '1px dashed rgba(168,200,160,0.35)' : 'none',
-        }}
-      >
-        {value || (isUnlocked ? '—' : '—')}
-      </span>
-    );
   }
 
   return (
@@ -125,21 +122,15 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
         />
       </div>
 
-      {!isUnlocked && (
-        <div style={{ background: 'rgba(255,180,80,0.1)', border: '1px solid rgba(255,180,80,0.3)', borderRadius: 8, padding: '10px 16px', margin: '0 0 16px 0', fontSize: 13, color: 'rgba(255,180,80,0.9)' }}>
-          🔒 Unlock to edit contacts.
-        </div>
-      )}
-
       <div className="table-wrapper">
         <table style={{ tableLayout: 'fixed' }}>
           <thead>
             <tr>
-              <th style={{ width: '22%' }}>Last Name</th>
-              <th style={{ width: '20%' }}>First Name</th>
+              <th style={{ width: '20%' }}>Last Name</th>
+              <th style={{ width: '18%' }}>First Name</th>
               <th style={{ width: '22%' }}>Phone</th>
               <th style={{ width: '28%' }}>Email</th>
-              {isUnlocked && <th style={{ width: 60, textAlign: 'center' }}></th>}
+              {isUnlocked && <th style={{ width: 100, textAlign: 'center' }}>Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -153,10 +144,23 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
               <tr key={c.id}>
                 <td style={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.lastName}</td>
                 <td style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.firstName}</td>
-                <td><EditableCell contactId={c.id} field="phone" value={c.phone} /></td>
-                <td style={{ overflow: 'hidden' }}><EditableCell contactId={c.id} field="email" value={c.email} /></td>
+                <td style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {c.phone
+                    ? <a href={`tel:${c.phone}`} style={{ color: 'var(--water-light)', textDecoration: 'none' }}>{c.phone}</a>
+                    : <span style={{ color: 'var(--header-bg)' }}>—</span>}
+                </td>
+                <td style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {c.email
+                    ? <a href={`mailto:${c.email}`} style={{ color: 'var(--water-light)', textDecoration: 'none' }}>{c.email}</a>
+                    : <span style={{ color: 'var(--header-bg)' }}>—</span>}
+                </td>
                 {isUnlocked && (
-                  <td style={{ textAlign: 'center' }}>
+                  <td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    <button
+                      className="btn btn-outline btn-sm"
+                      style={{ padding: '3px 8px', fontSize: 12, marginRight: 4 }}
+                      onClick={() => setEditing(c)}
+                    >✏️</button>
                     <button
                       className="btn btn-outline btn-sm"
                       style={{ color: '#ff6b6b', borderColor: 'rgba(255,107,107,0.4)', padding: '3px 8px', fontSize: 12 }}
@@ -169,6 +173,14 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
           </tbody>
         </table>
       </div>
+
+      {editing && (
+        <EditModal
+          contact={editing}
+          onSave={handleSave}
+          onCancel={() => setEditing(null)}
+        />
+      )}
     </div>
   );
 }
