@@ -144,7 +144,25 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
       </div>
 
       <div className="table-wrapper">
-        <table>
+        <table style={{ tableLayout: 'fixed', minWidth: 960 }}>
+          <colgroup>
+            <col style={{ width: 52 }} />   {/* Place      */}
+            <col />                          {/* Boater First (flex) */}
+            <col />                          {/* Boater Last  (flex) */}
+            <col />                          {/* Co-Angler First (flex) */}
+            <col />                          {/* Co-Angler Last  (flex) */}
+            <col style={{ width: 68 }} />   {/* Boat #      */}
+            <col style={{ width: 58 }} />   {/* # Fish      */}
+            <col style={{ width: 90 }} />   {/* Lunker lbs  */}
+            <col style={{ width: 110 }} />  {/* Total Wt    */}
+            <col style={{ width: 68 }} />   {/* Lunker tog  */}
+            <col style={{ width: 68 }} />   {/* Option tog  */}
+            <col style={{ width: 58 }} />   {/* Paid        */}
+            <col style={{ width: 90 }} />   {/* App Signed  */}
+            <col style={{ width: 82 }} />   {/* ⚓ Checked   */}
+            <col style={{ width: 82 }} />   {/* Buy-In      */}
+            {isUnlocked && <col style={{ width: 108 }} />}  {/* Actions */}
+          </colgroup>
           <thead>
             <tr>
               {[
@@ -195,10 +213,10 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
                   style={{ ...(flagged ? { background: 'rgba(255,180,80,0.08)' } : {}) }}
                 >
                   <td className={`rank-cell ${rankClass}`}>{rank || ''}</td>
-                  <td>{flagged && <span title="Needs attention" style={{ color: '#ffb450', marginRight: 4 }}>⚠️</span>}{row.boaterFirst}</td>
-                  <td>{row.boaterLast}</td>
-                  <td>{row.coAnglerFirst}</td>
-                  <td>{row.coAnglerLast}</td>
+                  <td className="td-name" title={`${row.boaterFirst} ${row.boaterLast}`.trim()}>{flagged && <span style={{ color: '#ffb450', marginRight: 4 }}>⚠️</span>}{row.boaterFirst}</td>
+                  <td className="td-name" title={`${row.boaterFirst} ${row.boaterLast}`.trim()}>{row.boaterLast}</td>
+                  <td className="td-name" title={`${row.coAnglerFirst} ${row.coAnglerLast}`.trim()}>{row.coAnglerFirst}</td>
+                  <td className="td-name" title={`${row.coAnglerFirst} ${row.coAnglerLast}`.trim()}>{row.coAnglerLast}</td>
                   <td
                     onClick={e => { e.stopPropagation(); isUnlocked && handleStartEdit(row, 'boatNo'); }}
                     style={editingId === row.id && editValues.hasOwnProperty('boatNo')
