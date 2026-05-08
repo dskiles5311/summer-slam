@@ -15,7 +15,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
   }
 
   const buyInFilter = !buyInBlurred ? 'none'
-    : buyInPeeking ? 'blur(2px)'
+    : buyInPeeking ? 'blur(1px)'
     : 'blur(6px)';
 
   return (
