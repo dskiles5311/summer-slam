@@ -52,14 +52,14 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggle, 
       )}
 
       <div className="table-wrapper">
-        <table>
+        <table style={{ tableLayout: 'fixed' }}>
           <thead>
             <tr>
-              <th style={{ textAlign: 'center', width: 80 }}>Checked In</th>
-              <th style={{ textAlign: 'center', width: 80 }}>Off Water</th>
-              <th style={{ width: 80 }}>Boat #</th>
-              <th>Boater</th>
-              <th>Co-Angler</th>
+              <th style={{ textAlign: 'center', width: 90 }}>Checked In</th>
+              <th style={{ textAlign: 'center', width: 90 }}>Off Water</th>
+              <th style={{ width: 72 }}>Boat #</th>
+              <th style={{ width: '42%' }}>Boater</th>
+              <th style={{ width: '35%' }}>Co-Angler</th>
             </tr>
           </thead>
           <tbody>
@@ -110,8 +110,12 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggle, 
                     </span>
                   </td>
                   <td style={{ fontWeight: 700, fontSize: 16 }}>{row.boatNo || '—'}</td>
-                  <td>{row.boaterFirst} {row.boaterLast}</td>
-                  <td style={{ color: 'var(--header-bg)' }}>{row.coAnglerFirst} {row.coAnglerLast}</td>
+                  <td style={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+                    {row.boaterFirst} {row.boaterLast}
+                  </td>
+                  <td style={{ color: 'var(--header-bg)', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+                    {row.coAnglerFirst} {row.coAnglerLast}
+                  </td>
                 </tr>
               );
             })}
