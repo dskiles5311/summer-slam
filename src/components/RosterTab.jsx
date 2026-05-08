@@ -192,8 +192,7 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
               return (
                 <tr
                   key={row.id}
-                  onClick={() => isUnlocked && onEdit(row)}
-                  style={{ ...(isUnlocked ? { cursor: 'pointer' } : {}), ...(flagged ? { background: 'rgba(255,180,80,0.08)' } : {}) }}
+                  style={{ ...(flagged ? { background: 'rgba(255,180,80,0.08)' } : {}) }}
                 >
                   <td className={`rank-cell ${rankClass}`}>{rank || ''}</td>
                   <td>{flagged && <span title="Needs attention" style={{ color: '#ffb450', marginRight: 4 }}>⚠️</span>}{row.boaterFirst}</td>

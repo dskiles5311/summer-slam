@@ -178,6 +178,23 @@ export default function EditModal({ entry, onSave, onCancel }) {
               </div>
             </div>
 
+            {(parseFloat(form.rawWeight) > 0 || parseInt(form.deadFish) > 0 || parseInt(form.shortFish) > 0) && (
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ background: 'rgba(255,107,107,0.08)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: 8, padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+                  <div style={{ fontSize: 12, color: '#ff9090' }}>
+                    <strong>Deductions on record:</strong>
+                    {parseFloat(form.rawWeight) > 0 && <span style={{ marginLeft: 8 }}>Scale {parseFloat(form.rawWeight).toFixed(2)} lbs</span>}
+                    {parseInt(form.deadFish) > 0 && <span style={{ marginLeft: 8 }}>{form.deadFish} dead</span>}
+                    {parseInt(form.shortFish) > 0 && <span style={{ marginLeft: 8 }}>{form.shortFish} short</span>}
+                  </div>
+                  <button type="button" className="btn btn-danger btn-sm"
+                    onClick={() => setForm(prev => ({ ...prev, rawWeight: null, deadFish: 0, shortFish: 0 }))}>
+                    ✕ Clear Deductions
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="edit-section-label">Payment &amp; Status</div>
             <div className="edit-grid-4">
               <div className="form-field">

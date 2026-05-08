@@ -214,8 +214,10 @@ export default function App() {
       parsed = String(value).trim();
     }
 
+    const extraClears = field === 'totalWeight' ? { rawWeight: null, deadFish: 0, shortFish: 0 } : {};
+
     try {
-      const updated = await updateEntry(entryId, { ...entry, [field]: parsed });
+      const updated = await updateEntry(entryId, { ...entry, [field]: parsed, ...extraClears });
       setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
 
       const duplicate = parsed && field === 'boatNo' && entries.some(e =>
