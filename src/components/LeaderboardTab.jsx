@@ -3,7 +3,6 @@ import { getLeaderboardEntries, getStats } from '../utils/calculations';
 export default function LeaderboardTab({ entries, settings }) {
   const topN = parseInt(settings.payoutSettings?.numWinners) || 10;
   const lbEntries = getLeaderboardEntries(entries);
-  const displayed = lbEntries.slice(0, topN);
   const { payoutSettings } = settings;
 
   const totalWeight = lbEntries.reduce((s, e) => s + (parseFloat(e.totalWeight) || 0), 0).toFixed(2);
@@ -130,11 +129,11 @@ export default function LeaderboardTab({ entries, settings }) {
       </div>
 
       <div id="lbContainer" style={{ maxWidth: 900, marginLeft: 'auto', marginRight: 'auto' }}>
-        {displayed.length === 0 ? (
+        {lbEntries.length === 0 ? (
           <p style={{ textAlign: 'center', color: 'var(--header-bg)', padding: 40 }}>
             No entries yet. Add anglers in the Roster tab.
           </p>
-        ) : displayed.map(row => {
+        ) : lbEntries.map((row, idx) => {
           const r = row._lbRank;
           const cardClass = r === 1 ? 'gold-card' : r === 2 ? 'silver-card' : r === 3 ? 'bronze-card' : 'normal-card';
           const rankClass = r === 1 ? 'r1' : r === 2 ? 'r2' : r === 3 ? 'r3' : 'rn';
@@ -148,7 +147,7 @@ export default function LeaderboardTab({ entries, settings }) {
           const coName = [row.coAnglerFirst, row.coAnglerLast].filter(Boolean).join(' ') || '—';
 
           return (
-            <div key={row.id} className={`lb-card ${cardClass}`}>
+            <div key={row.id} className={`lb-card ${cardClass}${idx >= topN ? ' lb-print-only' : ''}`}>
               <div className={`lb-rank ${rankClass}`}>{rankDisplay}</div>
               <div className="lb-boatno">
                 <div className="lb-boatno-num">{row.boatNo || '—'}</div>

@@ -296,6 +296,7 @@ tbody td { padding: 8px 10px; color: var(--white); vertical-align: middle; }
 }
 
 .lb-card:hover { transform: translateX(4px); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+.lb-print-only { display: none; }
 
 .lb-card.gold-card   { background: rgba(200,169,106,0.15); border-color: rgba(200,169,106,0.45); }
 .lb-card.silver-card { background: rgba(160,160,160,0.12); border-color: rgba(192,192,192,0.35); }
@@ -561,6 +562,7 @@ tbody td { padding: 8px 10px; color: var(--white); vertical-align: middle; }
   .lb-stat-item .lbl, .lb-payout .val, .lb-payout .lbl,
   .sc-lbl, .sc-val, .sc-boat, .sc-name, .sc-co { color: black !important; }
   .summary-grid-top { grid-template-columns: repeat(3, 1fr); }
+  .lb-print-only { display: grid; }
 }
 
 /* ── RESPONSIVE ── */
