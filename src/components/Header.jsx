@@ -1,7 +1,17 @@
+import { useState } from 'react';
 import { getStats } from '../utils/calculations';
 
 export default function Header({ entries, settings, activeTab, onTabChange, onThemeToggle, isUnlocked, onToggleLock }) {
   const stats = getStats(entries, settings.fees);
+  const [buyInBlurred, setBuyInBlurred] = useState(
+    () => localStorage.getItem('ss_buyin_blur') !== 'false'
+  );
+
+  function toggleBuyInBlur() {
+    const next = !buyInBlurred;
+    setBuyInBlurred(next);
+    localStorage.setItem('ss_buyin_blur', String(next));
+  }
 
   return (
     <header>
@@ -50,8 +60,12 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
             <span className="lbl" style={{ color: 'rgba(120,200,255,0.7)' }}>{stats.optionPaidCount} paid</span>
           </div>
           {isUnlocked && (
-            <div className="stat-chip">
-              <span className="val">${stats.totalBuyIn}</span>
+            <div className="stat-chip" onClick={toggleBuyInBlur}
+                 title={buyInBlurred ? 'Click to reveal' : 'Click to hide'}
+                 style={{ cursor: 'pointer', userSelect: 'none' }}>
+              <span className="val" style={{ filter: buyInBlurred ? 'blur(6px)' : 'none', transition: 'filter 0.2s' }}>
+                ${stats.totalBuyIn}
+              </span>
               <span className="lbl">Total Buy-In</span>
             </div>
           )}
