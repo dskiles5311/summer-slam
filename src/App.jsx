@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Header from './components/Header';
 import RosterTab from './components/RosterTab';
 import BoatCheckTab from './components/BoatCheckTab';
@@ -83,8 +83,12 @@ export default function App() {
     if (theme === 'light' || theme === 'outdoor') document.body.classList.add(theme);
   }, [theme]);
 
+  const activeTabRef = useRef(activeTab);
+  useEffect(() => { activeTabRef.current = activeTab; }, [activeTab]);
+
   useEffect(() => {
-    const interval = setInterval(async () => {
+    let timer;
+    async function poll() {
       try {
         const [entriesData, settingsData] = await Promise.all([fetchEntries(), fetchSettings()]);
         setEntries(prev => JSON.stringify(prev) !== JSON.stringify(entriesData) ? entriesData : prev);
@@ -98,8 +102,10 @@ export default function App() {
           setSettings(prev => JSON.stringify(prev) !== JSON.stringify(merged) ? merged : prev);
         }
       } catch { /* silently skip if fetch fails */ }
-    }, 20000);
-    return () => clearInterval(interval);
+      timer = setTimeout(poll, activeTabRef.current === 'leaderboard' ? 5000 : 20000);
+    }
+    timer = setTimeout(poll, activeTabRef.current === 'leaderboard' ? 5000 : 20000);
+    return () => clearTimeout(timer);
   }, []);
 
   async function handleUnlock(password) {
