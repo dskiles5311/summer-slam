@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { importCSV, exportCSV } from '../utils/csv';
 
 function StatusCell({ val }) {
@@ -38,25 +38,34 @@ function sortEntries(entries, { field, dir }) {
   });
 }
 
-const SORT_BUTTONS = [
-  { label: '🏆 Rank',      field: '_rank',        dir: 'asc'  },
-  { label: 'Boater ↑',     field: 'boaterLast',   dir: 'asc'  },
-  { label: 'Co-Angler ↑',  field: 'coAnglerLast', dir: 'asc'  },
-  { label: 'Boat # ↑',     field: 'boatNo',       dir: 'asc'  },
-  { label: 'Fish ↓',       field: 'numFish',      dir: 'desc' },
-  { label: 'Lunker ↓',     field: 'lunkerWeight', dir: 'desc' },
-  { label: 'Weight ↓',     field: 'totalWeight',  dir: 'desc' },
-];
 
 export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred, onEdit, onAdd, onDelete, onClearAll, onImport, onToggleBoatCheck, onToggleField, onUpdateInlineField }) {
   const entryFee = parseFloat(settings.fees?.entryFee) || 249;
   const boatCheck = settings.boatCheck || {};
-  const [sortConfig, setSortConfig] = useState({ field: '_rank', dir: 'asc' });
+  const [sortKey, setSortKey] = useState(() => localStorage.getItem('ss_roster_sort_key') || '_rank');
+  const [sortDir, setSortDir] = useState(() => localStorage.getItem('ss_roster_sort_dir') || 'asc');
+  const [filter, setFilter]   = useState('');
   const [editingId, setEditingId] = useState(null);
   const [editValues, setEditValues] = useState({});
   const [penaltyPopup, setPenaltyPopup] = useState(null); // { row, x, y }
 
-  const sorted = useMemo(() => sortEntries(entries, sortConfig), [entries, sortConfig]);
+  useEffect(() => { localStorage.setItem('ss_roster_sort_key', sortKey); }, [sortKey]);
+  useEffect(() => { localStorage.setItem('ss_roster_sort_dir', sortDir); }, [sortDir]);
+
+  function toggleSort(key) {
+    if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    else { setSortKey(key); setSortDir('asc'); }
+  }
+
+  const sorted = useMemo(() => sortEntries(entries, { field: sortKey, dir: sortDir }), [entries, sortKey, sortDir]);
+
+  const displayed = useMemo(() => {
+    if (!filter) return sorted;
+    const q = filter.toLowerCase();
+    return sorted.filter(e =>
+      `${e.boaterFirst} ${e.boaterLast} ${e.coAnglerFirst} ${e.coAnglerLast} ${e.boatNo}`.toLowerCase().includes(q)
+    );
+  }, [sorted, filter]);
 
   const duplicateBoatNos = useMemo(() => {
     const counts = {};
@@ -87,19 +96,33 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
     <div className="tab-panel active">
       <div className="toolbar">
         {isUnlocked && <button className="btn btn-gold" onClick={onAdd}>+ Add Entry</button>}
-        <div className="sort-group">
-          <label>Sort:</label>
-          {SORT_BUTTONS.map(({ label, field, dir }) => (
-            <button
-              key={label}
-              className={`btn btn-outline btn-sm${sortConfig.field === field ? ' active' : ''}`}
-              onClick={() => setSortConfig({ field, dir })}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+
+        <span style={{ fontSize: 13, color: 'var(--header-bg)' }}>
+          <strong style={{ color: 'var(--gold-light)' }}>{displayed.length}</strong>
+          {filter ? ` of ${sorted.length}` : ''} entries
+        </span>
+
         <div style={{ flex: 1 }} />
+
+        <input
+          type="search"
+          placeholder="Filter by name, boat #…"
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
+          style={{
+            background: 'rgba(255,255,255,0.06)',
+            border: '1px solid rgba(139,180,225,0.3)',
+            borderRadius: 8,
+            color: 'var(--white)',
+            fontSize: 14,
+            padding: '7px 12px',
+            flex: '1 1 120px',
+            maxWidth: 220,
+            minWidth: 0,
+            outline: 'none',
+          }}
+        />
+
         {isUnlocked && (
           <label className="btn btn-outline" style={{ cursor: 'pointer' }}>
             📂 Import CSV
@@ -124,26 +147,42 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
         <table>
           <thead>
             <tr>
-              <th>Place</th>
-              <th>Boater First</th>
-              <th>Boater Last</th>
-              <th>Co-Angler First</th>
-              <th>Co-Angler Last</th>
-              <th>Boat #</th>
-              <th style={{ textAlign: 'center' }}># Fish</th>
-              <th style={{ textAlign: 'right' }}>Lunker (lbs)</th>
-              <th style={{ textAlign: 'right' }}>Total Wt (lbs)</th>
+              {[
+                { key: '_rank',        label: 'Place',          align: 'left'   },
+                { key: 'boaterFirst',  label: 'Boater First',   align: 'left'   },
+                { key: 'boaterLast',   label: 'Boater Last',    align: 'left'   },
+                { key: 'coAnglerFirst',label: 'Co-Angler First',align: 'left'   },
+                { key: 'coAnglerLast', label: 'Co-Angler Last', align: 'left'   },
+                { key: 'boatNo',       label: 'Boat #',         align: 'left'   },
+                { key: 'numFish',      label: '# Fish',         align: 'center' },
+                { key: 'lunkerWeight', label: 'Lunker (lbs)',   align: 'right'  },
+                { key: 'totalWeight',  label: 'Total Wt (lbs)', align: 'right'  },
+              ].map(({ key, label, align }) => (
+                <th key={key} style={{ textAlign: align, cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
+                    onClick={() => toggleSort(key)}>
+                  {label}
+                  <span style={{ marginLeft: 4, opacity: sortKey === key ? 1 : 0.3, fontSize: 11 }}>
+                    {sortKey === key ? (sortDir === 'asc' ? '▲' : '▼') : '▲'}
+                  </span>
+                </th>
+              ))}
               <th style={{ textAlign: 'center' }}>Lunker</th>
               <th style={{ textAlign: 'center' }}>Option</th>
               <th style={{ textAlign: 'center' }}>Paid</th>
               <th style={{ textAlign: 'center' }}>App Signed</th>
               <th style={{ textAlign: 'center' }}>⚓ Checked</th>
-              <th style={{ textAlign: 'right' }}>Buy-In</th>
+              <th style={{ textAlign: 'right', cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
+                  onClick={() => toggleSort('buyIn')}>
+                Buy-In
+                <span style={{ marginLeft: 4, opacity: sortKey === 'buyIn' ? 1 : 0.3, fontSize: 11 }}>
+                  {sortKey === 'buyIn' ? (sortDir === 'asc' ? '▲' : '▼') : '▲'}
+                </span>
+              </th>
               {isUnlocked && <th style={{ textAlign: 'center' }}>Actions</th>}
             </tr>
           </thead>
           <tbody>
-            {sorted.map(row => {
+            {displayed.map(row => {
               const rank = row._rank;
               const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : '';
               const buyIn = parseFloat(row.buyIn) || 0;
