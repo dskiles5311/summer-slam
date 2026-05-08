@@ -27,6 +27,7 @@ const DEFAULT_SETTINGS = {
     minPayout:   255,
     payouts:     [4000,1000,800,600,500,360,350,340,330,320,295,280,275,270,265,260,255],
   },
+  penalties:       { deadFishPenalty: 0.5, shortFishPenalty: 1.0, overLimitPenalty: 3.0, maxFish: 5 },
   boatCheck:       {},
   offWater:        {},
   recentWeighCount: 2,
@@ -68,6 +69,7 @@ export default function App() {
             ...settingsData,
             fees:           { ...DEFAULT_SETTINGS.fees,           ...(settingsData.fees           || {}) },
             payoutSettings: { ...DEFAULT_SETTINGS.payoutSettings, ...(settingsData.payoutSettings || {}) },
+            penalties:      { ...DEFAULT_SETTINGS.penalties,      ...(settingsData.penalties      || {}) },
           });
         }
       } catch {
@@ -368,7 +370,7 @@ export default function App() {
           />
         )}
         {activeTab === 'weighin' && (
-          <WeighInTab entries={entries} onWeighIn={handleWeighIn} onAddEntry={handleAddWeighInEntry} />
+          <WeighInTab entries={entries} settings={settingsWithTheme} onWeighIn={handleWeighIn} onAddEntry={handleAddWeighInEntry} />
         )}
         {activeTab === 'leaderboard' && (
           <LeaderboardTab entries={rankedEntries} settings={settingsWithTheme} />

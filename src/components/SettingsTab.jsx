@@ -6,16 +6,17 @@ const PANEL = { background: 'var(--settings-panel-bg)', border: '1px solid rgba(
 const H3 = { color: 'var(--header-bg)', fontSize: 14, marginBottom: 14, textTransform: 'uppercase', letterSpacing: 1 };
 
 export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSettings, onClearAll, onImport, onClearWeighLog }) {
-  const { fees, payoutSettings } = settings;
+  const { fees, payoutSettings, penalties } = settings;
 
-  const [totalPayout, setTotalPayout] = useState(payoutSettings.totalPayout || 0);
-  const [numWinners, setNumWinners]   = useState(payoutSettings.numWinners  || 10);
-  const [minPayout, setMinPayout]     = useState(payoutSettings.minPayout   || 250);
-  const [payouts, setPayouts]         = useState(payoutSettings.payouts      || []);
-  const [rawInputs, setRawInputs]     = useState(() => (payoutSettings.payouts || []).map(v => String(v || 0)));
-  const [rowErrors, setRowErrors]     = useState([]);
-  const [localFees, setLocalFees]     = useState(fees);
-  const [showLog, setShowLog]         = useState(false);
+  const [totalPayout, setTotalPayout]       = useState(payoutSettings.totalPayout || 0);
+  const [numWinners, setNumWinners]         = useState(payoutSettings.numWinners  || 10);
+  const [minPayout, setMinPayout]           = useState(payoutSettings.minPayout   || 250);
+  const [payouts, setPayouts]               = useState(payoutSettings.payouts      || []);
+  const [rawInputs, setRawInputs]           = useState(() => (payoutSettings.payouts || []).map(v => String(v || 0)));
+  const [rowErrors, setRowErrors]           = useState([]);
+  const [localFees, setLocalFees]           = useState(fees);
+  const [localPenalties, setLocalPenalties] = useState(penalties);
+  const [showLog, setShowLog]               = useState(false);
 
   useEffect(() => {
     setTotalPayout(payoutSettings.totalPayout || 0);
@@ -26,6 +27,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   }, [payoutSettings]);
 
   useEffect(() => { setLocalFees(fees); }, [fees]);
+  useEffect(() => { setLocalPenalties(penalties); }, [penalties]);
 
   function evalExpr(str) {
     const cleaned = String(str).replace(/[^0-9+\-*/.() ]/g, '').trim();
@@ -347,6 +349,42 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           </p>
         </div>
 
+        {/* Penalties */}
+        <div style={PANEL}>
+          <h3 style={H3}>Penalties</h3>
+          <div className="edit-grid-2" style={{ marginBottom: 12 }}>
+            <div className="form-field">
+              <label>Dead Fish (lbs per fish)</label>
+              <input type="number" value={localPenalties?.deadFishPenalty ?? 0.5} min="0" step="0.01" disabled={locked}
+                     onChange={e => setLocalPenalties(prev => ({ ...prev, deadFishPenalty: parseFloat(e.target.value) || 0 }))}
+                     onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
+            </div>
+            <div className="form-field">
+              <label>Short Fish (lbs per fish)</label>
+              <input type="number" value={localPenalties?.shortFishPenalty ?? 1.0} min="0" step="0.01" disabled={locked}
+                     onChange={e => setLocalPenalties(prev => ({ ...prev, shortFishPenalty: parseFloat(e.target.value) || 0 }))}
+                     onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
+            </div>
+            <div className="form-field">
+              <label>Over Limit (lbs per fish over max)</label>
+              <input type="number" value={localPenalties?.overLimitPenalty ?? 3.0} min="0" step="0.01" disabled={locked}
+                     onChange={e => setLocalPenalties(prev => ({ ...prev, overLimitPenalty: parseFloat(e.target.value) || 0 }))}
+                     onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
+            </div>
+            <div className="form-field">
+              <label>Max Fish Limit</label>
+              <input type="number" value={localPenalties?.maxFish ?? 5} min="1" step="1" disabled={locked}
+                     onChange={e => setLocalPenalties(prev => ({ ...prev, maxFish: parseInt(e.target.value) || 1 }))}
+                     onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
+            </div>
+          </div>
+          <p style={{ color: 'var(--header-bg)', fontSize: 11, marginTop: 8 }}>
+            Dead fish: deduct X lbs per dead fish from total weight.<br />
+            Short fish: deduct X lbs per short fish from total weight, and −1 from fish count.<br />
+            Over limit: deduct X lbs for each fish over the max limit.
+          </p>
+        </div>
+
         {/* Leaderboard Display */}
         <div style={PANEL}>
           <h3 style={H3}>Leaderboard Display</h3>
@@ -408,23 +446,27 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
         </div>
       </div>
 
-      {showLog && <WeighInLogModal entries={entries} onClose={() => setShowLog(false)} onClearLog={onClearWeighLog} />}
+      {showLog && <WeighInLogModal entries={entries} penalties={penalties} onClose={() => setShowLog(false)} onClearLog={onClearWeighLog} />}
     </div>
   );
 }
 
-function calcEntryPenalties(e) {
+function calcEntryPenalties(e, penalties = {}) {
+  const deadRate  = parseFloat(penalties.deadFishPenalty)  || 0.5;
+  const shortRate = parseFloat(penalties.shortFishPenalty) || 1.0;
+  const overRate  = parseFloat(penalties.overLimitPenalty) || 3.0;
+  const maxFish   = parseInt(penalties.maxFish)            || 5;
   const dead = Math.max(0, parseInt(e.deadFish)  || 0);
   const shrt = Math.max(0, parseInt(e.shortFish) || 0);
   const nf   = Math.max(0, parseInt(e.numFish)   || 0);
-  const over = Math.max(0, nf - 5);
-  const deadPen  = dead * 0.5;
-  const shortPen = shrt * 1.0;
-  const overPen  = over * 3.0;
+  const over = Math.max(0, nf - maxFish);
+  const deadPen  = dead * deadRate;
+  const shortPen = shrt * shortRate;
+  const overPen  = over * overRate;
   return { dead, shrt, over, deadPen, shortPen, overPen, total: deadPen + shortPen + overPen };
 }
 
-function WeighInLogModal({ entries, onClose, onClearLog }) {
+function WeighInLogModal({ entries, penalties, onClose, onClearLog }) {
   const overlayDownRef = { current: false };
 
   const logged = [...entries]
@@ -438,7 +480,7 @@ function WeighInLogModal({ entries, onClose, onClearLog }) {
   }
 
   function penaltyLines(e) {
-    const pen = calcEntryPenalties(e);
+    const pen = calcEntryPenalties(e, penalties);
     const lines = [];
     if (pen.dead > 0)  lines.push(`${pen.dead} dead −${pen.deadPen.toFixed(2)}`);
     if (pen.shrt > 0)  lines.push(`${pen.shrt} short −${pen.shortPen.toFixed(2)}`);

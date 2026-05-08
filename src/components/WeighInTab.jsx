@@ -15,23 +15,27 @@ const FIELD = {
 
 const LABEL = { fontSize: 12, fontWeight: 700, color: 'var(--header-bg)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 5, display: 'block' };
 
-function calcPenalties(numFish, deadFish, shortFish) {
+function calcPenalties(numFish, deadFish, shortFish, penalties = {}) {
+  const deadRate  = parseFloat(penalties.deadFishPenalty)  || 0.5;
+  const shortRate = parseFloat(penalties.shortFishPenalty) || 1.0;
+  const overRate  = parseFloat(penalties.overLimitPenalty) || 3.0;
+  const maxFish   = parseInt(penalties.maxFish)            || 5;
   const nf   = Math.max(0, parseInt(numFish)   || 0);
   const dead = Math.max(0, parseInt(deadFish)  || 0);
   const shrt = Math.max(0, parseInt(shortFish) || 0);
-  const over = Math.max(0, nf - 5);
+  const over = Math.max(0, nf - maxFish);
   return {
     dead,
     shrt,
     over,
-    deadPenalty:  dead * 0.5,
-    shortPenalty: shrt * 1.0,
-    overPenalty:  over * 3.0,
-    total:        dead * 0.5 + shrt * 1.0 + over * 3.0,
+    deadPenalty:  dead * deadRate,
+    shortPenalty: shrt * shortRate,
+    overPenalty:  over * overRate,
+    total:        dead * deadRate + shrt * shortRate + over * overRate,
   };
 }
 
-export default function WeighInTab({ entries, onWeighIn, onAddEntry }) {
+export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry }) {
   const [boatNo, setBoatNo]           = useState('');
   const [numFish, setNumFish]         = useState('');
   const [deadFish, setDeadFish]       = useState('');
@@ -51,7 +55,7 @@ export default function WeighInTab({ entries, onWeighIn, onAddEntry }) {
 
   useEffect(() => { boatRef.current?.focus(); }, []);
 
-  const pen = calcPenalties(numFish, deadFish, shortFish);
+  const pen = calcPenalties(numFish, deadFish, shortFish, settings?.penalties);
   const rawTw = parseFloat(totalWeight) || 0;
   const adjustedWeight = Math.max(0, rawTw - pen.total);
 
