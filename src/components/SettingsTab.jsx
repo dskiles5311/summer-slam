@@ -346,6 +346,21 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           </p>
         </div>
 
+        {/* Leaderboard Display */}
+        <div style={PANEL}>
+          <h3 style={H3}>Leaderboard Display</h3>
+          <div className="edit-grid-3">
+            <div className="form-field">
+              <label>Recent Weigh-Ins to Show</label>
+              <input type="number" value={settings.recentWeighCount ?? 2} min="0" max="10" step="1" disabled={locked}
+                     onChange={e => onUpdateSettings({ recentWeighCount: Math.max(0, parseInt(e.target.value) || 0) })} />
+            </div>
+          </div>
+          <p style={{ color: 'var(--header-bg)', fontSize: 11, marginTop: 8 }}>
+            Shows the most recent weigh-ins in a bar above the leaderboard. Set to 0 to hide.
+          </p>
+        </div>
+
         {/* Data Management */}
         <div style={PANEL}>
           <h3 style={H3}>Data Management</h3>

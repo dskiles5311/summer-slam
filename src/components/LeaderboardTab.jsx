@@ -1,6 +1,6 @@
 import { getLeaderboardEntries, getStats } from '../utils/calculations';
 
-export default function LeaderboardTab({ entries, settings }) {
+export default function LeaderboardTab({ entries, settings, recentWeighIds = [] }) {
   const topN = parseInt(settings.payoutSettings?.numWinners) || 10;
   const lbEntries = getLeaderboardEntries(entries);
   const { payoutSettings } = settings;
@@ -30,6 +30,12 @@ export default function LeaderboardTab({ entries, settings }) {
   const option1Pct = (settings.fees?.option1Pct ?? 70) / 100;
   const option1Payout = (optionPot * option1Pct).toFixed(2);
   const option2Payout = (optionPot * (1 - option1Pct)).toFixed(2);
+
+  const recentWeighCount = parseInt(settings.recentWeighCount) || 2;
+  const recentEntries = recentWeighIds
+    .slice(0, recentWeighCount)
+    .map(id => entries.find(e => e.id === id))
+    .filter(Boolean);
 
   return (
     <div className="tab-panel active" style={{ position: 'relative' }}>
@@ -120,6 +126,34 @@ export default function LeaderboardTab({ entries, settings }) {
           ) : <span className="sc-name">—</span>}
         </div>
       </div>
+
+      {recentEntries.length > 0 && (
+        <div className="recently-weighed" style={{ maxWidth: 900, marginLeft: 'auto', marginRight: 'auto', marginBottom: 12 }}>
+          <div className="rw-label">⚖️ Recently Weighed</div>
+          <div className="rw-cards">
+            {recentEntries.map((row, i) => {
+              const lw = parseFloat(row.lunkerWeight) || 0;
+              const tw = parseFloat(row.totalWeight) || 0;
+              const coName = [row.coAnglerFirst, row.coAnglerLast].filter(Boolean).join(' ');
+              return (
+                <div key={row.id} className={`rw-card${i === 0 ? ' rw-latest' : ''}`}>
+                  {i === 0 && <span className="rw-new">NEW</span>}
+                  <span className="rw-boat">#{row.boatNo || '—'}</span>
+                  <div className="rw-names">
+                    <span className="rw-boater">{[row.boaterFirst, row.boaterLast].filter(Boolean).join(' ') || '—'}</span>
+                    {coName && <span className="rw-co">{coName}</span>}
+                  </div>
+                  <div className="rw-stats">
+                    <span>{row.numFish || 0} fish</span>
+                    {lw > 0 && <span>🎯 {lw.toFixed(2)} lbs</span>}
+                    <span className="rw-total">{tw > 0 ? `${tw.toFixed(2)} lbs` : '—'}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="top-n-control" style={{ maxWidth: 900, marginLeft: 'auto', marginRight: 'auto' }}>
         <span style={{ color: 'var(--header-bg)', fontSize: 14 }}>

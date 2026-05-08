@@ -371,6 +371,103 @@ tbody td { padding: 8px 10px; color: var(--white); vertical-align: middle; }
 .summary-card .s-name.s-co { font-size: 22px; font-weight: 500; color: var(--header-bg); margin-top: 2px; }
 .summary-card .s-val  { font-size: 20px; font-weight: 700; color: var(--gold-light); display: block; }
 
+/* ── RECENTLY WEIGHED ── */
+.recently-weighed { }
+
+.rw-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--header-bg);
+  margin-bottom: 6px;
+}
+
+.rw-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 8px;
+}
+
+.rw-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(139,180,225,0.2);
+  background: rgba(255,255,255,0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.rw-card.rw-latest {
+  border-color: rgba(255,180,80,0.45);
+  background: rgba(255,180,80,0.07);
+}
+
+.rw-new {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #ffb450;
+  color: #1a1a1a;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  padding: 2px 6px;
+  border-radius: 0 10px 0 6px;
+}
+
+.rw-boat {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--gold-light);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.rw-names {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rw-boater {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rw-co {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--header-bg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rw-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: 12px;
+  color: var(--header-bg);
+  white-space: nowrap;
+}
+
+.rw-total {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gold-light);
+}
+
 /* ── BUY-IN BLUR ── */
 .buyin-val { transition: filter 0.25s; }
 .buyin-blurred .buyin-val { filter: blur(6px); }
