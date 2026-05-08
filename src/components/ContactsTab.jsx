@@ -244,15 +244,17 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
           }}
         />
 
-        <button className="btn btn-outline btn-sm" onClick={handleExport}
-                title="Download all contacts as CSV">
-          ⬇ Export
-        </button>
         {isUnlocked && (
-          <button className="btn btn-outline btn-sm" onClick={() => fileInputRef.current?.click()}
-                  title="Import contacts from CSV (FirstName, LastName, Phone, Email)">
-            ⬆ Import
-          </button>
+          <>
+            <button className="btn btn-outline btn-sm" onClick={handleExport}
+                    title="Download all contacts as CSV">
+              ⬇ Export
+            </button>
+            <button className="btn btn-outline btn-sm" onClick={() => fileInputRef.current?.click()}
+                    title="Import contacts from CSV (FirstName, LastName, Phone, Email)">
+              ⬆ Import
+            </button>
+          </>
         )}
       </div>
 
