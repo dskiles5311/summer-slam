@@ -399,6 +399,11 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
             <li><strong style={{ color: 'var(--white)' }}>iPhone/iPad:</strong> Share → Add to Home Screen</li>
           </ul>
         </div>
+
+        <div style={{ textAlign: 'center', padding: '8px 0 4px', color: 'var(--header-bg)', fontSize: 12 }}>
+          <div style={{ marginBottom: 4 }}>Summer Slam Tournament Manager <span style={{ color: 'var(--gold-light)', fontWeight: 700 }}>v1.0.0</span></div>
+          <div>Created by <strong style={{ color: 'var(--white)' }}>David Skiles</strong></div>
+        </div>
       </div>
     </div>
   );
