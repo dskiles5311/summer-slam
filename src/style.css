@@ -372,30 +372,28 @@ tbody td { padding: 8px 10px; color: var(--white); vertical-align: middle; }
 .summary-card .s-val  { font-size: 20px; font-weight: 700; color: var(--gold-light); display: block; }
 
 /* ── RECENTLY WEIGHED ── */
-.recently-weighed { }
-
 .rw-label {
-  font-size: 11px;
+  font-size: 16px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
   color: var(--header-bg);
-  margin-bottom: 6px;
+  text-align: center;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
 }
 
 .rw-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .rw-card {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 52px 60px 1fr auto;
   align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border-radius: 10px;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 12px;
   border: 1px solid rgba(139,180,225,0.2);
   background: rgba(255,255,255,0.04);
   position: relative;
@@ -407,66 +405,57 @@ tbody td { padding: 8px 10px; color: var(--white); vertical-align: middle; }
   background: rgba(255,180,80,0.07);
 }
 
-.rw-new {
-  position: absolute;
-  top: 0;
-  right: 0;
+.rw-icon { text-align: center; line-height: 1; }
+
+.rw-new-badge {
+  display: inline-block;
   background: #ffb450;
   color: #1a1a1a;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  padding: 2px 6px;
-  border-radius: 0 10px 0 6px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  padding: 4px 8px;
+  border-radius: 6px;
 }
+
+.rw-weigh-icon { font-size: 26px; }
 
 .rw-boat {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--gold-light);
-  line-height: 1;
-  white-space: nowrap;
+  text-align: center;
+  border-right: 1px solid rgba(168,200,160,0.25);
+  padding-right: 14px;
 }
 
-.rw-names {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
+.rw-boat-num { font-size: 26px; font-weight: 900; color: var(--header-bg); line-height: 1; }
+.rw-boat-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--header-bg); opacity: 0.7; margin-top: 2px; }
+
+.rw-names { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 
 .rw-boater {
-  font-size: 14px;
+  font-size: 19px;
   font-weight: 700;
   color: var(--white);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.3;
 }
 
 .rw-co {
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   color: var(--header-bg);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.rw-stats {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-  font-size: 12px;
-  color: var(--header-bg);
-  white-space: nowrap;
-}
+.rw-stats { display: flex; gap: 20px; align-items: center; flex-shrink: 0; }
 
-.rw-total {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--gold-light);
-}
+.rw-stat { text-align: center; }
+.rw-stat-val { font-size: 17px; font-weight: 700; color: var(--water-light); }
+.rw-stat-lbl { font-size: 10px; color: var(--header-bg); margin-top: 1px; }
+.rw-stat.rw-highlight .rw-stat-val { font-size: 20px; font-weight: 800; color: var(--gold-light); }
 
 /* ── BUY-IN BLUR ── */
 .buyin-val { transition: filter 0.25s; }

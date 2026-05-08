@@ -130,7 +130,7 @@ export default function LeaderboardTab({ entries, settings }) {
       </div>
 
       {recentEntries.length > 0 && (
-        <div className="recently-weighed" style={{ maxWidth: 900, marginLeft: 'auto', marginRight: 'auto', marginBottom: 12 }}>
+        <div style={{ maxWidth: 900, marginLeft: 'auto', marginRight: 'auto', marginBottom: 12 }}>
           <div className="rw-label">⚖️ Recently Weighed</div>
           <div className="rw-cards">
             {recentEntries.map((row, i) => {
@@ -139,16 +139,34 @@ export default function LeaderboardTab({ entries, settings }) {
               const coName = [row.coAnglerFirst, row.coAnglerLast].filter(Boolean).join(' ');
               return (
                 <div key={row.id} className={`rw-card${i === 0 ? ' rw-latest' : ''}`}>
-                  {i === 0 && <span className="rw-new">NEW</span>}
-                  <span className="rw-boat">#{row.boatNo || '—'}</span>
+                  <div className="rw-icon">
+                    {i === 0
+                      ? <span className="rw-new-badge">NEW</span>
+                      : <span className="rw-weigh-icon">⚖️</span>}
+                  </div>
+                  <div className="rw-boat">
+                    <div className="rw-boat-num">{row.boatNo || '—'}</div>
+                    <div className="rw-boat-lbl">Boat #</div>
+                  </div>
                   <div className="rw-names">
                     <span className="rw-boater">{[row.boaterFirst, row.boaterLast].filter(Boolean).join(' ') || '—'}</span>
                     {coName && <span className="rw-co">{coName}</span>}
                   </div>
                   <div className="rw-stats">
-                    <span>{row.numFish || 0} fish</span>
-                    {lw > 0 && <span>🎯 {lw.toFixed(2)} lbs</span>}
-                    <span className="rw-total">{tw > 0 ? `${tw.toFixed(2)} lbs` : '—'}</span>
+                    <div className="rw-stat">
+                      <div className="rw-stat-val">{row.numFish || 0}</div>
+                      <div className="rw-stat-lbl">Fish</div>
+                    </div>
+                    {lw > 0 && (
+                      <div className="rw-stat">
+                        <div className="rw-stat-val">{lw.toFixed(2)}</div>
+                        <div className="rw-stat-lbl">Lunker</div>
+                      </div>
+                    )}
+                    <div className="rw-stat rw-highlight">
+                      <div className="rw-stat-val">{tw > 0 ? `${tw.toFixed(2)} lbs` : '—'}</div>
+                      <div className="rw-stat-lbl">Total Wt</div>
+                    </div>
                   </div>
                 </div>
               );
