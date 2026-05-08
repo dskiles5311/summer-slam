@@ -84,11 +84,11 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggle, 
                       borderRadius: '50%',
                       fontSize: 16,
                       fontWeight: 700,
-                      background: checked ? 'rgba(76,175,80,0.2)' : 'rgba(255,255,255,0.06)',
-                      border: `2px solid ${checked ? '#4CAF50' : 'rgba(255,255,255,0.15)'}`,
-                      color: checked ? '#4CAF50' : 'rgba(255,255,255,0.3)',
+                      background: checked ? 'rgba(76,175,80,0.2)' : 'rgba(168,200,160,0.1)',
+                      border: `2px solid ${checked ? '#4CAF50' : 'rgba(168,200,160,0.55)'}`,
+                      color: checked ? '#4CAF50' : 'var(--header-bg)',
                     }}>
-                      {checked ? '✓' : ''}
+                      {checked ? '✓' : '○'}
                     </span>
                   </td>
                   <td style={{ textAlign: 'center', cursor: isUnlocked && checked ? 'pointer' : 'default' }}
@@ -102,11 +102,11 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggle, 
                       fontSize: 16,
                       fontWeight: 700,
                       opacity: checked ? 1 : 0.25,
-                      background: isOffWater ? 'rgba(120,200,255,0.2)' : 'rgba(255,255,255,0.06)',
-                      border: `2px solid ${isOffWater ? '#78c8ff' : 'rgba(255,255,255,0.15)'}`,
-                      color: isOffWater ? '#78c8ff' : 'rgba(255,255,255,0.3)',
+                      background: isOffWater ? 'rgba(120,200,255,0.2)' : 'rgba(168,200,160,0.1)',
+                      border: `2px solid ${isOffWater ? '#78c8ff' : 'rgba(168,200,160,0.55)'}`,
+                      color: isOffWater ? '#78c8ff' : 'var(--header-bg)',
                     }}>
-                      {isOffWater ? '✓' : ''}
+                      {isOffWater ? '✓' : '○'}
                     </span>
                   </td>
                   <td style={{ fontWeight: 700, fontSize: 16 }}>{row.boatNo || '—'}</td>

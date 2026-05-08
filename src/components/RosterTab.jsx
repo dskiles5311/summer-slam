@@ -288,11 +288,11 @@ export default function RosterTab({ entries, settings, isUnlocked, onEdit, onAdd
                       borderRadius: '50%',
                       fontSize: 13,
                       fontWeight: 700,
-                      background: boatCheck[row.id] ? 'rgba(76,175,80,0.2)' : 'rgba(255,255,255,0.06)',
-                      border: `2px solid ${boatCheck[row.id] ? '#4CAF50' : 'rgba(255,255,255,0.15)'}`,
-                      color: boatCheck[row.id] ? '#4CAF50' : 'rgba(255,255,255,0.3)',
+                      background: boatCheck[row.id] ? 'rgba(76,175,80,0.2)' : 'rgba(168,200,160,0.1)',
+                      border: `2px solid ${boatCheck[row.id] ? '#4CAF50' : 'rgba(168,200,160,0.55)'}`,
+                      color: boatCheck[row.id] ? '#4CAF50' : 'var(--header-bg)',
                     }}>
-                      {boatCheck[row.id] ? '✓' : ''}
+                      {boatCheck[row.id] ? '✓' : '○'}
                     </span>
                   </td>
                   <td style={{ textAlign: 'right' }}>
