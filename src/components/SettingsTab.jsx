@@ -413,6 +413,17 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   );
 }
 
+function calcEntryPenalties(e) {
+  const dead = Math.max(0, parseInt(e.deadFish)  || 0);
+  const shrt = Math.max(0, parseInt(e.shortFish) || 0);
+  const nf   = Math.max(0, parseInt(e.numFish)   || 0);
+  const over = Math.max(0, nf - 5);
+  const deadPen  = dead * 0.5;
+  const shortPen = shrt * 1.0;
+  const overPen  = over * 3.0;
+  return { dead, shrt, over, deadPen, shortPen, overPen, total: deadPen + shortPen + overPen };
+}
+
 function WeighInLogModal({ entries, onClose, onClearLog }) {
   const overlayDownRef = { current: false };
 
@@ -426,10 +437,23 @@ function WeighInLogModal({ entries, onClose, onClearLog }) {
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   }
 
+  function penaltyLines(e) {
+    const pen = calcEntryPenalties(e);
+    const lines = [];
+    if (pen.dead > 0)  lines.push(`${pen.dead} dead −${pen.deadPen.toFixed(2)}`);
+    if (pen.shrt > 0)  lines.push(`${pen.shrt} short −${pen.shortPen.toFixed(2)}`);
+    if (pen.over > 0)  lines.push(`${pen.over} over −${pen.overPen.toFixed(2)}`);
+    if (lines.length > 1) lines.push(`Total −${pen.total.toFixed(2)}`);
+    return { lines, total: pen.total };
+  }
+
   function handlePrint() {
     const rows = logged.map((e, i) => {
-      const lw = parseFloat(e.lunkerWeight) || 0;
-      const tw = parseFloat(e.totalWeight)  || 0;
+      const lw  = parseFloat(e.lunkerWeight) || 0;
+      const tw  = parseFloat(e.totalWeight)  || 0;
+      const rw  = parseFloat(e.rawWeight)    || 0;
+      const { lines, total: penTotal } = penaltyLines(e);
+      const dedCell = lines.length ? lines.join('<br>') : '—';
       return `<tr>
         <td style="text-align:right">${i + 1}</td>
         <td>${fmtTime(e.weighedAt)}</td>
@@ -438,17 +462,19 @@ function WeighInLogModal({ entries, onClose, onClearLog }) {
         <td>${[e.coAnglerFirst, e.coAnglerLast].filter(Boolean).join(' ') || '—'}</td>
         <td style="text-align:right">${e.numFish || 0}</td>
         <td style="text-align:right">${lw > 0 ? lw.toFixed(2) : '—'}</td>
+        <td style="text-align:right">${rw > 0 ? rw.toFixed(2) : '—'}</td>
+        <td style="text-align:right;color:${penTotal > 0 ? '#c0392b' : '#555'}">${dedCell}</td>
         <td style="text-align:right;font-weight:700">${tw > 0 ? tw.toFixed(2) : '—'}</td>
       </tr>`;
     }).join('');
-    const win = window.open('', '_blank', 'width=800,height=600');
+    const win = window.open('', '_blank', 'width=960,height=600');
     win.document.write(`<!DOCTYPE html><html><head><title>Weigh-In Log</title>
       <style>
         body{font-family:sans-serif;font-size:12px;padding:20px;color:#000}
         h2{margin-bottom:4px}p{margin-bottom:12px;color:#555;font-size:11px}
         table{width:100%;border-collapse:collapse}
         th{text-align:left;padding:6px 8px;background:#1a3a6e;color:#fff;font-size:11px;text-transform:uppercase}
-        td{padding:5px 8px;border-bottom:1px solid #ddd}
+        td{padding:5px 8px;border-bottom:1px solid #ddd;vertical-align:top}
         tr:nth-child(even) td{background:#f9f9f9}
       </style></head><body>
       <h2>Summer Slam — Weigh-In Log</h2>
@@ -458,11 +484,43 @@ function WeighInLogModal({ entries, onClose, onClearLog }) {
         <th>Boater</th><th>Co-Angler</th>
         <th style="text-align:right">Fish</th>
         <th style="text-align:right">Lunker</th>
-        <th style="text-align:right">Total</th>
+        <th style="text-align:right">Scale Wt</th>
+        <th style="text-align:right">Deductions</th>
+        <th style="text-align:right">Adj Wt</th>
       </tr></thead><tbody>${rows}</tbody></table>
       <script>window.onload=()=>{window.print();window.onafterprint=()=>window.close();}<\/script>
       </body></html>`);
     win.document.close();
+  }
+
+  function handleExport() {
+    const header = ['#', 'Time', 'Boat', 'Boater', 'Co-Angler', 'Fish', 'Lunker', 'Scale Wt', 'Deductions', 'Adj Wt'];
+    const csvRows = [header, ...logged.map((e, i) => {
+      const lw = parseFloat(e.lunkerWeight) || 0;
+      const tw = parseFloat(e.totalWeight)  || 0;
+      const rw = parseFloat(e.rawWeight)    || 0;
+      const { lines } = penaltyLines(e);
+      const csvEsc = v => `"${String(v).replace(/"/g, '""')}"`;
+      return [
+        i + 1,
+        fmtTime(e.weighedAt),
+        `#${e.boatNo || ''}`,
+        csvEsc([e.boaterFirst, e.boaterLast].filter(Boolean).join(' ') || ''),
+        csvEsc([e.coAnglerFirst, e.coAnglerLast].filter(Boolean).join(' ') || ''),
+        e.numFish || 0,
+        lw > 0 ? lw.toFixed(2) : '',
+        rw > 0 ? rw.toFixed(2) : '',
+        csvEsc(lines.join(' / ')),
+        tw > 0 ? tw.toFixed(2) : '',
+      ];
+    })].map(r => r.join(',')).join('\r\n');
+    const blob = new Blob([csvRows], { type: 'text/csv' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `weigh-in-log-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   function handleClear() {
@@ -471,13 +529,15 @@ function WeighInLogModal({ entries, onClose, onClearLog }) {
     onClose();
   }
 
+  const rightAligned = new Set(['#', 'Fish', 'Lunker', 'Scale Wt', 'Deductions', 'Adj Wt']);
+
   return (
     <div
       className="edit-overlay"
       onPointerDown={e => { overlayDownRef.current = e.target === e.currentTarget; }}
       onPointerUp={e => { if (overlayDownRef.current && e.target === e.currentTarget) onClose(); }}
     >
-      <div className="edit-panel" style={{ maxWidth: 720, width: '95vw' }}>
+      <div className="edit-panel" style={{ maxWidth: 900, width: '95vw' }}>
         <div className="edit-panel-inner">
           <div className="edit-panel-header">
             <h3>📋 Weigh-In Log</h3>
@@ -495,8 +555,8 @@ function WeighInLogModal({ entries, onClose, onClearLog }) {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
                   <tr>
-                    {['#', 'Time', 'Boat', 'Boater', 'Co-Angler', 'Fish', 'Lunker', 'Total'].map(h => (
-                      <th key={h} style={{ textAlign: h === '#' || h === 'Fish' || h === 'Lunker' || h === 'Total' ? 'right' : 'left', padding: '6px 10px', color: 'var(--header-bg)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, borderBottom: '1px solid rgba(139,180,225,0.2)', whiteSpace: 'nowrap' }}>
+                    {['#', 'Time', 'Boat', 'Boater', 'Co-Angler', 'Fish', 'Lunker', 'Scale Wt', 'Deductions', 'Adj Wt'].map(h => (
+                      <th key={h} style={{ textAlign: rightAligned.has(h) ? 'right' : 'left', padding: '6px 10px', color: 'var(--header-bg)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, borderBottom: '1px solid rgba(139,180,225,0.2)', whiteSpace: 'nowrap' }}>
                         {h}
                       </th>
                     ))}
@@ -506,6 +566,8 @@ function WeighInLogModal({ entries, onClose, onClearLog }) {
                   {logged.map((e, i) => {
                     const lw = parseFloat(e.lunkerWeight) || 0;
                     const tw = parseFloat(e.totalWeight)  || 0;
+                    const rw = parseFloat(e.rawWeight)    || 0;
+                    const { lines, total: penTotal } = penaltyLines(e);
                     return (
                       <tr key={e.id} style={{ borderBottom: '1px solid rgba(139,180,225,0.08)' }}>
                         <td style={{ padding: '7px 10px', color: 'var(--header-bg)', textAlign: 'right', fontWeight: 600 }}>{i + 1}</td>
@@ -515,6 +577,10 @@ function WeighInLogModal({ entries, onClose, onClearLog }) {
                         <td style={{ padding: '7px 10px', color: 'var(--header-bg)' }}>{[e.coAnglerFirst, e.coAnglerLast].filter(Boolean).join(' ') || '—'}</td>
                         <td style={{ padding: '7px 10px', textAlign: 'right' }}>{e.numFish || 0}</td>
                         <td style={{ padding: '7px 10px', textAlign: 'right', color: 'var(--header-bg)' }}>{lw > 0 ? lw.toFixed(2) : '—'}</td>
+                        <td style={{ padding: '7px 10px', textAlign: 'right', color: 'var(--header-bg)' }}>{rw > 0 ? rw.toFixed(2) : '—'}</td>
+                        <td style={{ padding: '7px 10px', textAlign: 'right', color: penTotal > 0 ? '#ff6b6b' : 'var(--header-bg)', fontSize: 12, lineHeight: 1.6, verticalAlign: 'top' }}>
+                          {lines.length ? lines.map((l, j) => <div key={j}>{l}</div>) : '—'}
+                        </td>
                         <td style={{ padding: '7px 10px', textAlign: 'right', fontWeight: 700, color: 'var(--gold-light)' }}>{tw > 0 ? tw.toFixed(2) : '—'}</td>
                       </tr>
                     );
@@ -525,6 +591,7 @@ function WeighInLogModal({ entries, onClose, onClearLog }) {
           )}
           <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
             <button className="btn btn-danger btn-lg" onClick={handleClear} style={{ marginRight: 'auto' }}>🗑️ Clear Log</button>
+            <button className="btn btn-outline btn-lg" onClick={handleExport} disabled={logged.length === 0}>💾 Export CSV</button>
             <button className="btn btn-outline btn-lg" onClick={handlePrint} disabled={logged.length === 0}>🖨️ Print</button>
             <button className="btn btn-outline btn-lg" onClick={onClose}>Close</button>
           </div>
