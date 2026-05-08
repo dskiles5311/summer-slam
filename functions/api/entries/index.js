@@ -32,6 +32,7 @@ function toJS(row) {
     deadFish:       row.dead_fish       ?? 0,
     shortFish:      row.short_fish      ?? 0,
     needsAttention: Boolean(row.needs_attention),
+    weighedAt:      row.weighed_at      ?? null,
   };
 }
 

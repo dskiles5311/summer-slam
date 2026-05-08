@@ -34,6 +34,7 @@ function parseEntry(raw) {
     deadFish:       raw.dead_fish       ?? raw.deadFish       ?? 0,
     shortFish:      raw.short_fish      ?? raw.shortFish      ?? 0,
     needsAttention: Boolean(raw.needs_attention ?? raw.needsAttention ?? false),
+    weighedAt:      raw.weighed_at ?? raw.weighedAt ?? null,
   };
 }
 

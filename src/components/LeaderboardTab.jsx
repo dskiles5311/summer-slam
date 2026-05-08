@@ -1,6 +1,6 @@
 import { getLeaderboardEntries, getStats } from '../utils/calculations';
 
-export default function LeaderboardTab({ entries, settings, recentWeighIds = [] }) {
+export default function LeaderboardTab({ entries, settings }) {
   const topN = parseInt(settings.payoutSettings?.numWinners) || 10;
   const lbEntries = getLeaderboardEntries(entries);
   const { payoutSettings } = settings;
@@ -32,10 +32,12 @@ export default function LeaderboardTab({ entries, settings, recentWeighIds = [] 
   const option2Payout = (optionPot * (1 - option1Pct)).toFixed(2);
 
   const recentWeighCount = parseInt(settings.recentWeighCount) || 2;
-  const recentEntries = recentWeighIds
-    .slice(0, recentWeighCount)
-    .map(id => entries.find(e => e.id === id))
-    .filter(Boolean);
+  const recentEntries = recentWeighCount > 0
+    ? [...entries]
+        .filter(e => e.weighedAt)
+        .sort((a, b) => new Date(b.weighedAt) - new Date(a.weighedAt))
+        .slice(0, recentWeighCount)
+    : [];
 
   return (
     <div className="tab-panel active" style={{ position: 'relative' }}>

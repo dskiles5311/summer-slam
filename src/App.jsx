@@ -41,7 +41,6 @@ export default function App() {
   const [editingEntry, setEditingEntry] = useState(null);
   const [isUnlocked, setIsUnlocked]     = useState(() => isPasswordStored());
   const [buyInBlurred, setBuyInBlurred] = useState(() => localStorage.getItem('ss_buyin_blur') !== 'false');
-  const [recentWeighIds, setRecentWeighIds] = useState([]);
 
   function handleToggleBuyInBlur() {
     const next = !buyInBlurred;
@@ -248,7 +247,6 @@ export default function App() {
         needsAttention: true,
       });
       setEntries(prev => [...prev, created]);
-      setRecentWeighIds(prev => [created.id, ...prev]);
       showToast(`Boat #${boatNo} added and flagged for attention`, 'warning');
       return true;
     } catch {
@@ -263,7 +261,6 @@ export default function App() {
     try {
       const updated = await updateEntry(entryId, { ...entry, ...weighData });
       setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
-      setRecentWeighIds(prev => [entryId, ...prev.filter(id => id !== entryId)]);
       showToast(`Boat #${entry.boatNo} saved!`, 'success');
       return true;
     } catch {
@@ -357,7 +354,7 @@ export default function App() {
           <WeighInTab entries={entries} onWeighIn={handleWeighIn} onAddEntry={handleAddWeighInEntry} />
         )}
         {activeTab === 'leaderboard' && (
-          <LeaderboardTab entries={rankedEntries} settings={settingsWithTheme} recentWeighIds={recentWeighIds} />
+          <LeaderboardTab entries={rankedEntries} settings={settingsWithTheme} />
         )}
         {activeTab === 'rules' && <RulesTab />}
         {activeTab === 'contacts' && (
