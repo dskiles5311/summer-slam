@@ -5,7 +5,7 @@ import { exportCSV, importCSV } from '../utils/csv';
 const PANEL = { background: 'var(--settings-panel-bg)', border: '1px solid rgba(139,180,225,0.2)', borderRadius: 10, padding: 20, marginBottom: 16 };
 const H3 = { color: 'var(--header-bg)', fontSize: 14, marginBottom: 14, textTransform: 'uppercase', letterSpacing: 1 };
 
-export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSettings, onClearAll, onImport }) {
+export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSettings, onClearAll, onImport, onClearWeighLog }) {
   const { fees, payoutSettings } = settings;
 
   const [totalPayout, setTotalPayout] = useState(payoutSettings.totalPayout || 0);
@@ -408,12 +408,12 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
         </div>
       </div>
 
-      {showLog && <WeighInLogModal entries={entries} onClose={() => setShowLog(false)} />}
+      {showLog && <WeighInLogModal entries={entries} onClose={() => setShowLog(false)} onClearLog={onClearWeighLog} />}
     </div>
   );
 }
 
-function WeighInLogModal({ entries, onClose }) {
+function WeighInLogModal({ entries, onClose, onClearLog }) {
   const overlayDownRef = { current: false };
 
   const logged = [...entries]
@@ -424,6 +424,51 @@ function WeighInLogModal({ entries, onClose }) {
     if (!ts) return '—';
     const d = new Date(ts + (ts.includes('Z') || ts.includes('+') ? '' : 'Z'));
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+
+  function handlePrint() {
+    const rows = logged.map((e, i) => {
+      const lw = parseFloat(e.lunkerWeight) || 0;
+      const tw = parseFloat(e.totalWeight)  || 0;
+      return `<tr>
+        <td style="text-align:right">${i + 1}</td>
+        <td>${fmtTime(e.weighedAt)}</td>
+        <td>#${e.boatNo || '—'}</td>
+        <td>${[e.boaterFirst, e.boaterLast].filter(Boolean).join(' ') || '—'}</td>
+        <td>${[e.coAnglerFirst, e.coAnglerLast].filter(Boolean).join(' ') || '—'}</td>
+        <td style="text-align:right">${e.numFish || 0}</td>
+        <td style="text-align:right">${lw > 0 ? lw.toFixed(2) : '—'}</td>
+        <td style="text-align:right;font-weight:700">${tw > 0 ? tw.toFixed(2) : '—'}</td>
+      </tr>`;
+    }).join('');
+    const win = window.open('', '_blank', 'width=800,height=600');
+    win.document.write(`<!DOCTYPE html><html><head><title>Weigh-In Log</title>
+      <style>
+        body{font-family:sans-serif;font-size:12px;padding:20px;color:#000}
+        h2{margin-bottom:4px}p{margin-bottom:12px;color:#555;font-size:11px}
+        table{width:100%;border-collapse:collapse}
+        th{text-align:left;padding:6px 8px;background:#1a3a6e;color:#fff;font-size:11px;text-transform:uppercase}
+        td{padding:5px 8px;border-bottom:1px solid #ddd}
+        tr:nth-child(even) td{background:#f9f9f9}
+      </style></head><body>
+      <h2>Summer Slam — Weigh-In Log</h2>
+      <p>Printed ${new Date().toLocaleString()} &nbsp;·&nbsp; ${logged.length} weigh-in${logged.length !== 1 ? 's' : ''}</p>
+      <table><thead><tr>
+        <th style="text-align:right">#</th><th>Time</th><th>Boat</th>
+        <th>Boater</th><th>Co-Angler</th>
+        <th style="text-align:right">Fish</th>
+        <th style="text-align:right">Lunker</th>
+        <th style="text-align:right">Total</th>
+      </tr></thead><tbody>${rows}</tbody></table>
+      <script>window.onload=()=>{window.print();window.onafterprint=()=>window.close();}<\/script>
+      </body></html>`);
+    win.document.close();
+  }
+
+  function handleClear() {
+    if (!confirm('Clear the weigh-in log? This removes timestamps from all entries and cannot be undone.')) return;
+    onClearLog();
+    onClose();
   }
 
   return (
@@ -439,7 +484,7 @@ function WeighInLogModal({ entries, onClose }) {
             <button className="edit-panel-close" onClick={onClose}>✕</button>
           </div>
           <p style={{ color: 'var(--header-bg)', fontSize: 12, marginBottom: 14 }}>
-            {logged.length} weigh-in{logged.length !== 1 ? 's' : ''} recorded this session · read-only · ordered by time
+            {logged.length} weigh-in{logged.length !== 1 ? 's' : ''} recorded · read-only · ordered by time
           </p>
           {logged.length === 0 ? (
             <p style={{ color: 'var(--header-bg)', textAlign: 'center', padding: '32px 0' }}>
@@ -478,7 +523,9 @@ function WeighInLogModal({ entries, onClose }) {
               </table>
             </div>
           )}
-          <div style={{ marginTop: 16, textAlign: 'right' }}>
+          <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+            <button className="btn btn-danger btn-lg" onClick={handleClear} style={{ marginRight: 'auto' }}>🗑️ Clear Log</button>
+            <button className="btn btn-outline btn-lg" onClick={handlePrint} disabled={logged.length === 0}>🖨️ Print</button>
             <button className="btn btn-outline btn-lg" onClick={onClose}>Close</button>
           </div>
         </div>

@@ -82,6 +82,14 @@ export async function deleteEntry(id) {
   if (!res.ok) throw new Error('Failed to delete entry');
 }
 
+export async function clearWeighLog() {
+  const res = await fetch(`${BASE}/entries/clear-weigh-log`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new Error('Failed to clear weigh-in log');
+}
+
 export async function fetchSettings() {
   const res = await fetch(`${BASE}/settings`);
   if (!res.ok) throw new Error('Failed to fetch settings');

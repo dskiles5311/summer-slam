@@ -15,6 +15,7 @@ import {
   fetchEntries, createEntry, updateEntry, deleteEntry,
   fetchSettings, saveSettings, verifyPassword, storePassword, clearPassword, isPasswordStored,
   upsertContacts, fetchContacts, updateContact, deleteContact,
+  clearWeighLog,
 } from './utils/api';
 import { calcRanks } from './utils/calculations';
 
@@ -275,6 +276,16 @@ export default function App() {
     }
   }
 
+  async function handleClearWeighLog() {
+    try {
+      await clearWeighLog();
+      setEntries(prev => prev.map(e => ({ ...e, weighedAt: null })));
+      showToast('Weigh-in log cleared', 'info');
+    } catch {
+      showToast('Failed to clear weigh-in log', 'error');
+    }
+  }
+
   async function handleClearAll() {
     if (!confirm('Clear ALL data? This cannot be undone!')) return;
     try {
@@ -379,6 +390,7 @@ export default function App() {
             onUpdateSettings={handleUpdateSettings}
             onClearAll={handleClearAll}
             onImport={handleImport}
+            onClearWeighLog={handleClearWeighLog}
           />
         )}
       </main>
