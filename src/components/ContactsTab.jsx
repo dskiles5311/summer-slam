@@ -72,8 +72,11 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
   const [loading, setLoading]   = useState(true);
   const [filter, setFilter]     = useState('');
   const [editing, setEditing]   = useState(null);
-  const [sortKey, setSortKey]   = useState('lastName');
-  const [sortDir, setSortDir]   = useState('asc');
+  const [sortKey, setSortKey]   = useState(() => localStorage.getItem('ss_contacts_sort_key') || 'lastName');
+  const [sortDir, setSortDir]   = useState(() => localStorage.getItem('ss_contacts_sort_dir') || 'asc');
+
+  useEffect(() => { localStorage.setItem('ss_contacts_sort_key', sortKey); }, [sortKey]);
+  useEffect(() => { localStorage.setItem('ss_contacts_sort_dir', sortDir); }, [sortDir]);
 
   useEffect(() => {
     fetchContacts().then(data => { setContacts(data); setLoading(false); });
