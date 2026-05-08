@@ -229,6 +229,18 @@ export default function App() {
     }
   }
 
+  async function handleClearDeductions(entryId) {
+    const entry = entries.find(e => e.id === entryId);
+    if (!entry) return;
+    try {
+      const updated = await updateEntry(entryId, { ...entry, rawWeight: null, deadFish: 0, shortFish: 0 });
+      setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
+      showToast('Deductions cleared', 'info');
+    } catch {
+      showToast('Failed to clear deductions', 'error');
+    }
+  }
+
   async function handleResetBoatCheck() {
     await handleUpdateSettings({ boatCheck: {}, offWater: {} });
   }
@@ -359,6 +371,7 @@ export default function App() {
             onToggleBoatCheck={handleToggleBoatCheck}
             onToggleField={handleToggleEntryField}
             onUpdateInlineField={handleUpdateInlineField}
+            onClearDeductions={handleClearDeductions}
           />
         )}
         {activeTab === 'boatcheck' && (

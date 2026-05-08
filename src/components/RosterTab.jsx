@@ -39,7 +39,7 @@ function sortEntries(entries, { field, dir }) {
 }
 
 
-export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred, onEdit, onAdd, onDelete, onClearAll, onImport, onToggleBoatCheck, onToggleField, onUpdateInlineField }) {
+export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred, onEdit, onAdd, onDelete, onClearAll, onImport, onToggleBoatCheck, onToggleField, onUpdateInlineField, onClearDeductions }) {
   const entryFee = parseFloat(settings.fees?.entryFee) || 249;
   const boatCheck = settings.boatCheck || {};
   const [sortKey, setSortKey] = useState(() => localStorage.getItem('ss_roster_sort_key') || '_rank');
@@ -389,6 +389,15 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
                 <span style={{ color: 'var(--gold-light, #e8c876)' }}>Adjusted weight</span>
                 <span style={{ color: 'var(--gold-light, #e8c876)' }}>{parseFloat(r.totalWeight).toFixed(2)} lbs</span>
               </div>
+              {isUnlocked && (
+                <button
+                  className="btn btn-danger btn-sm"
+                  style={{ marginTop: 12, width: '100%' }}
+                  onClick={() => { onClearDeductions(r.id); setPenaltyPopup(null); }}
+                >
+                  ✕ Clear Deductions
+                </button>
+              )}
             </div>
           </>
         );
