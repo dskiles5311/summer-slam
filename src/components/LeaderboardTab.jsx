@@ -58,7 +58,7 @@ export default function LeaderboardTab({ entries, settings }) {
         </p>
       </div>
 
-      <div className="summary-grid-top" style={{ marginBottom: 10 }}>
+      <div className="summary-grid-top" style={{ marginBottom: 10, maxWidth: 760, marginLeft: 'auto', marginRight: 'auto' }}>
         <div className="summary-chip">
           <span className="sc-lbl">Total Boats</span>
           <span className="sc-val">{totalBoats}</span>
@@ -95,7 +95,7 @@ export default function LeaderboardTab({ entries, settings }) {
         </div>
       </div>
 
-      <div className="summary-grid" style={{ marginBottom: 16 }}>
+      <div className="summary-grid" style={{ marginBottom: 16, maxWidth: 760, marginLeft: 'auto', marginRight: 'auto' }}>
         <div className="summary-card">
           <span className="s-lbl">⚡ Option 1 — ${option1Payout}</span>
           {option1Row ? (
@@ -118,7 +118,7 @@ export default function LeaderboardTab({ entries, settings }) {
         </div>
       </div>
 
-      <div className="top-n-control">
+      <div className="top-n-control" style={{ maxWidth: 760, marginLeft: 'auto', marginRight: 'auto' }}>
         <span style={{ color: 'var(--header-bg)', fontSize: 14 }}>
           Showing top <strong style={{ color: 'var(--gold-light)' }}>{topN}</strong> positions — set in Settings
         </span>
