@@ -458,8 +458,10 @@ function calcEntryPenalties(e, penalties = {}) {
   const maxFish   = parseInt(penalties.maxFish)            || 5;
   const dead = Math.max(0, parseInt(e.deadFish)  || 0);
   const shrt = Math.max(0, parseInt(e.shortFish) || 0);
-  const nf   = Math.max(0, parseInt(e.numFish)   || 0);
-  const over = Math.max(0, nf - maxFish);
+  // numFish is stored post-adjustment (short fish already removed), so
+  // reconstruct the raw count to correctly derive the over-limit count.
+  const rawNf = Math.max(0, parseInt(e.numFish) || 0) + shrt;
+  const over  = Math.max(0, rawNf - shrt - maxFish);
   const deadPen  = dead * deadRate;
   const shortPen = shrt * shortRate;
   const overPen  = over * overRate;
@@ -482,10 +484,10 @@ function WeighInLogModal({ entries, penalties, onClose, onClearLog }) {
   function penaltyLines(e) {
     const pen = calcEntryPenalties(e, penalties);
     const lines = [];
-    if (pen.dead > 0)  lines.push(`${pen.dead} dead −${pen.deadPen.toFixed(2)}`);
-    if (pen.shrt > 0)  lines.push(`${pen.shrt} short −${pen.shortPen.toFixed(2)}`);
-    if (pen.over > 0)  lines.push(`${pen.over} over −${pen.overPen.toFixed(2)}`);
-    if (lines.length > 1) lines.push(`Total −${pen.total.toFixed(2)}`);
+    if (pen.dead > 0)  lines.push(`${pen.dead} dead −${pen.deadPen.toFixed(2)} lbs`);
+    if (pen.shrt > 0)  lines.push(`${pen.shrt} short −${pen.shortPen.toFixed(2)} lbs, −${pen.shrt} fish`);
+    if (pen.over > 0)  lines.push(`${pen.over} over limit −${pen.overPen.toFixed(2)} lbs`);
+    if (pen.total > 0) lines.push(`Wt penalty −${pen.total.toFixed(2)} lbs`);
     return { lines, total: pen.total };
   }
 
