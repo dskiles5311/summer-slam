@@ -15,6 +15,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   const [rawInputs, setRawInputs]     = useState(() => (payoutSettings.payouts || []).map(v => String(v || 0)));
   const [rowErrors, setRowErrors]     = useState([]);
   const [localFees, setLocalFees]     = useState(fees);
+  const [showLog, setShowLog]         = useState(false);
 
   useEffect(() => {
     setTotalPayout(payoutSettings.totalPayout || 0);
@@ -366,6 +367,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           <h3 style={H3}>Data Management</h3>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <button className="btn btn-primary" onClick={() => exportCSV(entries, payoutSettings)}>💾 Export CSV</button>
+            <button className="btn btn-outline" onClick={() => setShowLog(true)}>📋 Weigh-In Log</button>
             {isUnlocked && (
               <label className="btn btn-outline" style={{ cursor: 'pointer' }}>
                 📂 Import CSV
@@ -403,6 +405,82 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
         <div style={{ textAlign: 'center', padding: '8px 0 4px', color: 'var(--header-bg)', fontSize: 12 }}>
           <div style={{ marginBottom: 4 }}>Summer Slam Tournament Manager <span style={{ color: 'var(--gold-light)', fontWeight: 700 }}>v1.0.0</span></div>
           <div>Created by <strong style={{ color: 'var(--white)' }}>David Skiles</strong></div>
+        </div>
+      </div>
+
+      {showLog && <WeighInLogModal entries={entries} onClose={() => setShowLog(false)} />}
+    </div>
+  );
+}
+
+function WeighInLogModal({ entries, onClose }) {
+  const overlayDownRef = { current: false };
+
+  const logged = [...entries]
+    .filter(e => e.weighedAt)
+    .sort((a, b) => new Date(a.weighedAt) - new Date(b.weighedAt));
+
+  function fmtTime(ts) {
+    if (!ts) return '—';
+    const d = new Date(ts + (ts.includes('Z') || ts.includes('+') ? '' : 'Z'));
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+
+  return (
+    <div
+      className="edit-overlay"
+      onPointerDown={e => { overlayDownRef.current = e.target === e.currentTarget; }}
+      onPointerUp={e => { if (overlayDownRef.current && e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="edit-panel" style={{ maxWidth: 720, width: '95vw' }}>
+        <div className="edit-panel-inner">
+          <div className="edit-panel-header">
+            <h3>📋 Weigh-In Log</h3>
+            <button className="edit-panel-close" onClick={onClose}>✕</button>
+          </div>
+          <p style={{ color: 'var(--header-bg)', fontSize: 12, marginBottom: 14 }}>
+            {logged.length} weigh-in{logged.length !== 1 ? 's' : ''} recorded this session · read-only · ordered by time
+          </p>
+          {logged.length === 0 ? (
+            <p style={{ color: 'var(--header-bg)', textAlign: 'center', padding: '32px 0' }}>
+              No weigh-ins recorded yet.
+            </p>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                <thead>
+                  <tr>
+                    {['#', 'Time', 'Boat', 'Boater', 'Co-Angler', 'Fish', 'Lunker', 'Total'].map(h => (
+                      <th key={h} style={{ textAlign: h === '#' || h === 'Fish' || h === 'Lunker' || h === 'Total' ? 'right' : 'left', padding: '6px 10px', color: 'var(--header-bg)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, borderBottom: '1px solid rgba(139,180,225,0.2)', whiteSpace: 'nowrap' }}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {logged.map((e, i) => {
+                    const lw = parseFloat(e.lunkerWeight) || 0;
+                    const tw = parseFloat(e.totalWeight)  || 0;
+                    return (
+                      <tr key={e.id} style={{ borderBottom: '1px solid rgba(139,180,225,0.08)' }}>
+                        <td style={{ padding: '7px 10px', color: 'var(--header-bg)', textAlign: 'right', fontWeight: 600 }}>{i + 1}</td>
+                        <td style={{ padding: '7px 10px', color: 'var(--gold-light)', fontWeight: 600, whiteSpace: 'nowrap' }}>{fmtTime(e.weighedAt)}</td>
+                        <td style={{ padding: '7px 10px', fontWeight: 700 }}>#{e.boatNo || '—'}</td>
+                        <td style={{ padding: '7px 10px' }}>{[e.boaterFirst, e.boaterLast].filter(Boolean).join(' ') || '—'}</td>
+                        <td style={{ padding: '7px 10px', color: 'var(--header-bg)' }}>{[e.coAnglerFirst, e.coAnglerLast].filter(Boolean).join(' ') || '—'}</td>
+                        <td style={{ padding: '7px 10px', textAlign: 'right' }}>{e.numFish || 0}</td>
+                        <td style={{ padding: '7px 10px', textAlign: 'right', color: 'var(--header-bg)' }}>{lw > 0 ? lw.toFixed(2) : '—'}</td>
+                        <td style={{ padding: '7px 10px', textAlign: 'right', fontWeight: 700, color: 'var(--gold-light)' }}>{tw > 0 ? tw.toFixed(2) : '—'}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <div style={{ marginTop: 16, textAlign: 'right' }}>
+            <button className="btn btn-outline btn-lg" onClick={onClose}>Close</button>
+          </div>
         </div>
       </div>
     </div>
