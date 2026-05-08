@@ -225,6 +225,15 @@ tbody tr:hover { background: rgba(255,255,255,0.04); }
 
 tbody td { padding: 8px 10px; color: var(--white); vertical-align: middle; overflow: hidden; }
 tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
+.roster-table tbody tr { height: 41px; }
+.roster-table tbody td input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  font: inherit;
+  line-height: inherit;
+  box-sizing: border-box;
+}
 
 .rank-cell { font-weight: 800; font-size: 17px; color: var(--gold-light); text-align: center; min-width: 40px; }
 .rank-1 { color: #FFD700; font-size: 20px; }

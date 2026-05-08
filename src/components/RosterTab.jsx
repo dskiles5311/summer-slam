@@ -144,7 +144,7 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
       </div>
 
       <div className="table-wrapper">
-        <table style={{ tableLayout: 'fixed', minWidth: 960 }}>
+        <table className="roster-table" style={{ tableLayout: 'fixed', minWidth: 960 }}>
           <colgroup>
             <col style={{ width: 52 }} />   {/* Place      */}
             <col />                          {/* Boater First (flex) */}
