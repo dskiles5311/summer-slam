@@ -125,7 +125,7 @@ export default function LeaderboardTab({ entries, settings }) {
         <button className="btn btn-gold btn-sm" onClick={() => window.print()}>🖨️ Print / PDF</button>
       </div>
 
-      <div id="lbContainer">
+      <div id="lbContainer" style={{ maxWidth: 760, marginLeft: 'auto', marginRight: 'auto' }}>
         {displayed.length === 0 ? (
           <p style={{ textAlign: 'center', color: 'var(--header-bg)', padding: 40 }}>
             No entries yet. Add anglers in the Roster tab.
