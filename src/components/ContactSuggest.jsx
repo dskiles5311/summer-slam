@@ -8,7 +8,7 @@ const ITEM_STYLE = {
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  borderBottom: '1px solid rgba(255,255,255,0.06)',
+  borderBottom: '1px solid rgba(168,200,160,0.15)',
 };
 
 const DROP_STYLE = {
@@ -17,12 +17,12 @@ const DROP_STYLE = {
   left: 0,
   right: 0,
   zIndex: 2000,
-  background: 'var(--modal-bg, #1a2a3a)',
-  border: '1px solid rgba(139,180,225,0.35)',
+  background: 'var(--navy-mid)',
+  border: '1px solid rgba(168,200,160,0.4)',
   borderRadius: 6,
   maxHeight: 220,
   overflowY: 'auto',
-  boxShadow: '0 6px 24px rgba(0,0,0,0.5)',
+  boxShadow: '0 6px 24px rgba(0,0,0,0.4)',
 };
 
 export default function ContactSuggest({ value, placeholder, onChange, onSelect, inputRef, inputProps = {} }) {
@@ -85,8 +85,8 @@ export default function ContactSuggest({ value, placeholder, onChange, onSelect,
               onMouseDown={() => select(s)}
               style={{ ...ITEM_STYLE, background: i === active ? 'rgba(139,180,225,0.12)' : 'transparent' }}
             >
-              <span style={{ fontWeight: 600 }}>{s.firstName} {s.lastName}</span>
-              {s.phone && <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 12 }}>{s.phone}</span>}
+              <span style={{ fontWeight: 600, color: 'var(--white)' }}>{s.firstName} {s.lastName}</span>
+              {s.phone && <span style={{ color: 'var(--header-bg)', fontSize: 12 }}>{s.phone}</span>}
             </div>
           ))}
         </div>
