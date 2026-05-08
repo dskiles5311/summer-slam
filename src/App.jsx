@@ -307,7 +307,7 @@ export default function App() {
         entries={rankedEntries}
         settings={settingsWithTheme}
         activeTab={isUnlocked || activeTab === 'rules' ? activeTab : 'leaderboard'}
-        onTabChange={tab => { if (isUnlocked || tab === 'rules') setActiveTab(tab); }}
+        onTabChange={tab => { if (isUnlocked || tab === 'rules' || tab === 'leaderboard') setActiveTab(tab); }}
         onThemeToggle={() => {
           const next = theme === 'dark' ? 'light' : theme === 'light' ? 'outdoor' : 'dark';
           setTheme(next);
