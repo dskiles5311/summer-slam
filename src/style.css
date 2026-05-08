@@ -563,6 +563,7 @@ tbody td { padding: 8px 10px; color: var(--white); vertical-align: middle; }
   .summary-grid-top { grid-template-columns: repeat(2, 1fr); }
   .lb-card { grid-template-columns: 46px 52px 1fr auto auto; gap: 10px; }
   .lb-stat-item:not(.highlight) { display: none; }
+  .contacts-table .col-email { display: none; }
 
   /* Nav tabs: scroll horizontally, never wrap */
   .nav-tabs {

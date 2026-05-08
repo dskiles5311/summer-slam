@@ -239,7 +239,9 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
             color: 'var(--white)',
             fontSize: 14,
             padding: '7px 12px',
-            width: 220,
+            flex: '1 1 120px',
+            maxWidth: 220,
+            minWidth: 0,
             outline: 'none',
           }}
         />
@@ -259,7 +261,7 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
       </div>
 
       <div className="table-wrapper">
-        <table style={{ tableLayout: 'fixed' }}>
+        <table className="contacts-table" style={{ tableLayout: 'fixed' }}>
           <thead>
             <tr>
               {[
@@ -274,8 +276,8 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
                   </span>
                 </th>
               ))}
-              <th style={{ width: '22%' }}>Phone</th>
-              <th style={{ width: '28%' }}>Email</th>
+              <th style={{ width: '25%' }}>Phone</th>
+              <th className="col-email" style={{ width: '25%' }}>Email</th>
               {isUnlocked && <th style={{ width: 100, textAlign: 'center' }}>Actions</th>}
             </tr>
           </thead>
@@ -295,7 +297,7 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
                     ? <a href={`tel:${c.phone}`} style={{ color: 'var(--water-light)', textDecoration: 'none' }}>{c.phone}</a>
                     : <span style={{ color: 'var(--header-bg)' }}>—</span>}
                 </td>
-                <td style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <td className="col-email" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {c.email
                     ? <a href={`mailto:${c.email}`} style={{ color: 'var(--water-light)', textDecoration: 'none' }}>{c.email}</a>
                     : <span style={{ color: 'var(--header-bg)' }}>—</span>}
