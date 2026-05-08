@@ -72,16 +72,30 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
   const [loading, setLoading]   = useState(true);
   const [filter, setFilter]     = useState('');
   const [editing, setEditing]   = useState(null);
+  const [sortKey, setSortKey]   = useState('lastName');
+  const [sortDir, setSortDir]   = useState('asc');
 
   useEffect(() => {
     fetchContacts().then(data => { setContacts(data); setLoading(false); });
   }, [fetchContacts]);
 
-  const displayed = contacts.filter(c => {
-    if (!filter) return true;
-    const q = filter.toLowerCase();
-    return `${c.firstName} ${c.lastName} ${c.phone} ${c.email}`.toLowerCase().includes(q);
-  });
+  function toggleSort(key) {
+    if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    else { setSortKey(key); setSortDir('asc'); }
+  }
+
+  const displayed = contacts
+    .filter(c => {
+      if (!filter) return true;
+      const q = filter.toLowerCase();
+      return `${c.firstName} ${c.lastName} ${c.phone} ${c.email}`.toLowerCase().includes(q);
+    })
+    .sort((a, b) => {
+      const av = sortKey === 'firstName' ? a.firstName : a.lastName;
+      const bv = sortKey === 'firstName' ? b.firstName : b.lastName;
+      const cmp = av.localeCompare(bv);
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
 
   async function handleSave(id, updates) {
     const updated = await updateContact(id, updates);
@@ -126,8 +140,18 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
         <table style={{ tableLayout: 'fixed' }}>
           <thead>
             <tr>
-              <th style={{ width: '20%' }}>Last Name</th>
-              <th style={{ width: '18%' }}>First Name</th>
+              {[
+                { key: 'firstName', label: 'First Name', width: '20%' },
+                { key: 'lastName',  label: 'Last Name',  width: '18%' },
+              ].map(({ key, label, width }) => (
+                <th key={key} style={{ width, cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
+                    onClick={() => toggleSort(key)}>
+                  {label}
+                  <span style={{ marginLeft: 5, opacity: sortKey === key ? 1 : 0.3, fontSize: 11 }}>
+                    {sortKey === key ? (sortDir === 'asc' ? '▲' : '▼') : '▲'}
+                  </span>
+                </th>
+              ))}
               <th style={{ width: '22%' }}>Phone</th>
               <th style={{ width: '28%' }}>Email</th>
               {isUnlocked && <th style={{ width: 100, textAlign: 'center' }}>Actions</th>}
@@ -142,8 +166,8 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
               </td></tr>
             ) : displayed.map(c => (
               <tr key={c.id}>
-                <td style={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.lastName}</td>
                 <td style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.firstName}</td>
+                <td style={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.lastName}</td>
                 <td style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {c.phone
                     ? <a href={`tel:${c.phone}`} style={{ color: 'var(--water-light)', textDecoration: 'none' }}>{c.phone}</a>
