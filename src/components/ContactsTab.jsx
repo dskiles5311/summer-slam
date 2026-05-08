@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { upsertContacts } from '../utils/api';
 
 const FIELD_STYLE = {
   background: 'rgba(255,255,255,0.06)',
@@ -11,6 +12,45 @@ const FIELD_STYLE = {
   boxSizing: 'border-box',
   outline: 'none',
 };
+
+function csvEscape(val) {
+  if (!val) return '';
+  if (val.includes(',') || val.includes('"') || val.includes('\n'))
+    return `"${val.replace(/"/g, '""')}"`;
+  return val;
+}
+
+function parseCsvLine(line) {
+  const cols = [];
+  let cur = '', inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') { inQuotes = !inQuotes; }
+    else if (ch === ',' && !inQuotes) { cols.push(cur); cur = ''; }
+    else { cur += ch; }
+  }
+  cols.push(cur);
+  return cols;
+}
+
+function parseCsv(text) {
+  const lines = text.trim().split(/\r?\n/);
+  if (lines.length < 2) return [];
+  const headers = parseCsvLine(lines[0]).map(h => h.trim().toLowerCase().replace(/[^a-z]/g, ''));
+  return lines.slice(1)
+    .map(line => {
+      const cols = parseCsvLine(line);
+      const row = {};
+      headers.forEach((h, i) => { row[h] = (cols[i] || '').trim(); });
+      return {
+        firstName: row.firstname || row.first    || '',
+        lastName:  row.lastname  || row.last     || '',
+        phone:     row.phone     || '',
+        email:     row.email     || '',
+      };
+    })
+    .filter(r => r.firstName && r.lastName);
+}
 
 function EditModal({ contact, onSave, onCancel }) {
   const [phone, setPhone] = useState(contact.phone);
@@ -68,12 +108,14 @@ function EditModal({ contact, onSave, onCancel }) {
 }
 
 export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, deleteContact }) {
-  const [contacts, setContacts] = useState([]);
-  const [loading, setLoading]   = useState(true);
-  const [filter, setFilter]     = useState('');
-  const [editing, setEditing]   = useState(null);
-  const [sortKey, setSortKey]   = useState(() => localStorage.getItem('ss_contacts_sort_key') || 'lastName');
-  const [sortDir, setSortDir]   = useState(() => localStorage.getItem('ss_contacts_sort_dir') || 'asc');
+  const [contacts, setContacts]       = useState([]);
+  const [loading, setLoading]         = useState(true);
+  const [filter, setFilter]           = useState('');
+  const [editing, setEditing]         = useState(null);
+  const [sortKey, setSortKey]         = useState(() => localStorage.getItem('ss_contacts_sort_key') || 'lastName');
+  const [sortDir, setSortDir]         = useState(() => localStorage.getItem('ss_contacts_sort_dir') || 'asc');
+  const [importStatus, setImportStatus] = useState(null); // { type: 'loading'|'success'|'error', msg }
+  const fileInputRef = useRef(null);
 
   useEffect(() => { localStorage.setItem('ss_contacts_sort_key', sortKey); }, [sortKey]);
   useEffect(() => { localStorage.setItem('ss_contacts_sort_dir', sortDir); }, [sortDir]);
@@ -114,6 +156,53 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
     } catch { /* ignore */ }
   }
 
+  function handleExport() {
+    const rows = [['FirstName', 'LastName', 'Phone', 'Email']];
+    contacts.forEach(c => rows.push([
+      csvEscape(c.firstName), csvEscape(c.lastName),
+      csvEscape(c.phone),     csvEscape(c.email),
+    ]));
+    const csv = rows.map(r => r.join(',')).join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `summer-slam-contacts-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function handleImportFile(e) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    const text = await file.text();
+    const parsed = parseCsv(text);
+
+    if (!parsed.length) {
+      setImportStatus({ type: 'error', msg: 'No valid contacts found. Ensure the CSV has FirstName and LastName columns.' });
+      setTimeout(() => setImportStatus(null), 5000);
+      return;
+    }
+
+    setImportStatus({ type: 'loading', msg: `Importing ${parsed.length} contacts…` });
+    try {
+      await upsertContacts(parsed);
+      const refreshed = await fetchContacts();
+      setContacts(refreshed);
+      setImportStatus({ type: 'success', msg: `✓ Imported ${parsed.length} contact${parsed.length !== 1 ? 's' : ''}` });
+      setTimeout(() => setImportStatus(null), 4000);
+    } catch {
+      setImportStatus({ type: 'error', msg: 'Import failed — check the file format and try again.' });
+      setTimeout(() => setImportStatus(null), 5000);
+    }
+  }
+
+  const statusColor = importStatus?.type === 'success' ? '#4CAF50'
+                    : importStatus?.type === 'error'   ? '#ff6b6b'
+                    : 'var(--gold-light)';
+
   return (
     <div className="tab-panel active">
       <div className="toolbar">
@@ -121,6 +210,23 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
           <strong style={{ color: 'var(--gold-light)' }}>{displayed.length}</strong>
           {filter ? ` of ${contacts.length}` : ''} contacts
         </span>
+
+        {importStatus && (
+          <span style={{ fontSize: 13, fontWeight: 600, color: statusColor }}>
+            {importStatus.msg}
+          </span>
+        )}
+
+        <div style={{ flex: 1 }} />
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".csv"
+          style={{ display: 'none' }}
+          onChange={handleImportFile}
+        />
+
         <input
           type="search"
           placeholder="Filter by name, phone, email…"
@@ -133,10 +239,21 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
             color: 'var(--white)',
             fontSize: 14,
             padding: '7px 12px',
-            width: 260,
+            width: 220,
             outline: 'none',
           }}
         />
+
+        <button className="btn btn-outline btn-sm" onClick={handleExport}
+                title="Download all contacts as CSV">
+          ⬇ Export
+        </button>
+        {isUnlocked && (
+          <button className="btn btn-outline btn-sm" onClick={() => fileInputRef.current?.click()}
+                  title="Import contacts from CSV (FirstName, LastName, Phone, Email)">
+            ⬆ Import
+          </button>
+        )}
       </div>
 
       <div className="table-wrapper">
@@ -183,16 +300,12 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
                 </td>
                 {isUnlocked && (
                   <td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    <button
-                      className="btn btn-outline btn-sm"
-                      style={{ padding: '3px 8px', fontSize: 12, marginRight: 4 }}
-                      onClick={() => setEditing(c)}
-                    >✏️</button>
-                    <button
-                      className="btn btn-outline btn-sm"
-                      style={{ color: '#ff6b6b', borderColor: 'rgba(255,107,107,0.4)', padding: '3px 8px', fontSize: 12 }}
-                      onClick={() => handleDelete(c.id, `${c.firstName} ${c.lastName}`)}
-                    >✕</button>
+                    <button className="btn btn-outline btn-sm"
+                            style={{ padding: '3px 8px', fontSize: 12, marginRight: 4 }}
+                            onClick={() => setEditing(c)}>✏️</button>
+                    <button className="btn btn-outline btn-sm"
+                            style={{ color: '#ff6b6b', borderColor: 'rgba(255,107,107,0.4)', padding: '3px 8px', fontSize: 12 }}
+                            onClick={() => handleDelete(c.id, `${c.firstName} ${c.lastName}`)}>✕</button>
                   </td>
                 )}
               </tr>
