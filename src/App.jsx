@@ -405,7 +405,7 @@ export default function App() {
       <Header
         entries={rankedEntries}
         settings={settingsWithTheme}
-        activeTab={isUnlocked || activeTab === 'rules' ? activeTab : 'leaderboard'}
+        activeTab={isUnlocked || activeTab === 'rules' || activeTab === 'archive' ? activeTab : 'leaderboard'}
         onTabChange={tab => { if (isUnlocked || tab === 'rules' || tab === 'leaderboard' || tab === 'archive') setActiveTab(tab); }}
         onThemeToggle={() => {
           const next = theme === 'dark' ? 'light' : theme === 'light' ? 'outdoor' : 'dark';
