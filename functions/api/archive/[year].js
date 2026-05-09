@@ -20,6 +20,17 @@ function toJS(row) {
     rawWeight:      row.raw_weight      ?? null,
     deadFish:       row.dead_fish       ?? 0,
     shortFish:      row.short_fish      ?? 0,
+    boaterPhone:    row.boater_phone    ?? '',
+    boaterEmail:    row.boater_email    ?? '',
+    coAnglerPhone:  row.co_angler_phone ?? '',
+    coAnglerEmail:  row.co_angler_email ?? '',
+    lunker:         row.lunker          ?? 0,
+    option:         row.option_field    ?? 0,
+    paid:           row.paid            ?? 0,
+    appSigned:      row.app_signed      ?? 0,
+    buyIn:          row.buy_in          ?? 0,
+    needsAttention: Boolean(row.needs_attention),
+    weighedAt:      row.weighed_at      ?? null,
   };
 }
 

@@ -55,6 +55,17 @@ CREATE TABLE IF NOT EXISTS archives (
   raw_weight      REAL,
   dead_fish       INTEGER DEFAULT 0,
   short_fish      INTEGER DEFAULT 0,
+  boater_phone    TEXT,
+  boater_email    TEXT,
+  co_angler_phone TEXT,
+  co_angler_email TEXT,
+  lunker          INTEGER,
+  option_field    INTEGER,
+  paid            INTEGER,
+  app_signed      INTEGER,
+  buy_in          REAL DEFAULT 0,
+  needs_attention INTEGER DEFAULT 0,
+  weighed_at      TEXT,
   archived_at     TEXT DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS archives_year ON archives(year);

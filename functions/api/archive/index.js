@@ -32,8 +32,10 @@ export async function onRequestPost({ request, env }) {
       ...entries.map(e => ({
         sql: `INSERT INTO archives
                 (year, place, boater_first, boater_last, co_angler_first, co_angler_last,
-                 boat_no, num_fish, lunker_weight, total_weight, raw_weight, dead_fish, short_fish)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                 boat_no, num_fish, lunker_weight, total_weight, raw_weight, dead_fish, short_fish,
+                 boater_phone, boater_email, co_angler_phone, co_angler_email,
+                 lunker, option_field, paid, app_signed, buy_in, needs_attention, weighed_at)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         args: [
           String(year),
           e.place != null ? Number(e.place) : null,
@@ -42,12 +44,23 @@ export async function onRequestPost({ request, env }) {
           e.coAnglerFirst  ?? '',
           e.coAnglerLast   ?? '',
           e.boatNo         ?? '',
-          Number(e.numFish)        || 0,
-          Number(e.lunkerWeight)   || 0,
-          Number(e.totalWeight)    || 0,
+          Number(e.numFish)      || 0,
+          Number(e.lunkerWeight) || 0,
+          Number(e.totalWeight)  || 0,
           e.rawWeight != null ? Number(e.rawWeight) : null,
-          Number(e.deadFish)       || 0,
-          Number(e.shortFish)      || 0,
+          Number(e.deadFish)     || 0,
+          Number(e.shortFish)    || 0,
+          e.boaterPhone    ?? '',
+          e.boaterEmail    ?? '',
+          e.coAnglerPhone  ?? '',
+          e.coAnglerEmail  ?? '',
+          e.lunker   != null ? Number(e.lunker)   : null,
+          e.option   != null ? Number(e.option)   : null,
+          e.paid     != null ? Number(e.paid)     : null,
+          e.appSigned != null ? Number(e.appSigned) : null,
+          Number(e.buyIn) || 0,
+          e.needsAttention ? 1 : 0,
+          e.weighedAt ?? null,
         ],
       })),
     ];

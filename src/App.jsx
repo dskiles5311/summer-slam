@@ -324,10 +324,10 @@ export default function App() {
     try {
       const payload = rankedEntries.map(e => ({
         place:         e._rank,
-        boaterFirst:   e.boaterFirst,
-        boaterLast:    e.boaterLast,
-        coAnglerFirst: e.coAnglerFirst,
-        coAnglerLast:  e.coAnglerLast,
+        boaterFirst:   e.boaterFirst,   boaterLast:    e.boaterLast,
+        boaterPhone:   e.boaterPhone,   boaterEmail:   e.boaterEmail,
+        coAnglerFirst: e.coAnglerFirst, coAnglerLast:  e.coAnglerLast,
+        coAnglerPhone: e.coAnglerPhone, coAnglerEmail: e.coAnglerEmail,
         boatNo:        e.boatNo,
         numFish:       e.numFish,
         lunkerWeight:  e.lunkerWeight,
@@ -335,6 +335,11 @@ export default function App() {
         rawWeight:     e.rawWeight,
         deadFish:      e.deadFish,
         shortFish:     e.shortFish,
+        lunker:        e.lunker,        option:        e.option,
+        paid:          e.paid,          appSigned:     e.appSigned,
+        buyIn:         e.buyIn,
+        needsAttention: e.needsAttention,
+        weighedAt:     e.weighedAt,
       }));
       await archiveEntries(label, payload);
       showToast(`${rankedEntries.length} entries archived as ${label}`, 'success');
@@ -351,9 +356,9 @@ export default function App() {
     try {
       const created = await Promise.all(archivedEntries.map(e => createEntry({
         boaterFirst:   e.boaterFirst,   boaterLast:    e.boaterLast,
-        boaterPhone:   '',              boaterEmail:   '',
+        boaterPhone:   e.boaterPhone,   boaterEmail:   e.boaterEmail,
         coAnglerFirst: e.coAnglerFirst, coAnglerLast:  e.coAnglerLast,
-        coAnglerPhone: '',              coAnglerEmail: '',
+        coAnglerPhone: e.coAnglerPhone, coAnglerEmail: e.coAnglerEmail,
         boatNo:        e.boatNo,
         numFish:       e.numFish,
         lunkerWeight:  e.lunkerWeight,
@@ -361,8 +366,10 @@ export default function App() {
         rawWeight:     e.rawWeight,
         deadFish:      e.deadFish,
         shortFish:     e.shortFish,
-        lunker: 0, option: 0, paid: 0, appSigned: 0, buyIn: 0,
-        needsAttention: false,
+        lunker:        e.lunker,        option:        e.option,
+        paid:          e.paid,          appSigned:     e.appSigned,
+        buyIn:         e.buyIn,
+        needsAttention: e.needsAttention,
       })));
       setEntries(created);
       showToast(`Loaded ${created.length} entries from archive — switch to Roster to edit`, 'success');
