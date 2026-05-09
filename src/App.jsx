@@ -343,6 +343,35 @@ export default function App() {
     }
   }
 
+  async function handleLoadArchive(archivedEntries) {
+    if (entries.length > 0) {
+      showToast('Clear the roster first before loading an archive', 'error');
+      return;
+    }
+    try {
+      const created = await Promise.all(archivedEntries.map(e => createEntry({
+        boaterFirst:   e.boaterFirst,   boaterLast:    e.boaterLast,
+        boaterPhone:   '',              boaterEmail:   '',
+        coAnglerFirst: e.coAnglerFirst, coAnglerLast:  e.coAnglerLast,
+        coAnglerPhone: '',              coAnglerEmail: '',
+        boatNo:        e.boatNo,
+        numFish:       e.numFish,
+        lunkerWeight:  e.lunkerWeight,
+        totalWeight:   e.totalWeight,
+        rawWeight:     e.rawWeight,
+        deadFish:      e.deadFish,
+        shortFish:     e.shortFish,
+        lunker: 0, option: 0, paid: 0, appSigned: 0, buyIn: 0,
+        needsAttention: false,
+      })));
+      setEntries(created);
+      showToast(`Loaded ${created.length} entries from archive — switch to Roster to edit`, 'success');
+      setActiveTab('roster');
+    } catch {
+      showToast('Failed to load archive into roster', 'error');
+    }
+  }
+
   async function handleImport(newEntries) {
     try {
       const created = await Promise.all(newEntries.map(e => createEntry(e)));
@@ -421,7 +450,13 @@ export default function App() {
           <LeaderboardTab entries={rankedEntries} settings={settingsWithTheme} />
         )}
         {activeTab === 'rules' && <RulesTab />}
-        {activeTab === 'archive' && <ArchiveTab />}
+        {activeTab === 'archive' && (
+          <ArchiveTab
+            isUnlocked={isUnlocked}
+            rosterCount={entries.length}
+            onLoadArchive={handleLoadArchive}
+          />
+        )}
         {activeTab === 'contacts' && (
           <ContactsTab
             isUnlocked={isUnlocked}

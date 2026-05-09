@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { fetchArchiveYears, fetchArchive } from '../utils/api';
 import { exportHTML } from '../utils/exportHtml';
 
-export default function ArchiveTab() {
+export default function ArchiveTab({ isUnlocked, rosterCount, onLoadArchive }) {
   const [years, setYears]       = useState([]);
   const [activeYear, setActiveYear] = useState(null);
   const [entries, setEntries]   = useState([]);
@@ -72,6 +72,19 @@ export default function ArchiveTab() {
             >
               {years.map(y => <option key={y} value={y}>{y}</option>)}
             </select>
+            {isUnlocked && (
+              <button
+                className="btn btn-primary"
+                disabled={rosterCount > 0}
+                title={rosterCount > 0 ? 'Clear the roster before loading an archive' : `Load ${activeYear} entries into the roster for editing`}
+                onClick={() => {
+                  if (!confirm(`Load ${entries.length} entries from ${activeYear} into the roster?\n\nYou can edit them there and re-archive when done.`)) return;
+                  onLoadArchive(entries);
+                }}
+              >
+                ↩ Load into Roster
+              </button>
+            )}
             <button
               className="btn btn-outline"
               onClick={() => {
@@ -97,6 +110,11 @@ export default function ArchiveTab() {
               <strong style={{ color: 'var(--gold-light)' }}>{entries.length}</strong> entries
             </span>
             <span style={{ color: 'var(--header-bg)', fontSize: 12, opacity: 0.6 }}>— read only</span>
+            {isUnlocked && rosterCount > 0 && (
+              <span style={{ fontSize: 12, color: '#ffb450', marginLeft: 8 }}>
+                ⚠️ Clear the roster ({rosterCount} {rosterCount === 1 ? 'entry' : 'entries'}) before loading an archive
+              </span>
+            )}
           </div>
 
           {loadingEntries ? (
