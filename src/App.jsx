@@ -332,6 +332,9 @@ export default function App() {
         numFish:       e.numFish,
         lunkerWeight:  e.lunkerWeight,
         totalWeight:   e.totalWeight,
+        rawWeight:     e.rawWeight,
+        deadFish:      e.deadFish,
+        shortFish:     e.shortFish,
       }));
       await archiveEntries(label, payload);
       showToast(`${rankedEntries.length} entries archived as ${label}`, 'success');

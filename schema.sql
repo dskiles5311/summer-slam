@@ -52,6 +52,9 @@ CREATE TABLE IF NOT EXISTS archives (
   num_fish        INTEGER DEFAULT 0,
   lunker_weight   REAL DEFAULT 0,
   total_weight    REAL DEFAULT 0,
+  raw_weight      REAL,
+  dead_fish       INTEGER DEFAULT 0,
+  short_fish      INTEGER DEFAULT 0,
   archived_at     TEXT DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS archives_year ON archives(year);

@@ -147,7 +147,14 @@ export default function ArchiveTab() {
                           {row.numFish > 0 ? row.numFish : '—'}
                         </td>
                         <td style={{ textAlign: 'right', fontWeight: 700, color: '#e8c876' }}>
-                          {parseFloat(row.totalWeight) > 0 ? parseFloat(row.totalWeight).toFixed(2) : '—'}
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
+                            {parseFloat(row.totalWeight) > 0 ? parseFloat(row.totalWeight).toFixed(2) : '—'}
+                            {row.rawWeight > 0 && (
+                              <span style={{ fontSize: 11, background: 'rgba(255,107,107,0.25)', color: '#ff9090', borderRadius: 4, padding: '1px 5px', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                                −{(row.rawWeight - parseFloat(row.totalWeight)).toFixed(2)}
+                              </span>
+                            )}
+                          </span>
                         </td>
                       </tr>
                     );

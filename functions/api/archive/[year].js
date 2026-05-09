@@ -17,6 +17,9 @@ function toJS(row) {
     numFish:        row.num_fish        ?? 0,
     lunkerWeight:   row.lunker_weight   ?? 0,
     totalWeight:    row.total_weight    ?? 0,
+    rawWeight:      row.raw_weight      ?? null,
+    deadFish:       row.dead_fish       ?? 0,
+    shortFish:      row.short_fish      ?? 0,
   };
 }
 

@@ -33,8 +33,8 @@ export async function onRequestPost({ request, env }) {
       await db.execute({
         sql: `INSERT INTO archives
                 (year, place, boater_first, boater_last, co_angler_first, co_angler_last,
-                 boat_no, num_fish, lunker_weight, total_weight)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                 boat_no, num_fish, lunker_weight, total_weight, raw_weight, dead_fish, short_fish)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         args: [
           String(year),
           e.place != null ? Number(e.place) : null,
@@ -46,6 +46,9 @@ export async function onRequestPost({ request, env }) {
           Number(e.numFish)        || 0,
           Number(e.lunkerWeight)   || 0,
           Number(e.totalWeight)    || 0,
+          e.rawWeight != null ? Number(e.rawWeight) : null,
+          Number(e.deadFish)       || 0,
+          Number(e.shortFish)      || 0,
         ],
       });
     }
