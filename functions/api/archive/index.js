@@ -27,10 +27,9 @@ export async function onRequestPost({ request, env }) {
       return Response.json({ error: 'year and entries are required' }, { status: 400 });
     }
 
-    await db.execute({ sql: 'DELETE FROM archives WHERE year = ?', args: [String(year)] });
-
-    for (const e of entries) {
-      await db.execute({
+    const stmts = [
+      { sql: 'DELETE FROM archives WHERE year = ?', args: [String(year)] },
+      ...entries.map(e => ({
         sql: `INSERT INTO archives
                 (year, place, boater_first, boater_last, co_angler_first, co_angler_last,
                  boat_no, num_fish, lunker_weight, total_weight, raw_weight, dead_fish, short_fish)
@@ -50,8 +49,10 @@ export async function onRequestPost({ request, env }) {
           Number(e.deadFish)       || 0,
           Number(e.shortFish)      || 0,
         ],
-      });
-    }
+      })),
+    ];
+
+    await db.batch(stmts, 'write');
 
     return Response.json({ ok: true, year: String(year), count: entries.length });
   } catch (e) {
