@@ -39,6 +39,23 @@ CREATE TABLE IF NOT EXISTS settings (
   value TEXT NOT NULL
 );
 
+-- Historical tournament snapshots (persists across seasons)
+CREATE TABLE IF NOT EXISTS archives (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  year            TEXT NOT NULL,
+  place           INTEGER,
+  boater_first    TEXT DEFAULT '',
+  boater_last     TEXT DEFAULT '',
+  co_angler_first TEXT DEFAULT '',
+  co_angler_last  TEXT DEFAULT '',
+  boat_no         TEXT DEFAULT '',
+  num_fish        INTEGER DEFAULT 0,
+  lunker_weight   REAL DEFAULT 0,
+  total_weight    REAL DEFAULT 0,
+  archived_at     TEXT DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS archives_year ON archives(year);
+
 INSERT OR IGNORE INTO settings (key, value) VALUES
   ('fees',           '{"entryFee":249,"lunkerFee":10,"optFee":20}'),
   ('payoutSettings', '{"totalPayout":10500,"numWinners":17,"minPayout":255,"payouts":[4000,1000,800,600,500,360,350,340,330,320,295,280,275,270,265,260,255]}'),

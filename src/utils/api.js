@@ -140,6 +140,28 @@ export async function searchContacts(q) {
   } catch { return []; }
 }
 
+export async function fetchArchiveYears() {
+  const res = await fetch(`${BASE}/archive`);
+  if (!res.ok) throw new Error('Failed to fetch archive years');
+  return res.json();
+}
+
+export async function fetchArchive(year) {
+  const res = await fetch(`${BASE}/archive/${encodeURIComponent(year)}`);
+  if (!res.ok) throw new Error('Failed to fetch archive');
+  return res.json();
+}
+
+export async function archiveEntries(year, entries) {
+  const res = await fetch(`${BASE}/archive`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ year, entries }),
+  });
+  if (!res.ok) throw new Error('Failed to archive entries');
+  return res.json();
+}
+
 export async function upsertContacts(people) {
   const valid = people.filter(p => p.firstName && p.lastName);
   if (!valid.length) return;

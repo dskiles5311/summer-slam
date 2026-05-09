@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { importCSV, exportCSV } from '../utils/csv';
+import { exportHTML } from '../utils/exportHtml';
 
 function StatusCell({ val }) {
   if (val === 1 || val === '1') return <span className="cell-green">YES</span>;
@@ -39,7 +40,7 @@ function sortEntries(entries, { field, dir }) {
 }
 
 
-export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred, onEdit, onAdd, onDelete, onClearAll, onImport, onToggleBoatCheck, onToggleField, onUpdateInlineField, onClearDeductions }) {
+export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred, onEdit, onAdd, onDelete, onClearAll, onImport, onToggleBoatCheck, onToggleField, onUpdateInlineField, onClearDeductions, onArchive }) {
   const entryFee = parseFloat(settings.fees?.entryFee) || 249;
   const boatCheck = settings.boatCheck || {};
   const [sortKey, setSortKey] = useState(() => localStorage.getItem('ss_roster_sort_key') || '_rank');
@@ -140,6 +141,8 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
           </label>
         )}
         <button className="btn btn-primary" onClick={() => exportCSV(entries, settings.payoutSettings)}>💾 Export CSV</button>
+        <button className="btn btn-outline" onClick={() => exportHTML(sorted, 'Summer Slam Roster')}>📄 Export HTML</button>
+        {isUnlocked && <button className="btn btn-outline" onClick={onArchive}>🗂️ Archive Year</button>}
         {isUnlocked && <button className="btn btn-danger" onClick={onClearAll}>🗑️ Clear All</button>}
       </div>
 

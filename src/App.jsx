@@ -8,6 +8,7 @@ import RulesTab from './components/RulesTab';
 import SettingsTab from './components/SettingsTab';
 import SignUpTab from './components/SignUpTab';
 import ContactsTab from './components/ContactsTab';
+import ArchiveTab from './components/ArchiveTab';
 import EditModal from './components/EditModal';
 import UnlockModal from './components/UnlockModal';
 import Toast from './components/Toast';
@@ -15,7 +16,7 @@ import {
   fetchEntries, createEntry, updateEntry, deleteEntry,
   fetchSettings, saveSettings, verifyPassword, storePassword, clearPassword, isPasswordStored,
   upsertContacts, fetchContacts, updateContact, deleteContact,
-  clearWeighLog,
+  clearWeighLog, archiveEntries,
 } from './utils/api';
 import { calcRanks } from './utils/calculations';
 
@@ -122,7 +123,7 @@ export default function App() {
   function handleLock() {
     clearPassword();
     setIsUnlocked(false);
-    setActiveTab(prev => (prev === 'rules' ? 'rules' : 'leaderboard'));
+    setActiveTab(prev => (['rules', 'archive', 'leaderboard'].includes(prev) ? prev : 'leaderboard'));
   }
 
   async function handleSaveEntry(entryData) {
@@ -315,6 +316,30 @@ export default function App() {
     }
   }
 
+  async function handleArchive() {
+    const year = window.prompt('Save current entries as which year?', String(new Date().getFullYear()));
+    if (!year?.trim()) return;
+    const label = year.trim();
+    if (!confirm(`Archive ${rankedEntries.length} entries as "${label}"?\n\nAny existing archive for ${label} will be replaced.`)) return;
+    try {
+      const payload = rankedEntries.map(e => ({
+        place:         e._rank,
+        boaterFirst:   e.boaterFirst,
+        boaterLast:    e.boaterLast,
+        coAnglerFirst: e.coAnglerFirst,
+        coAnglerLast:  e.coAnglerLast,
+        boatNo:        e.boatNo,
+        numFish:       e.numFish,
+        lunkerWeight:  e.lunkerWeight,
+        totalWeight:   e.totalWeight,
+      }));
+      await archiveEntries(label, payload);
+      showToast(`${rankedEntries.length} entries archived as ${label}`, 'success');
+    } catch {
+      showToast('Failed to archive entries', 'error');
+    }
+  }
+
   async function handleImport(newEntries) {
     try {
       const created = await Promise.all(newEntries.map(e => createEntry(e)));
@@ -342,7 +367,7 @@ export default function App() {
         entries={rankedEntries}
         settings={settingsWithTheme}
         activeTab={isUnlocked || activeTab === 'rules' ? activeTab : 'leaderboard'}
-        onTabChange={tab => { if (isUnlocked || tab === 'rules' || tab === 'leaderboard') setActiveTab(tab); }}
+        onTabChange={tab => { if (isUnlocked || tab === 'rules' || tab === 'leaderboard' || tab === 'archive') setActiveTab(tab); }}
         onThemeToggle={() => {
           const next = theme === 'dark' ? 'light' : theme === 'light' ? 'outdoor' : 'dark';
           setTheme(next);
@@ -373,6 +398,7 @@ export default function App() {
             onToggleField={handleToggleEntryField}
             onUpdateInlineField={handleUpdateInlineField}
             onClearDeductions={handleClearDeductions}
+            onArchive={handleArchive}
           />
         )}
         {activeTab === 'boatcheck' && (
@@ -392,6 +418,7 @@ export default function App() {
           <LeaderboardTab entries={rankedEntries} settings={settingsWithTheme} />
         )}
         {activeTab === 'rules' && <RulesTab />}
+        {activeTab === 'archive' && <ArchiveTab />}
         {activeTab === 'contacts' && (
           <ContactsTab
             isUnlocked={isUnlocked}
