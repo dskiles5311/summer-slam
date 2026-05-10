@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { upsertContacts } from '../utils/api';
 
 const FIELD_STYLE = {
@@ -107,6 +107,107 @@ function EditModal({ contact, onSave, onCancel }) {
   );
 }
 
+function DuplicateReviewModal({ groups, onDelete, onClose }) {
+  const [busy, setBusy] = useState(null); // id currently being deleted
+
+  async function removeSingle(id) {
+    setBusy(id);
+    await onDelete(id);
+    setBusy(null);
+  }
+
+  async function keepOne(group, keepId) {
+    for (const c of group) {
+      if (c.id === keepId) continue;
+      setBusy(c.id);
+      await onDelete(c.id);
+    }
+    setBusy(null);
+  }
+
+  const overlayDownRef = useRef(false);
+
+  if (groups.length === 0) return null;
+
+  return (
+    <div
+      className="edit-overlay"
+      onPointerDown={e => { overlayDownRef.current = e.target === e.currentTarget; }}
+      onPointerUp={e => { if (overlayDownRef.current && e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="edit-panel" style={{ maxWidth: 560 }}>
+        <div className="edit-panel-inner" style={{ maxHeight: '80dvh', overflowY: 'auto' }}>
+          <div className="edit-panel-header">
+            <h3>Duplicate Contacts</h3>
+            <button className="edit-panel-close" onClick={onClose}>✕</button>
+          </div>
+          <p style={{ color: 'var(--header-bg)', fontSize: 13, marginBottom: 20 }}>
+            {groups.length} group{groups.length !== 1 ? 's' : ''} share the same name with different info.
+            Keep one entry or remove extras individually.
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {groups.map((group, gi) => (
+              <div key={gi} style={{
+                border: '1px solid rgba(255,180,80,0.35)',
+                borderLeft: '4px solid #ffb450',
+                borderRadius: 8, padding: 12,
+              }}>
+                <div style={{ fontWeight: 700, color: '#ffb450', fontSize: 14, marginBottom: 10 }}>
+                  {group[0].firstName} {group[0].lastName}
+                  <span style={{ fontWeight: 400, fontSize: 12, color: 'var(--header-bg)', marginLeft: 8 }}>
+                    {group.length} entries
+                  </span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {group.map(c => (
+                    <div key={c.id} style={{
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      background: 'rgba(255,255,255,0.04)', borderRadius: 6, padding: '8px 10px',
+                      opacity: busy === c.id ? 0.5 : 1,
+                    }}>
+                      <div style={{ flex: 1, fontSize: 13, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                        <span style={{ color: c.phone ? 'var(--white)' : 'var(--header-bg)' }}>
+                          📞 {c.phone || <em>no phone</em>}
+                        </span>
+                        <span style={{ color: c.email ? 'var(--white)' : 'var(--header-bg)' }}>
+                          ✉ {c.email || <em>no email</em>}
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                        <button
+                          className="btn btn-gold btn-sm"
+                          style={{ fontSize: 11, padding: '3px 10px', whiteSpace: 'nowrap' }}
+                          disabled={busy !== null}
+                          onClick={() => keepOne(group, c.id)}
+                          title="Keep this entry and delete all others in this group"
+                        >
+                          ✓ Keep
+                        </button>
+                        <button
+                          className="btn btn-outline btn-sm"
+                          style={{ fontSize: 11, padding: '3px 8px', color: '#ff6b6b', borderColor: 'rgba(255,107,107,0.4)', whiteSpace: 'nowrap' }}
+                          disabled={busy !== null}
+                          onClick={() => removeSingle(c.id)}
+                          title="Delete only this entry"
+                        >
+                          {busy === c.id ? '…' : '✕'}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: 20, textAlign: 'right' }}>
+            <button className="btn btn-outline" onClick={onClose}>Done</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, deleteContact }) {
   const [contacts, setContacts]       = useState([]);
   const [loading, setLoading]         = useState(true);
@@ -115,7 +216,22 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
   const [sortKey, setSortKey]         = useState(() => localStorage.getItem('ss_contacts_sort_key') || 'lastName');
   const [sortDir, setSortDir]         = useState(() => localStorage.getItem('ss_contacts_sort_dir') || 'asc');
   const [importStatus, setImportStatus] = useState(null); // { type: 'loading'|'success'|'error', msg }
+  const [showDuplicates, setShowDuplicates] = useState(false);
   const fileInputRef = useRef(null);
+
+  const dupGroups = useMemo(() => {
+    const map = {};
+    contacts.forEach(c => {
+      const key = `${c.firstName.trim().toLowerCase()}|${c.lastName.trim().toLowerCase()}`;
+      if (!map[key]) map[key] = [];
+      map[key].push(c);
+    });
+    return Object.values(map).filter(g => g.length > 1);
+  }, [contacts]);
+
+  useEffect(() => {
+    if (showDuplicates && dupGroups.length === 0) setShowDuplicates(false);
+  }, [dupGroups.length, showDuplicates]);
 
   useEffect(() => { localStorage.setItem('ss_contacts_sort_key', sortKey); }, [sortKey]);
   useEffect(() => { localStorage.setItem('ss_contacts_sort_dir', sortDir); }, [sortDir]);
@@ -150,6 +266,13 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
 
   async function handleDelete(id, name) {
     if (!confirm(`Remove ${name} from contacts?`)) return;
+    try {
+      await deleteContact(id);
+      setContacts(prev => prev.filter(c => c.id !== id));
+    } catch { /* ignore */ }
+  }
+
+  async function handleDeleteSilent(id) {
     try {
       await deleteContact(id);
       setContacts(prev => prev.filter(c => c.id !== id));
@@ -210,6 +333,16 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
           <strong style={{ color: 'var(--gold-light)' }}>{displayed.length}</strong>
           {filter ? ` of ${contacts.length}` : ''} contacts
         </span>
+
+        {dupGroups.length > 0 && (
+          <button
+            className="btn btn-outline btn-sm"
+            onClick={() => setShowDuplicates(true)}
+            style={{ color: '#ffb450', borderColor: 'rgba(255,180,80,0.45)', fontWeight: 700 }}
+          >
+            ⚠ {dupGroups.length} duplicate{dupGroups.length !== 1 ? 's' : ''}
+          </button>
+        )}
 
         {importStatus && (
           <span style={{ fontSize: 13, fontWeight: 600, color: statusColor }}>
@@ -323,6 +456,14 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
           contact={editing}
           onSave={handleSave}
           onCancel={() => setEditing(null)}
+        />
+      )}
+
+      {showDuplicates && (
+        <DuplicateReviewModal
+          groups={dupGroups}
+          onDelete={handleDeleteSilent}
+          onClose={() => setShowDuplicates(false)}
         />
       )}
     </div>
