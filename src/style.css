@@ -326,7 +326,7 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
 /* ── LEADERBOARD SUMMARY ── */
 .summary-grid-top {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: 0.7fr 0.7fr 1.4fr 1.4fr 1.4fr 1.4fr;
   gap: 10px;
 }
 
