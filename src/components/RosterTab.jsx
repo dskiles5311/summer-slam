@@ -40,9 +40,9 @@ function sortEntries(entries, { field, dir }) {
 }
 
 
-export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred, onEdit, onAdd, onDelete, onClearAll, onImport, onToggleBoatCheck, onToggleField, onUpdateInlineField, onClearDeductions, onArchive }) {
+export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred, onEdit, onAdd, onDelete, onClearAll, onImport, onToggleOffWater, onToggleField, onUpdateInlineField, onClearDeductions, onArchive }) {
   const entryFee = parseFloat(settings.fees?.entryFee) || 249;
-  const boatCheck = settings.boatCheck || {};
+  const offWater = settings.offWater || {};
   const [sortKey, setSortKey] = useState(() => localStorage.getItem('ss_roster_sort_key') || '_rank');
   const [sortDir, setSortDir] = useState(() => localStorage.getItem('ss_roster_sort_dir') || 'asc');
   const [filter, setFilter]   = useState('');
@@ -191,7 +191,7 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
               <th style={{ textAlign: 'center' }}>Option</th>
               <th style={{ textAlign: 'center' }}>Paid</th>
               <th style={{ textAlign: 'center' }}>App Signed</th>
-              <th style={{ textAlign: 'center' }}>⚓ Checked</th>
+              <th style={{ textAlign: 'center' }}>Off Water</th>
               <th style={{ textAlign: 'right', cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
                   onClick={() => toggleSort('buyIn')}>
                 Buy-In
@@ -339,7 +339,7 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
                   ))}
                   <td
                     style={{ textAlign: 'center', cursor: isUnlocked ? 'pointer' : undefined }}
-                    onClick={e => { e.stopPropagation(); isUnlocked && onToggleBoatCheck(row.id); }}
+                    onClick={e => { e.stopPropagation(); isUnlocked && onToggleOffWater(row.id); }}
                   >
                     <span style={{
                       display: 'inline-block',
@@ -349,11 +349,11 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
                       borderRadius: '50%',
                       fontSize: 13,
                       fontWeight: 700,
-                      background: boatCheck[row.id] ? 'rgba(76,175,80,0.2)' : 'rgba(168,200,160,0.1)',
-                      border: `2px solid ${boatCheck[row.id] ? '#4CAF50' : 'rgba(168,200,160,0.55)'}`,
-                      color: boatCheck[row.id] ? '#4CAF50' : 'var(--header-bg)',
+                      background: offWater[row.id] ? 'rgba(120,200,255,0.2)' : 'rgba(168,200,160,0.1)',
+                      border: `2px solid ${offWater[row.id] ? '#78c8ff' : 'rgba(168,200,160,0.55)'}`,
+                      color: offWater[row.id] ? '#78c8ff' : 'var(--header-bg)',
                     }}>
-                      {boatCheck[row.id] ? '✓' : '○'}
+                      {offWater[row.id] ? '✓' : '○'}
                     </span>
                   </td>
                   <td className={buyInBlurred ? 'buyin-blurred' : ''} style={{ textAlign: 'right' }}>

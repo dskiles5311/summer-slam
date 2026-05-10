@@ -483,7 +483,7 @@ export default function App() {
                 onDelete={handleDeleteEntry}
                 onClearAll={handleClearAll}
                 onImport={handleImport}
-                onToggleBoatCheck={handleToggleBoatCheck}
+                onToggleOffWater={handleToggleOffWater}
                 onToggleField={handleToggleEntryField}
                 onUpdateInlineField={handleUpdateInlineField}
                 onClearDeductions={handleClearDeductions}
@@ -498,7 +498,6 @@ export default function App() {
                 entries={rankedEntries}
                 settings={settingsWithTheme}
                 isUnlocked={isUnlocked}
-                onToggle={handleToggleBoatCheck}
                 onToggleOffWater={handleToggleOffWater}
                 onReset={handleResetBoatCheck}
               />
