@@ -1,13 +1,9 @@
-import { useState } from 'react';
+
 import { getStats } from '../utils/calculations';
 
 export default function Header({ entries, settings, activeTab, onTabChange, onThemeToggle, isUnlocked, onToggleLock, buyInBlurred, onToggleBuyInBlur }) {
   const stats = getStats(entries, settings.fees);
-  const [buyInPeeking, setBuyInPeeking] = useState(false);
-
-  const buyInFilter = !buyInBlurred ? 'none'
-    : buyInPeeking ? 'blur(1px)'
-    : 'blur(6px)';
+  const buyInFilter = buyInBlurred ? 'blur(6px)' : 'none';
 
   return (
     <header>
@@ -57,9 +53,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
           </div>
           {isUnlocked && (
             <div className="stat-chip" onClick={onToggleBuyInBlur}
-                 onMouseEnter={() => setBuyInPeeking(true)}
-                 onMouseLeave={() => setBuyInPeeking(false)}
-                 title={buyInBlurred ? 'Hover to peek · Click to reveal' : 'Click to hide'}
+                 title={buyInBlurred ? 'Tap to reveal' : 'Tap to hide'}
                  style={{ cursor: 'pointer', userSelect: 'none' }}>
               <span className="val" style={{ filter: buyInFilter, transition: 'filter 0.25s' }}>
                 ${stats.totalBuyIn}

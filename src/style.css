@@ -470,7 +470,6 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
 /* ── BUY-IN BLUR ── */
 .buyin-val { transition: filter 0.25s; }
 .buyin-blurred .buyin-val { filter: blur(6px); }
-.buyin-blurred:hover .buyin-val { filter: blur(1px); }
 
 /* ── EDIT MODAL OVERLAY ── */
 .edit-overlay {
