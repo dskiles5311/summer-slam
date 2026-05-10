@@ -98,7 +98,10 @@ export default function CheckInTab({ entries, onSave }) {
 
   return (
     <div className="tab-panel active">
-      {/* Search bar — above the scroll container so it never moves */}
+      <div className="toolbar">
+        <h2 style={{ color: 'var(--gold-light)', fontSize: 18, fontWeight: 800 }}>✅ Check In</h2>
+      </div>
+      {/* Search bar — below sticky toolbar, above scrollable results */}
       <div style={{ maxWidth: 560, margin: '0 auto', paddingBottom: 12, borderBottom: '1px solid rgba(168,200,160,0.13)' }}>
         <input
           ref={searchRef}
@@ -124,7 +127,7 @@ export default function CheckInTab({ entries, onSave }) {
         paddingTop: 12,
         overflowY: 'auto',
         /* 100dvh adjusts for iOS address bar; max() ensures ≥200px in landscape */
-        maxHeight: 'max(200px, calc(100dvh - 280px))',
+        maxHeight: 'max(200px, calc(100dvh - 330px))',
         WebkitOverflowScrolling: 'touch',
         overscrollBehavior: 'contain',
         paddingBottom: 'env(safe-area-inset-bottom, 12px)',

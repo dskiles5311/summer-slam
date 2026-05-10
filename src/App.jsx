@@ -15,7 +15,7 @@ import UnlockModal from './components/UnlockModal';
 import Toast from './components/Toast';
 import {
   fetchEntries, createEntry, updateEntry, deleteEntry,
-  fetchSettings, saveSettings, verifyPassword, storePassword, clearPassword, isPasswordStored,
+  fetchSettings, saveSettings, verifyPassword, storePassword, clearPassword, isPasswordStored, revalidatePassword,
   upsertContacts, fetchContacts, updateContact, deleteContact,
   clearWeighLog, archiveEntries,
 } from './utils/api';
@@ -43,7 +43,7 @@ export default function App() {
   const [loading, setLoading]           = useState(true);
   const [toast, setToast]               = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
-  const [isUnlocked, setIsUnlocked]     = useState(() => isPasswordStored());
+  const [isUnlocked, setIsUnlocked]     = useState(false);
   const [buyInBlurred, setBuyInBlurred] = useState(() => localStorage.getItem('ss_buyin_blur') !== 'false');
 
   function handleToggleBuyInBlur() {
@@ -59,6 +59,12 @@ export default function App() {
   const clearToast = useCallback(() => setToast(null), []);
 
   const rankedEntries = calcRanks(entries);
+
+  useEffect(() => {
+    if (isPasswordStored()) {
+      revalidatePassword().then(ok => { if (ok) setIsUnlocked(true); });
+    }
+  }, []);
 
   useEffect(() => {
     async function loadData() {

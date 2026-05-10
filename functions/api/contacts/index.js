@@ -6,6 +6,7 @@ function getDb(env) {
 }
 
 export async function onRequestGet({ request, env }) {
+  if (!checkAuth(request, env)) return Response.json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const q = new URL(request.url).searchParams.get('q') || '';
     const db = getDb(env);

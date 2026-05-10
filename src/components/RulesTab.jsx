@@ -6,7 +6,7 @@ export default function RulesTab() {
     const fullUrl = `${window.location.origin}${pdfPath}`;
     const viewerSrc = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(fullUrl)}`;
     return (
-      <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 160px)', overflow: 'hidden' }}>
+      <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100dvh - 160px)', overflow: 'hidden' }}>
         <iframe
           src={viewerSrc}
           title="Tournament Rules"
@@ -17,7 +17,7 @@ export default function RulesTab() {
   }
 
   return (
-    <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 160px)', overflow: 'hidden' }}>
+    <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100dvh - 160px)', overflow: 'hidden' }}>
       <iframe
         src={pdfPath}
         title="Tournament Rules"

@@ -47,6 +47,18 @@ export async function verifyPassword(password) {
   if (!res.ok) throw new Error('Invalid password');
 }
 
+export async function revalidatePassword() {
+  const pw = sessionStorage.getItem(SESSION_PW_KEY);
+  if (!pw) return false;
+  try {
+    await verifyPassword(pw);
+    return true;
+  } catch {
+    clearPassword();
+    return false;
+  }
+}
+
 export async function fetchEntries() {
   const res = await fetch(`${BASE}/entries`);
   if (!res.ok) throw new Error('Failed to fetch entries');
@@ -107,7 +119,7 @@ export async function saveSettings(updates) {
 
 export async function fetchContacts() {
   try {
-    const res = await fetch(`${BASE}/contacts`);
+    const res = await fetch(`${BASE}/contacts`, { headers: authHeaders() });
     if (!res.ok) return [];
     return res.json();
   } catch { return []; }
@@ -134,7 +146,7 @@ export async function deleteContact(id) {
 export async function searchContacts(q) {
   if (!q || q.length < 2) return [];
   try {
-    const res = await fetch(`${BASE}/contacts?q=${encodeURIComponent(q)}`);
+    const res = await fetch(`${BASE}/contacts?q=${encodeURIComponent(q)}`, { headers: authHeaders() });
     if (!res.ok) return [];
     return res.json();
   } catch { return []; }
