@@ -73,12 +73,6 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
               📝 Sign Up
             </button>
             <button
-              className={`nav-tab ${activeTab === 'roster' ? 'active' : ''}`}
-              onClick={() => onTabChange('roster')}
-            >
-              📋 Roster
-            </button>
-            <button
               className={`nav-tab ${activeTab === 'checkin' ? 'active' : ''}`}
               onClick={() => onTabChange('checkin')}
             >
@@ -98,6 +92,12 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
             </button>
           </>
         )}
+        <button
+          className={`nav-tab ${activeTab === 'roster' ? 'active' : ''}`}
+          onClick={() => onTabChange('roster')}
+        >
+          📋 Roster
+        </button>
         <button
           className={`nav-tab ${activeTab === 'leaderboard' ? 'active' : ''}`}
           onClick={() => onTabChange('leaderboard')}

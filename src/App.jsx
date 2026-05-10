@@ -437,8 +437,8 @@ export default function App() {
       <Header
         entries={rankedEntries}
         settings={settingsWithTheme}
-        activeTab={isUnlocked || activeTab === 'rules' || activeTab === 'archive' ? activeTab : 'leaderboard'}
-        onTabChange={tab => { if (isUnlocked || tab === 'rules' || tab === 'leaderboard' || tab === 'archive') setActiveTab(tab); }}
+        activeTab={isUnlocked || activeTab === 'rules' || activeTab === 'archive' || activeTab === 'roster' ? activeTab : 'leaderboard'}
+        onTabChange={tab => { if (isUnlocked || tab === 'rules' || tab === 'leaderboard' || tab === 'archive' || tab === 'roster') setActiveTab(tab); }}
         onThemeToggle={() => {
           const next = theme === 'dark' ? 'light' : theme === 'light' ? 'outdoor' : 'dark';
           setTheme(next);
@@ -452,6 +452,24 @@ export default function App() {
 
       <main>
         {/* Public tabs — always mounted */}
+        <div style={{ display: activeTab === 'roster' ? '' : 'none' }}>
+          <RosterTab
+            entries={rankedEntries}
+            settings={settingsWithTheme}
+            isUnlocked={isUnlocked}
+            buyInBlurred={buyInBlurred}
+            onEdit={setEditingEntry}
+            onAdd={() => setEditingEntry({})}
+            onDelete={handleDeleteEntry}
+            onClearAll={handleClearAll}
+            onImport={handleImport}
+            onToggleOffWater={handleToggleOffWater}
+            onToggleField={handleToggleEntryField}
+            onUpdateInlineField={handleUpdateInlineField}
+            onClearDeductions={handleClearDeductions}
+            onArchive={handleArchive}
+          />
+        </div>
         <div style={{ display: activeTab === 'leaderboard' ? '' : 'none' }}>
           <LeaderboardTab entries={rankedEntries} settings={settingsWithTheme} />
         </div>
@@ -471,24 +489,6 @@ export default function App() {
           <>
             <div style={{ display: activeTab === 'signup' ? '' : 'none' }}>
               <SignUpTab onAddEntry={handleSignUpEntry} />
-            </div>
-            <div style={{ display: activeTab === 'roster' ? '' : 'none' }}>
-              <RosterTab
-                entries={rankedEntries}
-                settings={settingsWithTheme}
-                isUnlocked={isUnlocked}
-                buyInBlurred={buyInBlurred}
-                onEdit={setEditingEntry}
-                onAdd={() => setEditingEntry({})}
-                onDelete={handleDeleteEntry}
-                onClearAll={handleClearAll}
-                onImport={handleImport}
-                onToggleOffWater={handleToggleOffWater}
-                onToggleField={handleToggleEntryField}
-                onUpdateInlineField={handleUpdateInlineField}
-                onClearDeductions={handleClearDeductions}
-                onArchive={handleArchive}
-              />
             </div>
             <div style={{ display: activeTab === 'checkin' ? '' : 'none' }}>
               <CheckInTab entries={rankedEntries} onSave={handleCheckInSave} />

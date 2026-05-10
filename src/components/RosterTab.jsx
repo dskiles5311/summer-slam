@@ -93,6 +93,55 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
     setEditValues({});
   }
 
+  if (!isUnlocked) {
+    const lockedSorted = [...entries].sort((a, b) => {
+      const fa = (a.boaterFirst || '').toLowerCase();
+      const fb = (b.boaterFirst || '').toLowerCase();
+      if (fa < fb) return -1;
+      if (fa > fb) return 1;
+      return 0;
+    });
+    return (
+      <div className="tab-panel active">
+        <div className="table-wrapper">
+          <table style={{ tableLayout: 'fixed', minWidth: 480 }}>
+            <colgroup>
+              <col style={{ width: '25%' }} />
+              <col style={{ width: '25%' }} />
+              <col style={{ width: '25%' }} />
+              <col style={{ width: '25%' }} />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Boater First</th>
+                <th>Boater Last</th>
+                <th>Co-Angler First</th>
+                <th>Co-Angler Last</th>
+              </tr>
+            </thead>
+            <tbody>
+              {lockedSorted.map(row => (
+                <tr key={row.id}>
+                  <td className="td-name">{row.boaterFirst}</td>
+                  <td className="td-name">{row.boaterLast}</td>
+                  <td className="td-name">{row.coAnglerFirst}</td>
+                  <td className="td-name">{row.coAnglerLast}</td>
+                </tr>
+              ))}
+              {entries.length === 0 && (
+                <tr>
+                  <td colSpan={4} style={{ textAlign: 'center', color: 'var(--header-bg)', padding: 40 }}>
+                    No entries yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="tab-panel active">
       <div className="toolbar">
