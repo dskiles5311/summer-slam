@@ -630,8 +630,18 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
 @media (max-width: 768px) {
   .header-stats { display: none; }
   .summary-grid-top { grid-template-columns: repeat(3, 1fr); }
-  .lb-card { grid-template-columns: 46px 52px 1fr auto auto; gap: 10px; }
+  .lb-card { grid-template-columns: 62px 64px 1fr auto auto; gap: 12px; padding: 16px 16px; }
+  .lb-rank { font-size: 38px; }
+  .lb-rank.rn { font-size: 28px; }
+  .lb-boatno-num { font-size: 26px; }
+  .lb-boatno-lbl { font-size: 11px; }
+  .lb-angler-name { font-size: 20px; }
+  .lb-angler-name .lb-co { font-size: 17px; }
   .lb-stat-item:not(.highlight) { display: none; }
+  .lb-stat-item.highlight .val { font-size: 22px; }
+  .lb-stat-item .lbl { font-size: 11px; }
+  .lb-payout .val { font-size: 20px; }
+  .lb-payout .lbl { font-size: 11px; }
   .contacts-table .col-email { display: none; }
 
   /* Nav tabs: scroll horizontally, never wrap */
@@ -649,11 +659,18 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
 }
 
 @media (max-width: 700px) {
-  .lb-card { grid-template-columns: 46px 46px 1fr auto auto; gap: 10px; padding: 12px 12px; }
-  .lb-stat-item:not(.highlight) { display: none; }
+  .lb-card { grid-template-columns: 46px 48px 1fr auto auto; gap: 10px; padding: 12px 12px; }
+  .lb-rank { font-size: 26px; }
+  .lb-rank.rn { font-size: 20px; }
   .lb-boatno-num { font-size: 18px; }
+  .lb-boatno-lbl { font-size: 10px; }
   .lb-angler-name { font-size: 15px; }
   .lb-angler-name .lb-co { font-size: 13px; }
+  .lb-stat-item:not(.highlight) { display: none; }
+  .lb-stat-item.highlight .val { font-size: 18px; }
+  .lb-stat-item .lbl { font-size: 10px; }
+  .lb-payout .val { font-size: 16px; }
+  .lb-payout .lbl { font-size: 10px; }
 }
 
 @media (max-width: 600px) {
@@ -686,6 +703,19 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
 
 @media (max-width: 480px) {
   .summary-grid-top { grid-template-columns: repeat(2, 1fr); }
+
+  .lb-card { grid-template-columns: 40px 44px 1fr auto auto; gap: 8px; padding: 10px 10px; }
+  .lb-rank { font-size: 22px; }
+  .lb-rank.rn { font-size: 17px; }
+  .lb-boatno-num { font-size: 15px; }
+  .lb-boatno-lbl { font-size: 9px; }
+  .lb-angler-name { font-size: 13px; }
+  .lb-angler-name .lb-co { font-size: 11px; }
+  .lb-payout { min-width: 56px; }
+  .lb-payout .val { font-size: 13px; }
+  .lb-payout .lbl { font-size: 9px; }
+  .lb-stat-item.highlight .val { font-size: 15px; }
+  .lb-stat-item .lbl { font-size: 9px; }
 
   /* Check In card: name cols 2-up, phone full-width on very small screens */
   .checkin-person-grid { grid-template-columns: 1fr 1fr !important; }
