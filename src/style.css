@@ -119,7 +119,7 @@ header {
 .nav-tab.active { color: var(--gold-light); border-bottom-color: var(--gold); }
 
 /* ── MAIN CONTENT ── */
-main { flex: 1; min-height: 0; padding: 16px 20px; overflow-y: auto; overflow-x: hidden; }
+main { flex: 1; min-height: 0; padding: 0 20px 16px; overflow-y: auto; overflow-x: hidden; }
 
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
@@ -128,10 +128,11 @@ main { flex: 1; min-height: 0; padding: 16px 20px; overflow-y: auto; overflow-x:
 .toolbar {
   display: flex;
   gap: 8px;
-  margin: -16px -20px 14px;
+  margin: 0 -20px 14px;
   padding: 12px 20px;
   flex-wrap: wrap;
   align-items: center;
+  position: -webkit-sticky;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -246,7 +247,7 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
 .add-row-btn:hover { background: rgba(255,255,255,0.07); color: var(--white); }
 
 /* ── LEADERBOARD ── */
-.leaderboard-header { text-align: center; margin-bottom: 20px; }
+.leaderboard-header { text-align: center; padding-top: 16px; margin-bottom: 20px; }
 
 .leaderboard-header h2 {
   font-size: 28px;
