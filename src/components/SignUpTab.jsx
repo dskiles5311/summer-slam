@@ -108,9 +108,11 @@ export default function SignUpTab({ onAddEntry }) {
     : FIELD;
 
   return (
-    <div className="tab-panel active" style={{ maxWidth: 520, margin: '0 auto', padding: '8px 0' }}>
-      <h2 style={{ color: 'var(--gold-light)', fontSize: 18, marginBottom: 20, fontWeight: 800 }}>📝 Sign Up</h2>
-
+    <div className="tab-panel active">
+      <div className="toolbar">
+        <h2 style={{ color: 'var(--gold-light)', fontSize: 18, fontWeight: 800 }}>📝 Sign Up</h2>
+      </div>
+      <div style={{ maxWidth: 520, margin: '0 auto', paddingTop: 16 }}>
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }} noValidate>
 
         {/* ── Boater ── */}
@@ -283,6 +285,7 @@ export default function SignUpTab({ onAddEntry }) {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

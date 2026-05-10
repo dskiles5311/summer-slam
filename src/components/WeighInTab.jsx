@@ -159,9 +159,11 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry })
   const hasPenalty = pen.total > 0;
 
   return (
-    <div className="tab-panel active" style={{ maxWidth: 520, margin: '0 auto', padding: '8px 0' }}>
-      <h2 style={{ color: 'var(--gold-light)', fontSize: 18, marginBottom: 20, fontWeight: 800 }}>🎣 Weigh In</h2>
-
+    <div className="tab-panel active">
+      <div className="toolbar">
+        <h2 style={{ color: 'var(--gold-light)', fontSize: 18, fontWeight: 800 }}>🎣 Weigh In</h2>
+      </div>
+      <div style={{ maxWidth: 520, margin: '0 auto', paddingTop: 16 }}>
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
         {/* Boat number */}
@@ -320,6 +322,7 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry })
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

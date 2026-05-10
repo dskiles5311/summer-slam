@@ -218,8 +218,11 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
 
   return (
     <div className="tab-panel active">
-      <div style={{ maxWidth: 640, margin: '0 auto' }}>
-        <h2 style={{ color: 'var(--gold-light)', marginBottom: 20, fontSize: 18 }}>Tournament Settings</h2>
+      <div className="toolbar">
+        <h2 style={{ color: 'var(--gold-light)', fontSize: 18, fontWeight: 800 }}>Tournament Settings</h2>
+        {locked && <span style={{ fontSize: 12, color: 'rgba(255,180,80,0.85)', fontWeight: 600 }}>🔒 Locked</span>}
+      </div>
+      <div style={{ maxWidth: 640, margin: '0 auto', paddingTop: 16 }}>
         {locked && (
           <div style={{ background: 'rgba(255,180,80,0.1)', border: '1px solid rgba(255,180,80,0.3)', borderRadius: 8, padding: '10px 16px', marginBottom: 16, fontSize: 13, color: 'rgba(255,180,80,0.9)' }}>
             🔒 Settings are locked. Click <strong>Locked</strong> in the header to unlock editing.
