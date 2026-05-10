@@ -44,6 +44,9 @@ export default function App() {
   const [toast, setToast]               = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
   const [isUnlocked, setIsUnlocked]     = useState(false);
+  const [everUnlocked, setEverUnlocked] = useState(false);
+  const [contacts, setContacts]         = useState([]);
+  const [contactsLoading, setContactsLoading] = useState(true);
   const [buyInBlurred, setBuyInBlurred] = useState(() => localStorage.getItem('ss_buyin_blur') !== 'false');
 
   function handleToggleBuyInBlur() {
@@ -65,6 +68,16 @@ export default function App() {
       revalidatePassword().then(ok => { if (ok) setIsUnlocked(true); });
     }
   }, []);
+
+  useEffect(() => { if (isUnlocked) setEverUnlocked(true); }, [isUnlocked]);
+
+  useEffect(() => {
+    if (!isUnlocked) return;
+    setContactsLoading(true);
+    fetchContacts()
+      .then(data => { setContacts(data); setContactsLoading(false); })
+      .catch(() => setContactsLoading(false));
+  }, [isUnlocked]);
 
   useEffect(() => {
     async function loadData() {
@@ -438,75 +451,83 @@ export default function App() {
       />
 
       <main>
-        {activeTab === 'signup' && (
-          <SignUpTab onAddEntry={handleSignUpEntry} />
-        )}
-        {activeTab === 'roster' && (
-          <RosterTab
-            entries={rankedEntries}
-            settings={settingsWithTheme}
-            isUnlocked={isUnlocked}
-            buyInBlurred={buyInBlurred}
-            onEdit={setEditingEntry}
-            onAdd={() => setEditingEntry({})}
-            onDelete={handleDeleteEntry}
-            onClearAll={handleClearAll}
-            onImport={handleImport}
-            onToggleBoatCheck={handleToggleBoatCheck}
-            onToggleField={handleToggleEntryField}
-            onUpdateInlineField={handleUpdateInlineField}
-            onClearDeductions={handleClearDeductions}
-            onArchive={handleArchive}
-          />
-        )}
-        {activeTab === 'checkin' && (
-          <CheckInTab
-            entries={rankedEntries}
-            onSave={handleCheckInSave}
-          />
-        )}
-        {activeTab === 'boatcheck' && (
-          <BoatCheckTab
-            entries={rankedEntries}
-            settings={settingsWithTheme}
-            isUnlocked={isUnlocked}
-            onToggle={handleToggleBoatCheck}
-            onToggleOffWater={handleToggleOffWater}
-            onReset={handleResetBoatCheck}
-          />
-        )}
-        {activeTab === 'weighin' && (
-          <WeighInTab entries={entries} settings={settingsWithTheme} onWeighIn={handleWeighIn} onAddEntry={handleAddWeighInEntry} />
-        )}
-        {activeTab === 'leaderboard' && (
+        {/* Public tabs — always mounted */}
+        <div style={{ display: activeTab === 'leaderboard' ? '' : 'none' }}>
           <LeaderboardTab entries={rankedEntries} settings={settingsWithTheme} />
-        )}
-        {activeTab === 'rules' && <RulesTab />}
-        {activeTab === 'archive' && (
+        </div>
+        <div style={{ display: activeTab === 'rules' ? '' : 'none' }}>
+          <RulesTab />
+        </div>
+        <div style={{ display: activeTab === 'archive' ? '' : 'none' }}>
           <ArchiveTab
             isUnlocked={isUnlocked}
             rosterCount={entries.length}
             onLoadArchive={handleLoadArchive}
           />
-        )}
-        {activeTab === 'contacts' && (
-          <ContactsTab
-            isUnlocked={isUnlocked}
-            fetchContacts={fetchContacts}
-            updateContact={updateContact}
-            deleteContact={deleteContact}
-          />
-        )}
-        {activeTab === 'settings' && (
-          <SettingsTab
-            settings={settingsWithTheme}
-            entries={rankedEntries}
-            isUnlocked={isUnlocked}
-            onUpdateSettings={handleUpdateSettings}
-            onClearAll={handleClearAll}
-            onImport={handleImport}
-            onClearWeighLog={handleClearWeighLog}
-          />
+        </div>
+
+        {/* Private tabs — mount once after first unlock, then stay mounted */}
+        {everUnlocked && (
+          <>
+            <div style={{ display: activeTab === 'signup' ? '' : 'none' }}>
+              <SignUpTab onAddEntry={handleSignUpEntry} />
+            </div>
+            <div style={{ display: activeTab === 'roster' ? '' : 'none' }}>
+              <RosterTab
+                entries={rankedEntries}
+                settings={settingsWithTheme}
+                isUnlocked={isUnlocked}
+                buyInBlurred={buyInBlurred}
+                onEdit={setEditingEntry}
+                onAdd={() => setEditingEntry({})}
+                onDelete={handleDeleteEntry}
+                onClearAll={handleClearAll}
+                onImport={handleImport}
+                onToggleBoatCheck={handleToggleBoatCheck}
+                onToggleField={handleToggleEntryField}
+                onUpdateInlineField={handleUpdateInlineField}
+                onClearDeductions={handleClearDeductions}
+                onArchive={handleArchive}
+              />
+            </div>
+            <div style={{ display: activeTab === 'checkin' ? '' : 'none' }}>
+              <CheckInTab entries={rankedEntries} onSave={handleCheckInSave} />
+            </div>
+            <div style={{ display: activeTab === 'boatcheck' ? '' : 'none' }}>
+              <BoatCheckTab
+                entries={rankedEntries}
+                settings={settingsWithTheme}
+                isUnlocked={isUnlocked}
+                onToggle={handleToggleBoatCheck}
+                onToggleOffWater={handleToggleOffWater}
+                onReset={handleResetBoatCheck}
+              />
+            </div>
+            <div style={{ display: activeTab === 'weighin' ? '' : 'none' }}>
+              <WeighInTab entries={entries} settings={settingsWithTheme} onWeighIn={handleWeighIn} onAddEntry={handleAddWeighInEntry} />
+            </div>
+            <div style={{ display: activeTab === 'contacts' ? '' : 'none' }}>
+              <ContactsTab
+                isUnlocked={isUnlocked}
+                contacts={contacts}
+                contactsLoading={contactsLoading}
+                onContactsChange={setContacts}
+                updateContact={updateContact}
+                deleteContact={deleteContact}
+              />
+            </div>
+            <div style={{ display: activeTab === 'settings' ? '' : 'none' }}>
+              <SettingsTab
+                settings={settingsWithTheme}
+                entries={rankedEntries}
+                isUnlocked={isUnlocked}
+                onUpdateSettings={handleUpdateSettings}
+                onClearAll={handleClearAll}
+                onImport={handleImport}
+                onClearWeighLog={handleClearWeighLog}
+              />
+            </div>
+          </>
         )}
       </main>
 

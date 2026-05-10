@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { upsertContacts } from '../utils/api';
+import { upsertContacts, fetchContacts } from '../utils/api';
 
 const FIELD_STYLE = {
   background: 'rgba(255,255,255,0.06)',
@@ -214,9 +214,7 @@ function DuplicateReviewModal({ groups, onDelete, onClose }) {
   );
 }
 
-export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, deleteContact }) {
-  const [contacts, setContacts]       = useState([]);
-  const [loading, setLoading]         = useState(true);
+export default function ContactsTab({ isUnlocked, contacts, contactsLoading, onContactsChange, updateContact, deleteContact }) {
   const [filter, setFilter]           = useState('');
   const [editing, setEditing]         = useState(null);
   const [sortKey, setSortKey]         = useState(() => localStorage.getItem('ss_contacts_sort_key') || 'lastName');
@@ -242,10 +240,6 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
   useEffect(() => { localStorage.setItem('ss_contacts_sort_key', sortKey); }, [sortKey]);
   useEffect(() => { localStorage.setItem('ss_contacts_sort_dir', sortDir); }, [sortDir]);
 
-  useEffect(() => {
-    fetchContacts().then(data => { setContacts(data); setLoading(false); });
-  }, [fetchContacts]);
-
   function toggleSort(key) {
     if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
     else { setSortKey(key); setSortDir('asc'); }
@@ -266,7 +260,7 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
 
   async function handleSave(id, updates) {
     const updated = await updateContact(id, updates);
-    setContacts(prev => prev.map(c => c.id === id ? { ...c, ...updated } : c));
+    onContactsChange(prev => prev.map(c => c.id === id ? { ...c, ...updated } : c));
     setEditing(null);
   }
 
@@ -274,14 +268,14 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
     if (!confirm(`Remove ${name} from contacts?`)) return;
     try {
       await deleteContact(id);
-      setContacts(prev => prev.filter(c => c.id !== id));
+      onContactsChange(prev => prev.filter(c => c.id !== id));
     } catch { /* ignore */ }
   }
 
   async function handleDeleteSilent(id) {
     try {
       await deleteContact(id);
-      setContacts(prev => prev.filter(c => c.id !== id));
+      onContactsChange(prev => prev.filter(c => c.id !== id));
     } catch { /* ignore */ }
   }
 
@@ -319,7 +313,7 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
     try {
       await upsertContacts(parsed);
       const refreshed = await fetchContacts();
-      setContacts(refreshed);
+      onContactsChange(refreshed);
       setImportStatus({ type: 'success', msg: `✓ Imported ${parsed.length} contact${parsed.length !== 1 ? 's' : ''}` });
       setTimeout(() => setImportStatus(null), 4000);
     } catch {
@@ -421,7 +415,7 @@ export default function ContactsTab({ isUnlocked, fetchContacts, updateContact, 
             </tr>
           </thead>
           <tbody>
-            {loading ? (
+            {contactsLoading ? (
               <tr><td colSpan={isUnlocked ? 5 : 4} style={{ textAlign: 'center', color: 'var(--header-bg)', padding: 40 }}>Loading…</td></tr>
             ) : displayed.length === 0 ? (
               <tr><td colSpan={isUnlocked ? 5 : 4} style={{ textAlign: 'center', color: 'var(--header-bg)', padding: 40 }}>
