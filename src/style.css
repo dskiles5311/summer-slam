@@ -25,13 +25,14 @@ body {
   font-family: 'Segoe UI', system-ui, sans-serif;
   background: var(--navy);
   color: var(--white);
-  min-height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   font-size: 16px;
   transition: background 0.25s, color 0.25s;
 }
 
 /* ── APP SHELL ── */
-#app { display: flex; flex-direction: column; min-height: 100vh; }
+#app { display: flex; flex-direction: column; height: 100%; }
 
 header {
   background: #1a3320;
@@ -119,7 +120,7 @@ header {
 .nav-tab.active { color: var(--gold-light); border-bottom-color: var(--gold); }
 
 /* ── MAIN CONTENT ── */
-main { flex: 1; min-height: 0; padding: 0 20px 16px; overflow-y: auto; overflow-x: hidden; }
+main { flex: 1; min-height: 0; padding: 0 20px 16px; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
 
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
@@ -596,7 +597,8 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
 /* ── PRINT / PDF ── */
 @media print {
   * { margin: 0; padding: 0; }
-  body { background: white; color: black; font-size: 11px; }
+  body { background: white; color: black; font-size: 11px; height: auto; overflow: visible; }
+  #app { height: auto; }
   header { display: none; }
   main { padding: 20px; background: white; }
 
