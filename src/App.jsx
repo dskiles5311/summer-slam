@@ -262,6 +262,10 @@ export default function App() {
     try {
       const updated = await updateEntry(entryId, { ...entry, ...updates });
       setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
+      upsertContacts([
+        { firstName: updated.boaterFirst,   lastName: updated.boaterLast,   phone: updated.boaterPhone,   email: updated.boaterEmail   },
+        { firstName: updated.coAnglerFirst, lastName: updated.coAnglerLast, phone: updated.coAnglerPhone, email: updated.coAnglerEmail },
+      ]).catch(() => {});
       showToast('Entry updated!', 'success');
     } catch {
       showToast('Failed to update entry', 'error');
