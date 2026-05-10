@@ -210,8 +210,10 @@ export default function LeaderboardTab({ entries, settings }) {
                 <div className="lb-boatno-lbl">Boat #</div>
               </div>
               <div className="lb-anglers">
-                <div className="lb-angler-name">{row.boaterFirst} {row.boaterLast}</div>
-                <div className="lb-angler-name lb-co">{coName}</div>
+                <div className="lb-angler-name">
+                  {row.boaterFirst} {row.boaterLast}
+                  {coName !== '—' && <span className="lb-co">, {coName}</span>}
+                </div>
               </div>
               <div className="lb-stats">
                 <div className="lb-stat-item">
