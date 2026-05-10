@@ -98,41 +98,36 @@ export default function CheckInTab({ entries, onSave }) {
 
   return (
     <div className="tab-panel active">
-      {/* Sticky search header — centered column width only, no full-bleed */}
-      <div style={{ maxWidth: 560, margin: '0 auto' }}>
-        <div style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 10,
-          background: 'var(--navy)',
-          borderBottom: '1px solid rgba(168,200,160,0.13)',
-          paddingBottom: 12,
-        }}>
-          <input
-            ref={searchRef}
-            type="search"
-            placeholder="Search by name, phone, or boat #…"
-            value={query}
-            onChange={e => { setQuery(e.target.value); setExpandedId(null); setDraft({}); }}
-            style={{
-              width: '100%',
-              background: 'rgba(255,255,255,0.07)',
-              border: '1px solid rgba(139,180,225,0.35)',
-              borderRadius: 8, color: 'var(--white)',
-              fontSize: 15, padding: '10px 13px', outline: 'none',
-              boxSizing: 'border-box',
-            }}
-          />
-        </div>
+      {/* Search bar — above the scroll container so it never moves */}
+      <div style={{ maxWidth: 560, margin: '0 auto', paddingBottom: 12, borderBottom: '1px solid rgba(168,200,160,0.13)' }}>
+        <input
+          ref={searchRef}
+          type="search"
+          placeholder="Search by name, phone, or boat #…"
+          value={query}
+          onChange={e => { setQuery(e.target.value); setExpandedId(null); setDraft({}); }}
+          style={{
+            width: '100%',
+            background: 'rgba(255,255,255,0.07)',
+            border: '1px solid rgba(139,180,225,0.35)',
+            borderRadius: 8, color: 'var(--white)',
+            fontSize: 15, padding: '10px 13px', outline: 'none',
+            boxSizing: 'border-box',
+          }}
+        />
       </div>
 
-      {/* Scrollable results column — centered, bounded height */}
+      {/* Scrollable results — bounded so search bar never scrolls away */}
       <div style={{
         maxWidth: 560,
         margin: '0 auto',
         paddingTop: 12,
         overflowY: 'auto',
-        maxHeight: 'calc(100vh - 280px)',
+        /* 100dvh adjusts for iOS address bar; max() ensures ≥200px in landscape */
+        maxHeight: 'max(200px, calc(100dvh - 280px))',
+        WebkitOverflowScrolling: 'touch',
+        overscrollBehavior: 'contain',
+        paddingBottom: 'env(safe-area-inset-bottom, 12px)',
       }}>
         {query.trim() && results.length === 0 && (
           <div style={{ textAlign: 'center', color: 'var(--header-bg)', padding: '24px 0', fontSize: 14 }}>
@@ -189,15 +184,15 @@ export default function CheckInTab({ entries, onSave }) {
                 {/* Expanded card */}
                 {isOpen && (
                   <div style={{ padding: '10px 12px 12px', borderTop: '1px solid rgba(168,200,160,0.12)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
+                    <div className="checkin-person-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
                       <F label="Boater First" value={draft.boaterFirst} onChange={v => set('boaterFirst', v)} />
                       <F label="Last"         value={draft.boaterLast}  onChange={v => set('boaterLast', v)} />
-                      <F label="Phone" type="tel" inputMode="tel" value={draft.boaterPhone} onChange={v => set('boaterPhone', v)} />
+                      <div className="checkin-phone"><F label="Phone" type="tel" inputMode="tel" value={draft.boaterPhone} onChange={v => set('boaterPhone', v)} /></div>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
+                    <div className="checkin-person-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
                       <F label="Co-Angler First" value={draft.coAnglerFirst} onChange={v => set('coAnglerFirst', v)} />
                       <F label="Last"            value={draft.coAnglerLast}  onChange={v => set('coAnglerLast', v)} />
-                      <F label="Phone" type="tel" inputMode="tel" value={draft.coAnglerPhone} onChange={v => set('coAnglerPhone', v)} />
+                      <div className="checkin-phone"><F label="Phone" type="tel" inputMode="tel" value={draft.coAnglerPhone} onChange={v => set('coAnglerPhone', v)} /></div>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, alignItems: 'end' }}>
                       <F label="Boat #" inputMode="numeric" value={draft.boatNo} onChange={v => set('boatNo', v)} />

@@ -730,6 +730,10 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
 
 @media (max-width: 480px) {
   .summary-grid-top { grid-template-columns: repeat(2, 1fr); }
+
+  /* Check In card: name cols 2-up, phone full-width on very small screens */
+  .checkin-person-grid { grid-template-columns: 1fr 1fr !important; }
+  .checkin-phone       { grid-column: 1 / -1; }
 }
 
 /* ── LIGHT THEME ── */
