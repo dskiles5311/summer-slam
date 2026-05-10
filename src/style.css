@@ -675,13 +675,13 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
   .edit-panel-actions .btn { width: 100%; text-align: center; }
   .btn-lg { min-height: 52px; font-size: 16px; }
 
-  /* Leaderboard: compact chip fonts on phones */
-  .summary-chip { padding: 8px 8px; }
-  .summary-chip .sc-lbl  { font-size: 11px; }
-  .summary-chip .sc-val  { font-size: 15px; }
-  .summary-chip .sc-boat { font-size: 11px; }
-  .summary-chip .sc-name { font-size: 11px; }
-  .summary-chip .sc-co   { font-size: 10px; }
+  /* Leaderboard: chip fonts on phones */
+  .summary-chip { padding: 14px 12px; }
+  .summary-chip .sc-lbl  { font-size: 16px; }
+  .summary-chip .sc-val  { font-size: 18px; }
+  .summary-chip .sc-boat { font-size: 16px; }
+  .summary-chip .sc-name { font-size: 14px; }
+  .summary-chip .sc-co   { font-size: 13px; }
 }
 
 @media (max-width: 480px) {
