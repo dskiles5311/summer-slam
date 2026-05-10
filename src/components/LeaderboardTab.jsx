@@ -1,4 +1,4 @@
-import { getLeaderboardEntries, getStats } from '../utils/calculations';
+import { getLeaderboardEntries } from '../utils/calculations';
 import { exportHTML } from '../utils/exportHtml';
 
 export default function LeaderboardTab({ entries, settings }) {
@@ -7,7 +7,7 @@ export default function LeaderboardTab({ entries, settings }) {
   const { payoutSettings } = settings;
 
   const totalWeight = lbEntries.reduce((s, e) => s + (parseFloat(e.totalWeight) || 0), 0).toFixed(2);
-  const { totalBoats } = getStats(entries, settings.fees);
+
 
   const lunkerRows = entries.filter(r => r.lunker === 1 && r.boatNo && parseFloat(r.lunkerWeight) > 0);
   const lunkerRow = lunkerRows.length
@@ -68,10 +68,6 @@ export default function LeaderboardTab({ entries, settings }) {
       </div>
 
       <div className="summary-grid-top" style={{ marginBottom: 12, maxWidth: 900, marginLeft: 'auto', marginRight: 'auto' }}>
-        <div className="summary-chip">
-          <span className="sc-lbl">Total Boats</span>
-          <span className="sc-val">{totalBoats}</span>
-        </div>
         <div className="summary-chip">
           <span className="sc-lbl">Total Weight</span>
           <span className="sc-val">{totalWeight} lbs</span>
