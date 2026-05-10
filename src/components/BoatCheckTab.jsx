@@ -52,12 +52,12 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggle, 
       )}
 
       <div className="table-wrapper">
-        <table style={{ tableLayout: 'fixed' }}>
+        <table style={{ tableLayout: 'fixed', minWidth: 420 }}>
           <thead>
             <tr>
-              <th style={{ textAlign: 'center', width: 90 }}>Checked In</th>
-              <th style={{ textAlign: 'center', width: 90 }}>Off Water</th>
-              <th style={{ width: 72 }}>Boat #</th>
+              <th style={{ textAlign: 'center', width: 76 }}>Checked In</th>
+              <th style={{ textAlign: 'center', width: 76 }}>Off Water</th>
+              <th style={{ width: 62 }}>Boat #</th>
               <th style={{ width: '42%' }}>Boater</th>
               <th style={{ width: '35%' }}>Co-Angler</th>
             </tr>

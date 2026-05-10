@@ -147,13 +147,13 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
       </div>
 
       <div className="table-wrapper">
-        <table className="roster-table" style={{ tableLayout: 'fixed', minWidth: 960 }}>
+        <table className="roster-table" style={{ tableLayout: 'fixed', minWidth: isUnlocked ? 1340 : 1230 }}>
           <colgroup>
             <col style={{ width: 52 }} />   {/* Place      */}
-            <col />                          {/* Boater First (flex) */}
-            <col />                          {/* Boater Last  (flex) */}
-            <col />                          {/* Co-Angler First (flex) */}
-            <col />                          {/* Co-Angler Last  (flex) */}
+            <col style={{ width: 100 }} />  {/* Boater First */}
+            <col style={{ width: 100 }} />  {/* Boater Last  */}
+            <col style={{ width: 100 }} />  {/* Co-Angler First */}
+            <col style={{ width: 100 }} />  {/* Co-Angler Last  */}
             <col style={{ width: 68 }} />   {/* Boat #      */}
             <col style={{ width: 58 }} />   {/* # Fish      */}
             <col style={{ width: 90 }} />   {/* Lunker lbs  */}
