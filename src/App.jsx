@@ -110,13 +110,15 @@ export default function App() {
   const activeTabRef = useRef(activeTab);
   useEffect(() => { activeTabRef.current = activeTab; }, [activeTab]);
 
+  const settingsSavePendingRef = useRef(0);
+
   useEffect(() => {
     let timer;
     async function poll() {
       try {
         const [entriesData, settingsData] = await Promise.all([fetchEntries(), fetchSettings()]);
         setEntries(prev => JSON.stringify(prev) !== JSON.stringify(entriesData) ? entriesData : prev);
-        if (settingsData && Object.keys(settingsData).length > 0) {
+        if (settingsSavePendingRef.current === 0 && settingsData && Object.keys(settingsData).length > 0) {
           const merged = {
             ...DEFAULT_SETTINGS,
             ...settingsData,
@@ -190,10 +192,13 @@ export default function App() {
       payoutSettings: updates.payoutSettings ? { ...settings.payoutSettings, ...updates.payoutSettings } : settings.payoutSettings,
     };
     setSettings(newSettings);
+    settingsSavePendingRef.current += 1;
     try {
       await saveSettings(newSettings);
     } catch {
       showToast('Failed to save settings', 'error');
+    } finally {
+      settingsSavePendingRef.current -= 1;
     }
   }
 
