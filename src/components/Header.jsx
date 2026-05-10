@@ -79,6 +79,12 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
               📋 Roster
             </button>
             <button
+              className={`nav-tab ${activeTab === 'checkin' ? 'active' : ''}`}
+              onClick={() => onTabChange('checkin')}
+            >
+              ✅ Check In
+            </button>
+            <button
               className={`nav-tab ${activeTab === 'boatcheck' ? 'active' : ''}`}
               onClick={() => onTabChange('boatcheck')}
             >

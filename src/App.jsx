@@ -7,6 +7,7 @@ import LeaderboardTab from './components/LeaderboardTab';
 import RulesTab from './components/RulesTab';
 import SettingsTab from './components/SettingsTab';
 import SignUpTab from './components/SignUpTab';
+import CheckInTab from './components/CheckInTab';
 import ContactsTab from './components/ContactsTab';
 import ArchiveTab from './components/ArchiveTab';
 import EditModal from './components/EditModal';
@@ -231,6 +232,18 @@ export default function App() {
     }
   }
 
+  async function handleCheckInSave(entryId, updates) {
+    const entry = entries.find(e => e.id === entryId);
+    if (!entry) return;
+    try {
+      const updated = await updateEntry(entryId, { ...entry, ...updates });
+      setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
+      showToast('Entry updated!', 'success');
+    } catch {
+      showToast('Failed to update entry', 'error');
+    }
+  }
+
   async function handleClearDeductions(entryId) {
     const entry = entries.find(e => e.id === entryId);
     if (!entry) return;
@@ -438,6 +451,12 @@ export default function App() {
             onUpdateInlineField={handleUpdateInlineField}
             onClearDeductions={handleClearDeductions}
             onArchive={handleArchive}
+          />
+        )}
+        {activeTab === 'checkin' && (
+          <CheckInTab
+            entries={rankedEntries}
+            onSave={handleCheckInSave}
           />
         )}
         {activeTab === 'boatcheck' && (
