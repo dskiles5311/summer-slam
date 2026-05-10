@@ -260,7 +260,7 @@ export default function App() {
     const entry = entries.find(e => e.id === entryId);
     if (!entry) return;
     try {
-      const updated = await updateEntry(entryId, { ...entry, ...updates });
+      const updated = await updateEntry(entryId, { ...entry, ...updates, preserveWeighTime: true });
       setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
       upsertContacts([
         { firstName: updated.boaterFirst,   lastName: updated.boaterLast,   phone: updated.boaterPhone,   email: updated.boaterEmail   },
