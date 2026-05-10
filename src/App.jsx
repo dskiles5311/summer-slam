@@ -116,7 +116,7 @@ export default function App() {
       } catch { /* silently skip if fetch fails */ }
       timer = setTimeout(poll, 1000);
     }
-    timer = setTimeout(poll, activeTabRef.current === 'leaderboard' ? 1000 : 5000);
+    timer = setTimeout(poll, 1000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -152,7 +152,7 @@ export default function App() {
       upsertContacts([
         { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone,   email: entryData.boaterEmail   },
         { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone, email: entryData.coAnglerEmail },
-      ]);
+      ]).catch(() => {});
     } catch {
       showToast('Failed to save entry', 'error');
     }
@@ -274,7 +274,7 @@ export default function App() {
       upsertContacts([
         { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone,   email: entryData.boaterEmail   },
         { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone, email: entryData.coAnglerEmail },
-      ]);
+      ]).catch(() => {});
       return true;
     } catch {
       showToast('Failed to sign up entry', 'error');

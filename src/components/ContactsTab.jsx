@@ -112,17 +112,23 @@ function DuplicateReviewModal({ groups, onDelete, onClose }) {
 
   async function removeSingle(id) {
     setBusy(id);
-    await onDelete(id);
-    setBusy(null);
+    try {
+      await onDelete(id);
+    } finally {
+      setBusy(null);
+    }
   }
 
   async function keepOne(group, keepId) {
-    for (const c of group) {
-      if (c.id === keepId) continue;
-      setBusy(c.id);
-      await onDelete(c.id);
+    try {
+      for (const c of group) {
+        if (c.id === keepId) continue;
+        setBusy(c.id);
+        await onDelete(c.id);
+      }
+    } finally {
+      setBusy(null);
     }
-    setBusy(null);
   }
 
   const overlayDownRef = useRef(false);
