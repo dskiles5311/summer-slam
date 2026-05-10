@@ -114,7 +114,7 @@ export default function App() {
           setSettings(prev => JSON.stringify(prev) !== JSON.stringify(merged) ? merged : prev);
         }
       } catch { /* silently skip if fetch fails */ }
-      timer = setTimeout(poll, activeTabRef.current === 'leaderboard' ? 1000 : 5000);
+      timer = setTimeout(poll, 1000);
     }
     timer = setTimeout(poll, activeTabRef.current === 'leaderboard' ? 1000 : 5000);
     return () => clearTimeout(timer);
