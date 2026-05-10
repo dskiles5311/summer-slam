@@ -32,7 +32,7 @@ body {
 }
 
 /* ── APP SHELL ── */
-#app { display: flex; flex-direction: column; height: 100%; }
+#app { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
 
 header {
   background: #1a3320;
