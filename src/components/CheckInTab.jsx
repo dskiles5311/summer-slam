@@ -98,17 +98,16 @@ export default function CheckInTab({ entries, onSave }) {
 
   return (
     <div className="tab-panel active">
-      {/* Sticky search header — matches toolbar look but within the centered column */}
-      <div style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 10,
-        background: 'var(--navy)',
-        borderBottom: '1px solid rgba(168,200,160,0.13)',
-        margin: '-16px -20px 0',
-        padding: '12px 20px',
-      }}>
-        <div style={{ maxWidth: 560, margin: '0 auto' }}>
+      {/* Sticky search header — centered column width only, no full-bleed */}
+      <div style={{ maxWidth: 560, margin: '0 auto' }}>
+        <div style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 10,
+          background: 'var(--navy)',
+          borderBottom: '1px solid rgba(168,200,160,0.13)',
+          paddingBottom: 12,
+        }}>
           <input
             ref={searchRef}
             type="search"
