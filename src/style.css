@@ -334,7 +334,7 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(168,200,160,0.25);
   border-radius: 10px;
-  padding: 12px 10px;
+  padding: 20px 16px;
   text-align: center;
   overflow-wrap: break-word;
   min-width: 0;
