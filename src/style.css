@@ -340,8 +340,8 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
   min-width: 0;
 }
 
-.summary-chip .sc-lbl    { font-size: 20px; font-weight: 800; color: var(--white); display: block; line-height: 1.2; margin-bottom: 4px; }
-.summary-chip .sc-val    { font-size: 22px; font-weight: 700; color: var(--gold-light); display: block; line-height: 1.1; }
+.summary-chip .sc-lbl    { font-size: 20px; font-weight: 800; color: var(--white); display: block; line-height: 1.2; margin-bottom: 4px; white-space: nowrap; }
+.summary-chip .sc-val    { font-size: 22px; font-weight: 700; color: var(--gold-light); display: block; line-height: 1.1; white-space: nowrap; }
 .summary-chip .sc-boat   { font-size: 18px; font-weight: 700; color: var(--gold-light); display: block; margin-top: 4px; }
 .summary-chip .sc-name   { font-size: 16px; font-weight: 600; color: var(--white); display: block; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .summary-chip .sc-co     { font-size: 15px; font-weight: 500; color: var(--header-bg); display: block; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
