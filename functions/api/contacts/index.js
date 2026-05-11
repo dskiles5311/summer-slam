@@ -40,7 +40,11 @@ export async function onRequestPost({ request, env }) {
   if (!checkAuth(request, env)) return Response.json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const db = getDb(env);
-    const { firstName, lastName, phone, email } = await request.json();
+    const body = await request.json();
+    const firstName = (body.firstName ?? '').trim();
+    const lastName  = (body.lastName  ?? '').trim();
+    const phone     = (body.phone     ?? '').trim();
+    const email     = (body.email     ?? '').trim();
     if (!firstName || !lastName) return Response.json({ error: 'firstName and lastName required' }, { status: 400 });
     await db.execute({
       sql: `INSERT INTO contacts (first_name, last_name, phone, email, last_seen)
@@ -48,7 +52,7 @@ export async function onRequestPost({ request, env }) {
             ON CONFLICT(first_name, last_name, phone) DO UPDATE SET
               email = CASE WHEN ? != '' THEN ? ELSE email END,
               last_seen = CURRENT_TIMESTAMP`,
-      args: [firstName, lastName, phone || '', email || '', email || '', email || ''],
+      args: [firstName, lastName, phone, email, email, email],
     });
     return Response.json({ success: true }, { status: 201 });
   } catch (e) {

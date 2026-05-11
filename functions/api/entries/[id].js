@@ -41,6 +41,7 @@ export async function onRequestPut({ params, request, env }) {
   try {
     const db   = getDb(env);
     const body = await request.json();
+    const t    = v => (v ?? '').trim();
 
     const newTotalWeight    = Number(body.totalWeight) || 0;
     const preserveWeighTime = body.preserveWeighTime ? 1 : 0;
@@ -54,9 +55,9 @@ export async function onRequestPut({ params, request, env }) {
               weighed_at = CASE WHEN ? > 0 AND ? = 0 THEN CURRENT_TIMESTAMP ELSE weighed_at END
             WHERE id=?`,
       args: [
-        body.boaterFirst   ?? '', body.boaterLast    ?? '', body.boaterPhone ?? '', body.boaterEmail ?? '',
-        body.coAnglerFirst ?? '', body.coAnglerLast  ?? '', body.coAnglerPhone ?? '', body.coAnglerEmail ?? '',
-        body.boatNo        ?? '',
+        t(body.boaterFirst),   t(body.boaterLast),    t(body.boaterPhone),   t(body.boaterEmail),
+        t(body.coAnglerFirst), t(body.coAnglerLast),  t(body.coAnglerPhone), t(body.coAnglerEmail),
+        t(body.boatNo),
         Number(body.numFish)      || 0,
         Number(body.lunkerWeight) || 0,
         newTotalWeight,

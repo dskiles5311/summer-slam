@@ -51,6 +51,7 @@ export async function onRequestPost({ request, env }) {
   try {
     const db   = getDb(env);
     const body = await request.json();
+    const t    = v => (v ?? '').trim();
 
     const result = await db.execute({
       sql: `INSERT INTO entries
@@ -61,9 +62,9 @@ export async function onRequestPost({ request, env }) {
                raw_weight, dead_fish, short_fish, needs_attention)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
-        body.boaterFirst   ?? '', body.boaterLast    ?? '', body.boaterPhone ?? '', body.boaterEmail ?? '',
-        body.coAnglerFirst ?? '', body.coAnglerLast  ?? '', body.coAnglerPhone ?? '', body.coAnglerEmail ?? '',
-        body.boatNo        ?? '',
+        t(body.boaterFirst),   t(body.boaterLast),    t(body.boaterPhone),   t(body.boaterEmail),
+        t(body.coAnglerFirst), t(body.coAnglerLast),  t(body.coAnglerPhone), t(body.coAnglerEmail),
+        t(body.boatNo),
         Number(body.numFish)      || 0,
         Number(body.lunkerWeight) || 0,
         Number(body.totalWeight)  || 0,

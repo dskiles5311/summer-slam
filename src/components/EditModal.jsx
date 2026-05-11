@@ -82,7 +82,7 @@ export default function EditModal({ entry, onSave, onCancel }) {
       } else if (numFields.includes(k)) {
         data[k] = v === '' ? '' : parseFloat(v);
       } else {
-        data[k] = v;
+        data[k] = typeof v === 'string' ? v.trim() : v;
       }
     });
     onSave(data);
