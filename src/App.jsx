@@ -167,10 +167,18 @@ export default function App() {
       upsertContacts([
         { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone,   email: entryData.boaterEmail   },
         { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone, email: entryData.coAnglerEmail },
-      ]).catch(() => {});
+      ]).then(refreshContacts).catch(() => {});
     } catch {
       showToast('Failed to save entry', 'error');
     }
+  }
+
+  async function refreshContacts() {
+    if (!isUnlocked) return;
+    try {
+      const data = await fetchContacts();
+      setContacts(data);
+    } catch { /* ignore */ }
   }
 
   async function handleDeleteEntry(id) {
@@ -265,7 +273,7 @@ export default function App() {
       upsertContacts([
         { firstName: updated.boaterFirst,   lastName: updated.boaterLast,   phone: updated.boaterPhone,   email: updated.boaterEmail   },
         { firstName: updated.coAnglerFirst, lastName: updated.coAnglerLast, phone: updated.coAnglerPhone, email: updated.coAnglerEmail },
-      ]).catch(() => {});
+      ]).then(refreshContacts).catch(() => {});
       showToast('Entry updated!', 'success');
     } catch {
       showToast('Failed to update entry', 'error');
@@ -296,7 +304,7 @@ export default function App() {
       upsertContacts([
         { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone,   email: entryData.boaterEmail   },
         { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone, email: entryData.coAnglerEmail },
-      ]).catch(() => {});
+      ]).then(refreshContacts).catch(() => {});
       return true;
     } catch {
       showToast('Failed to sign up entry', 'error');
