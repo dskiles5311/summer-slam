@@ -17,7 +17,7 @@ import {
   fetchEntries, createEntry, updateEntry, deleteEntry,
   fetchSettings, saveSettings, verifyPassword, storePassword, clearPassword, isPasswordStored, revalidatePassword,
   upsertContacts, fetchContacts, updateContact, deleteContact,
-  clearWeighLog, archiveEntries,
+  clearWeighLog, archiveEntries, backfillPhones,
 } from './utils/api';
 import { calcRanks } from './utils/calculations';
 
@@ -420,6 +420,24 @@ export default function App() {
     }
   }
 
+  async function handleBackfillPhones() {
+    try {
+      const result = await backfillPhones();
+      const refreshed = await fetchEntries();
+      setEntries(refreshed);
+      if (result.total === 0) {
+        showToast('No matches found — entries already have phones or no contact record exists', 'info');
+      } else {
+        const parts = [];
+        if (result.boaterCount)   parts.push(`${result.boaterCount} boater`);
+        if (result.coAnglerCount) parts.push(`${result.coAnglerCount} co-angler`);
+        showToast(`Filled in phones for: ${parts.join(', ')}`, 'success');
+      }
+    } catch {
+      showToast('Failed to backfill phones', 'error');
+    }
+  }
+
   async function handleImport(newEntries) {
     try {
       const created = await Promise.all(newEntries.map(e => createEntry(e)));
@@ -477,6 +495,7 @@ export default function App() {
             onUpdateInlineField={handleUpdateInlineField}
             onClearDeductions={handleClearDeductions}
             onArchive={handleArchive}
+            onBackfillPhones={handleBackfillPhones}
           />
         </div>
         <div style={{ display: activeTab === 'leaderboard' ? '' : 'none' }}>

@@ -174,6 +174,15 @@ export async function archiveEntries(year, entries) {
   return res.json();
 }
 
+export async function backfillPhones() {
+  const res = await fetch(`${BASE}/entries/backfill-phones`, {
+    method: 'POST',
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new Error('Failed to backfill phones');
+  return res.json();
+}
+
 export async function upsertContacts(people) {
   const valid = people.filter(p => p.firstName && p.lastName);
   if (!valid.length) return;

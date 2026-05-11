@@ -45,12 +45,10 @@ export async function onRequestPost({ request, env }) {
     await db.execute({
       sql: `INSERT INTO contacts (first_name, last_name, phone, email, last_seen)
             VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-            ON CONFLICT(first_name, last_name) DO UPDATE SET
-              phone = CASE WHEN ? != '' THEN ? ELSE phone END,
+            ON CONFLICT(first_name, last_name, phone) DO UPDATE SET
               email = CASE WHEN ? != '' THEN ? ELSE email END,
               last_seen = CURRENT_TIMESTAMP`,
-      args: [firstName, lastName, phone || '', email || '',
-             phone || '', phone || '', email || '', email || ''],
+      args: [firstName, lastName, phone || '', email || '', email || '', email || ''],
     });
     return Response.json({ success: true }, { status: 201 });
   } catch (e) {

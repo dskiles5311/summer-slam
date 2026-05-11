@@ -40,7 +40,7 @@ function sortEntries(entries, { field, dir }) {
 }
 
 
-export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred, onEdit, onAdd, onDelete, onClearAll, onImport, onToggleOffWater, onToggleField, onUpdateInlineField, onClearDeductions, onArchive }) {
+export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred, onEdit, onAdd, onDelete, onClearAll, onImport, onToggleOffWater, onToggleField, onUpdateInlineField, onClearDeductions, onArchive, onBackfillPhones }) {
   const entryFee = parseFloat(settings.fees?.entryFee) || 249;
   const offWater = settings.offWater || {};
   const [sortKey, setSortKey] = useState(() => localStorage.getItem('ss_roster_sort_key') || '_rank');
@@ -172,6 +172,13 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
             outline: 'none',
           }}
         />
+
+        {isUnlocked && onBackfillPhones && (
+          <button className="btn btn-outline" onClick={onBackfillPhones}
+                  title="Fill in missing phone numbers from saved contacts (matched by name)">
+            📋 Backfill phones
+          </button>
+        )}
 
         {isUnlocked && (
           <label className="btn btn-outline" style={{ cursor: 'pointer' }}>

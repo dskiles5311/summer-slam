@@ -26,12 +26,12 @@ CREATE TABLE IF NOT EXISTS entries (
 -- Persists across tournament seasons (not cleared with entries)
 CREATE TABLE IF NOT EXISTS contacts (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
-  first_name TEXT NOT NULL,
-  last_name  TEXT NOT NULL,
+  first_name TEXT NOT NULL COLLATE NOCASE,
+  last_name  TEXT NOT NULL COLLATE NOCASE,
   phone      TEXT DEFAULT '',
   email      TEXT DEFAULT '',
   last_seen  DATETIME DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(first_name, last_name)
+  UNIQUE(first_name, last_name, phone)
 );
 
 CREATE TABLE IF NOT EXISTS settings (

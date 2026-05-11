@@ -12,10 +12,12 @@ const EMPTY = {
 
 export default function EditModal({ entry, onSave, onCancel }) {
   const [form, setForm] = useState({ ...EMPTY });
+  const [errors, setErrors] = useState({});
   const firstInputRef = useRef(null);
   const overlayDownRef = useRef(false);
 
   useEffect(() => {
+    setErrors({});
     setForm({
       boaterFirst:    entry.boaterFirst   ?? '',
       boaterLast:     entry.boaterLast    ?? '',
@@ -50,10 +52,24 @@ export default function EditModal({ entry, onSave, onCancel }) {
 
   function set(field, val) {
     setForm(prev => ({ ...prev, [field]: val }));
+    if (errors[field]) setErrors(prev => ({ ...prev, [field]: null }));
+  }
+
+  function validate() {
+    if (entry?.id) return {};
+    const errs = {};
+    if (!form.boaterFirst.trim()) errs.boaterFirst = 'Required';
+    if (!form.boaterLast.trim())  errs.boaterLast  = 'Required';
+    if (!form.boaterPhone.trim()) errs.boaterPhone  = 'Required';
+    const hasCoAngler = form.coAnglerFirst.trim() || form.coAnglerLast.trim();
+    if (hasCoAngler && !form.coAnglerPhone.trim()) errs.coAnglerPhone = 'Required';
+    return errs;
   }
 
   function handleSubmit(e) {
     e.preventDefault();
+    const errs = validate();
+    if (Object.keys(errs).length) { setErrors(errs); return; }
     const numFields = ['numFish', 'lunkerWeight', 'totalWeight', 'buyIn'];
     const statusFields = ['lunker', 'option', 'paid', 'appSigned'];
     const passthroughFields = ['rawWeight', 'deadFish', 'shortFish', 'needsAttention'];
@@ -74,6 +90,11 @@ export default function EditModal({ entry, onSave, onCancel }) {
 
   const isNew = !entry?.id;
 
+  const err = (field) => errors[field]
+    ? <div style={{ fontSize: 11, color: '#ff6b6b', marginTop: 3 }}>{errors[field]}</div>
+    : null;
+  const errBorder = (field) => errors[field] ? { borderColor: '#ff6b6b' } : undefined;
+
   return (
     <div
       className="edit-overlay"
@@ -91,24 +112,30 @@ export default function EditModal({ entry, onSave, onCancel }) {
             <div className="edit-section-label">Boater &amp; Co-Angler</div>
             <div className="edit-grid-2">
               <div className="form-field">
-                <label>Boater First</label>
+                <label>Boater First{isNew ? ' *' : ''}</label>
                 <ContactSuggest
                   value={form.boaterFirst}
                   placeholder="First"
                   inputRef={firstInputRef}
                   onChange={v => set('boaterFirst', v)}
                   onSelect={c => setForm(prev => ({ ...prev, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || prev.boaterEmail }))}
+                  inputProps={{ style: errBorder('boaterFirst') }}
                 />
+                {err('boaterFirst')}
               </div>
               <div className="form-field">
-                <label>Boater Last</label>
+                <label>Boater Last{isNew ? ' *' : ''}</label>
                 <input type="text" value={form.boaterLast} placeholder="Last"
-                       onChange={e => set('boaterLast', e.target.value)} />
+                       onChange={e => set('boaterLast', e.target.value)}
+                       style={errBorder('boaterLast')} />
+                {err('boaterLast')}
               </div>
               <div className="form-field">
-                <label>Boater Phone</label>
+                <label>Boater Phone{isNew ? ' *' : ''}</label>
                 <input type="tel" value={form.boaterPhone} placeholder="(555) 123-4567"
-                       onChange={e => set('boaterPhone', e.target.value)} />
+                       onChange={e => set('boaterPhone', e.target.value)}
+                       style={errBorder('boaterPhone')} />
+                {err('boaterPhone')}
               </div>
               <div className="form-field">
                 <label>Boater Email</label>
@@ -130,9 +157,11 @@ export default function EditModal({ entry, onSave, onCancel }) {
                        onChange={e => set('coAnglerLast', e.target.value)} />
               </div>
               <div className="form-field">
-                <label>Co-Angler Phone</label>
+                <label>Co-Angler Phone{isNew && (form.coAnglerFirst || form.coAnglerLast) ? ' *' : ''}</label>
                 <input type="tel" value={form.coAnglerPhone} placeholder="(555) 123-4567"
-                       onChange={e => set('coAnglerPhone', e.target.value)} />
+                       onChange={e => set('coAnglerPhone', e.target.value)}
+                       style={errBorder('coAnglerPhone')} />
+                {err('coAnglerPhone')}
               </div>
               <div className="form-field">
                 <label>Co-Angler Email</label>
