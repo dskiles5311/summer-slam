@@ -65,32 +65,12 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
       </div>
       <nav className="nav-tabs">
         {isUnlocked && (
-          <>
-            <button
-              className={`nav-tab ${activeTab === 'signup' ? 'active' : ''}`}
-              onClick={() => onTabChange('signup')}
-            >
-              📝 Sign Up
-            </button>
-            <button
-              className={`nav-tab ${activeTab === 'checkin' ? 'active' : ''}`}
-              onClick={() => onTabChange('checkin')}
-            >
-              ✅ Check In
-            </button>
-            <button
-              className={`nav-tab ${activeTab === 'boatcheck' ? 'active' : ''}`}
-              onClick={() => onTabChange('boatcheck')}
-            >
-              ⚓ Boat Check
-            </button>
-            <button
-              className={`nav-tab ${activeTab === 'weighin' ? 'active' : ''}`}
-              onClick={() => onTabChange('weighin')}
-            >
-              🎣 Weigh In
-            </button>
-          </>
+          <button
+            className={`nav-tab ${activeTab === 'signup' ? 'active' : ''}`}
+            onClick={() => onTabChange('signup')}
+          >
+            📝 Sign Up
+          </button>
         )}
         <button
           className={`nav-tab ${activeTab === 'roster' ? 'active' : ''}`}
@@ -98,6 +78,30 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
         >
           📋 Roster
         </button>
+        {isUnlocked && (
+          <button
+            className={`nav-tab ${activeTab === 'checkin' ? 'active' : ''}`}
+            onClick={() => onTabChange('checkin')}
+          >
+            ✅ Check In
+          </button>
+        )}
+        {isUnlocked && (
+          <button
+            className={`nav-tab ${activeTab === 'boatcheck' ? 'active' : ''}`}
+            onClick={() => onTabChange('boatcheck')}
+          >
+            ⚓ Boat Check
+          </button>
+        )}
+        {isUnlocked && (
+          <button
+            className={`nav-tab ${activeTab === 'weighin' ? 'active' : ''}`}
+            onClick={() => onTabChange('weighin')}
+          >
+            🎣 Weigh In
+          </button>
+        )}
         <button
           className={`nav-tab ${activeTab === 'leaderboard' ? 'active' : ''}`}
           onClick={() => onTabChange('leaderboard')}
@@ -110,6 +114,14 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
         >
           📋 Rules
         </button>
+        {isUnlocked && (
+          <button
+            className={`nav-tab ${activeTab === 'contacts' ? 'active' : ''}`}
+            onClick={() => onTabChange('contacts')}
+          >
+            👥 Contacts
+          </button>
+        )}
         <button
           className={`nav-tab ${activeTab === 'archive' ? 'active' : ''}`}
           onClick={() => onTabChange('archive')}
@@ -117,20 +129,12 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
           🗂️ Archive
         </button>
         {isUnlocked && (
-          <>
-            <button
-              className={`nav-tab ${activeTab === 'contacts' ? 'active' : ''}`}
-              onClick={() => onTabChange('contacts')}
-            >
-              👥 Contacts
-            </button>
-            <button
-              className={`nav-tab ${activeTab === 'settings' ? 'active' : ''}`}
-              onClick={() => onTabChange('settings')}
-            >
-              ⚙️ Settings
-            </button>
-          </>
+          <button
+            className={`nav-tab ${activeTab === 'settings' ? 'active' : ''}`}
+            onClick={() => onTabChange('settings')}
+          >
+            ⚙️ Settings
+          </button>
         )}
       </nav>
     </header>
