@@ -105,7 +105,6 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
     setMinPayout(d.minPayout);
     setPayouts(d.payouts);
     setRawInputs(d.payouts.map(String));
-    setRowErrors([]);
     onUpdateSettings({ payoutSettings: d });
   }
 
@@ -431,18 +430,21 @@ function WeighInLogModal({ entries, penalties, onClose, onClearLog }) {
   }
 
   function handlePrint() {
+    const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     const rows = logged.map((e, i) => {
       const lw  = parseFloat(e.lunkerWeight) || 0;
       const tw  = parseFloat(e.totalWeight)  || 0;
       const rw  = parseFloat(e.rawWeight)    || 0;
       const { lines, total: penTotal } = penaltyLines(e);
       const dedCell = lines.length ? lines.join('<br>') : '—';
+      const boater   = esc([e.boaterFirst, e.boaterLast].filter(Boolean).join(' ') || '—');
+      const coAngler = esc([e.coAnglerFirst, e.coAnglerLast].filter(Boolean).join(' ') || '—');
       return `<tr>
         <td style="text-align:right">${i + 1}</td>
         <td>${fmtTime(e.weighedAt)}</td>
-        <td>#${e.boatNo || '—'}</td>
-        <td>${[e.boaterFirst, e.boaterLast].filter(Boolean).join(' ') || '—'}</td>
-        <td>${[e.coAnglerFirst, e.coAnglerLast].filter(Boolean).join(' ') || '—'}</td>
+        <td>#${esc(e.boatNo || '—')}</td>
+        <td>${boater}</td>
+        <td>${coAngler}</td>
         <td style="text-align:right">${e.numFish || 0}</td>
         <td style="text-align:right">${lw > 0 ? lw.toFixed(2) : '—'}</td>
         <td style="text-align:right">${rw > 0 ? rw.toFixed(2) : '—'}</td>

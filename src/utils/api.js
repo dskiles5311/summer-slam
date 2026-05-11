@@ -60,7 +60,7 @@ export async function revalidatePassword() {
 }
 
 export async function fetchEntries() {
-  const res = await fetch(`${BASE}/entries`);
+  const res = await fetch(`${BASE}/entries`, { headers: authHeaders() });
   if (!res.ok) throw new Error('Failed to fetch entries');
   const data = await res.json();
   return data.map(parseEntry);
@@ -180,6 +180,24 @@ export async function backfillPhones() {
     headers: authHeaders(),
   });
   if (!res.ok) throw new Error('Failed to backfill phones');
+  return res.json();
+}
+
+export async function clearAllEntries() {
+  const res = await fetch(`${BASE}/entries`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new Error('Failed to clear entries');
+}
+
+export async function createEntriesBulk(entries) {
+  const res = await fetch(`${BASE}/entries/bulk`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ entries }),
+  });
+  if (!res.ok) throw new Error('Failed to bulk-create entries');
   return res.json();
 }
 

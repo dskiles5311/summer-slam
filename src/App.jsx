@@ -18,6 +18,7 @@ import {
   fetchSettings, saveSettings, verifyPassword, storePassword, clearPassword, isPasswordStored, revalidatePassword,
   upsertContacts, fetchContacts, updateContact, deleteContact,
   clearWeighLog, archiveEntries, backfillPhones,
+  clearAllEntries, createEntriesBulk,
 } from './utils/api';
 import { calcRanks } from './utils/calculations';
 
@@ -358,7 +359,7 @@ export default function App() {
   async function handleClearAll() {
     if (!confirm('Clear ALL data? This cannot be undone!')) return;
     try {
-      await Promise.all(entries.map(e => deleteEntry(e.id)));
+      await clearAllEntries();
       setEntries([]);
       await handleUpdateSettings({ boatCheck: {}, offWater: {} });
       showToast('All data cleared', 'info');
@@ -405,7 +406,7 @@ export default function App() {
       return;
     }
     try {
-      const created = await Promise.all(archivedEntries.map(e => createEntry({
+      const payload = archivedEntries.map(e => ({
         boaterFirst:   e.boaterFirst,   boaterLast:    e.boaterLast,
         boaterPhone:   e.boaterPhone,   boaterEmail:   e.boaterEmail,
         coAnglerFirst: e.coAnglerFirst, coAnglerLast:  e.coAnglerLast,
@@ -421,9 +422,11 @@ export default function App() {
         paid:          e.paid,          appSigned:     e.appSigned,
         buyIn:         e.buyIn,
         needsAttention: e.needsAttention,
-      })));
-      setEntries(created);
-      showToast(`Loaded ${created.length} entries from archive — switch to Roster to edit`, 'success');
+      }));
+      await createEntriesBulk(payload);
+      const loaded = await fetchEntries();
+      setEntries(loaded);
+      showToast(`Loaded ${payload.length} entries from archive — switch to Roster to edit`, 'success');
       setActiveTab('roster');
     } catch {
       showToast('Failed to load archive into roster', 'error');
@@ -450,9 +453,10 @@ export default function App() {
 
   async function handleImport(newEntries) {
     try {
-      const created = await Promise.all(newEntries.map(e => createEntry(e)));
-      setEntries(prev => [...prev, ...created]);
-      showToast(`Imported ${created.length} entries`, 'success');
+      await createEntriesBulk(newEntries);
+      const all = await fetchEntries();
+      setEntries(all);
+      showToast(`Imported ${newEntries.length} entries`, 'success');
     } catch {
       showToast('Import failed', 'error');
     }

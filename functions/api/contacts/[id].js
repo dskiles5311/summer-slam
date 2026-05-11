@@ -7,6 +7,7 @@ function getDb(env) {
 
 export async function onRequestPut({ params, request, env }) {
   if (!checkAuth(request, env)) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!/^\d+$/.test(params.id)) return Response.json({ error: 'Invalid id' }, { status: 400 });
   try {
     const db = getDb(env);
     const { phone, email } = await request.json();
@@ -15,6 +16,7 @@ export async function onRequestPut({ params, request, env }) {
       args: [phone ?? '', email ?? '', params.id],
     });
     const result = await db.execute({ sql: 'SELECT * FROM contacts WHERE id=?', args: [params.id] });
+    if (!result.rows[0]) return Response.json({ error: 'Not found' }, { status: 404 });
     const r = result.rows[0];
     return Response.json({
       id:        Number(r.id),
@@ -30,6 +32,7 @@ export async function onRequestPut({ params, request, env }) {
 
 export async function onRequestDelete({ params, request, env }) {
   if (!checkAuth(request, env)) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!/^\d+$/.test(params.id)) return Response.json({ error: 'Invalid id' }, { status: 400 });
   try {
     const db = getDb(env);
     await db.execute({ sql: 'DELETE FROM contacts WHERE id=?', args: [params.id] });
