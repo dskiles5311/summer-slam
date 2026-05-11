@@ -80,6 +80,7 @@ export async function onRequestPut({ params, request, env }) {
       sql:  'SELECT * FROM entries WHERE id = ?',
       args: [params.id],
     });
+    if (!updated.rows[0]) return Response.json({ error: 'Not found' }, { status: 404 });
     return Response.json(toJS(updated.rows[0]));
   } catch (e) {
     return Response.json({ error: e.message }, { status: 500 });

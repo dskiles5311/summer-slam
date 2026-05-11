@@ -153,13 +153,13 @@ export async function searchContacts(q) {
 }
 
 export async function fetchArchiveYears() {
-  const res = await fetch(`${BASE}/archive`);
+  const res = await fetch(`${BASE}/archive`, { headers: authHeaders() });
   if (!res.ok) throw new Error('Failed to fetch archive years');
   return res.json();
 }
 
 export async function fetchArchive(year) {
-  const res = await fetch(`${BASE}/archive/${encodeURIComponent(year)}`);
+  const res = await fetch(`${BASE}/archive/${encodeURIComponent(year)}`, { headers: authHeaders() });
   if (!res.ok) throw new Error('Failed to fetch archive');
   return res.json();
 }
