@@ -1,6 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { importCSV, exportCSV } from '../utils/csv';
 import { exportHTML } from '../utils/exportHtml';
+import ConfirmActionModal from './ConfirmActionModal';
 
 function StatusCell({ val }) {
   if (val === 1 || val === '1') return <span className="cell-green">YES</span>;
@@ -49,6 +50,12 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
   const [editingId, setEditingId] = useState(null);
   const [editValues, setEditValues] = useState({});
   const [penaltyPopup, setPenaltyPopup] = useState(null); // { row, x, y }
+  const [confirmAction, setConfirmAction] = useState(null); // { label, action }
+  const fileInputRef = useRef(null);
+
+  function confirmed(label, action) {
+    setConfirmAction({ label, action });
+  }
 
   useEffect(() => { localStorage.setItem('ss_roster_sort_key', sortKey); }, [sortKey]);
   useEffect(() => { localStorage.setItem('ss_roster_sort_dir', sortDir); }, [sortDir]);
@@ -174,32 +181,51 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
         />
 
         {isUnlocked && onBackfillPhones && (
-          <button className="btn btn-outline" onClick={onBackfillPhones}
-                  title="Fill in missing phone numbers from saved contacts (matched by name)">
+          <button className="btn btn-outline"
+                  title="Fill in missing phone numbers from saved contacts (matched by name)"
+                  onClick={() => confirmed('backfill phones from contacts', onBackfillPhones)}>
             📋 Backfill phones
           </button>
         )}
 
+        <input ref={fileInputRef} type="file" accept=".csv" style={{ display: 'none' }}
+               onChange={e => {
+                 const f = e.target.files[0];
+                 if (f) {
+                   importCSV(f).then(onImport).catch(err => {
+                     console.error('Import failed:', err);
+                     alert(`Import error: ${err.message}`);
+                   });
+                 }
+                 e.target.value = '';
+               }} />
+
         {isUnlocked && (
-          <label className="btn btn-outline" style={{ cursor: 'pointer' }}>
+          <button className="btn btn-outline"
+                  onClick={() => confirmed('import CSV', () => fileInputRef.current?.click())}>
             📂 Import CSV
-            <input type="file" accept=".csv" style={{ display: 'none' }}
-                   onChange={e => {
-                     const f = e.target.files[0];
-                     if (f) {
-                       importCSV(f).then(onImport).catch(err => {
-                         console.error('Import failed:', err);
-                         alert(`Import error: ${err.message}`);
-                       });
-                     }
-                     e.target.value = '';
-                   }} />
-          </label>
+          </button>
         )}
-        <button className="btn btn-primary" onClick={() => exportCSV(entries, settings.payoutSettings)}>💾 Export CSV</button>
-        <button className="btn btn-outline" onClick={() => exportHTML(sorted, 'Summer Slam Roster')}>📄 Export HTML</button>
-        {isUnlocked && <button className="btn btn-outline" onClick={onArchive}>🗂️ Archive Year</button>}
-        {isUnlocked && <button className="btn btn-danger" onClick={onClearAll}>🗑️ Clear All</button>}
+        <button className="btn btn-primary"
+                onClick={() => confirmed('export CSV', () => exportCSV(entries, settings.payoutSettings))}>
+          💾 Export CSV
+        </button>
+        <button className="btn btn-outline"
+                onClick={() => confirmed('export HTML', () => exportHTML(sorted, 'Summer Slam Roster'))}>
+          📄 Export HTML
+        </button>
+        {isUnlocked && (
+          <button className="btn btn-outline"
+                  onClick={() => confirmed('archive year', onArchive)}>
+            🗂️ Archive Year
+          </button>
+        )}
+        {isUnlocked && (
+          <button className="btn btn-danger"
+                  onClick={() => confirmed('clear all entries', onClearAll)}>
+            🗑️ Clear All
+          </button>
+        )}
       </div>
 
       <div className="table-wrapper">
@@ -488,6 +514,14 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
           </>
         );
       })()}
+
+      {confirmAction && (
+        <ConfirmActionModal
+          label={confirmAction.label}
+          onConfirm={() => { confirmAction.action(); setConfirmAction(null); }}
+          onCancel={() => setConfirmAction(null)}
+        />
+      )}
     </div>
   );
 }
