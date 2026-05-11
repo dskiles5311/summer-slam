@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect } from 'react';
 import { calcWeightedPayouts } from '../utils/calculations';
 import { exportCSV, importCSV } from '../utils/csv';
 
@@ -13,7 +13,6 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   const [minPayout, setMinPayout]           = useState(payoutSettings.minPayout   || 250);
   const [payouts, setPayouts]               = useState(payoutSettings.payouts      || []);
   const [rawInputs, setRawInputs]           = useState(() => (payoutSettings.payouts || []).map(v => String(v || 0)));
-  const [rowErrors, setRowErrors]           = useState([]);
   const [localFees, setLocalFees]           = useState(fees);
   const [localPenalties, setLocalPenalties] = useState(penalties);
   const [showLog, setShowLog]               = useState(false);
@@ -68,53 +67,9 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
     return arr;
   }
 
-  // Builds the distribution for positions below the edited row using a cascade cap:
-  // each position receives min(its_natural_weighted_amount, the_position_above_it).
-  // This guarantees strict monotonic ordering regardless of how large the budget is
-  // relative to the ceiling. Winner count contracts when budget can't sustain the floor
-  // for all minCount positions, and expands when budget remains after all positions are
-  // filled and the floor would still be met by one more position.
-  function redistributeBelow(budget, minCount, maxFirst, floor) {
-    if (budget <= 0 || minCount <= 0) return { dist: [], count: 0 };
-
-    const results = [];
-    let remaining = budget;
-    let ceiling = maxFirst > 0 ? maxFirst : Infinity;
-    // Start with floor-constrained count (contraction); expand later if budget allows
-    let targetCount = floor > 0
-      ? Math.max(1, Math.min(minCount, Math.floor(budget / floor)))
-      : minCount;
-
-    for (let i = 0; remaining > 0; i++) {
-      // After filling targetCount, expand by one if remaining budget meets the floor
-      if (i >= targetCount) {
-        if (floor > 0 && remaining >= floor) targetCount++;
-        else break;
-      }
-
-      // How many positions are left, capped by what floor can support from remaining budget
-      const posLeft = Math.max(1, Math.min(
-        targetCount - i,
-        floor > 0 ? Math.floor(remaining / floor) : targetCount - i
-      ));
-
-      const natural = calcWithMin(remaining, posLeft, floor)[0];
-      const amt = isFinite(ceiling) ? Math.min(natural, ceiling) : natural;
-
-      if (amt <= 0) break;
-
-      results.push(amt);
-      remaining -= amt;
-      ceiling = amt; // Next position must be <= this one
-    }
-
-    return { dist: results, count: results.length };
-  }
-
   function syncPayouts(next, n = numWinners, min = minPayout) {
     setPayouts(next);
     setRawInputs(Array.from({ length: n }, (_, i) => String(next[i] || 0)));
-    setRowErrors([]);
     onUpdateSettings({ payoutSettings: { totalPayout, numWinners: n, minPayout: min, payouts: next } });
   }
 
@@ -126,12 +81,8 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
     const n = Math.max(1, parseInt(numWinners) || 1);
     setNumWinners(n);
     if (n === payoutSettings.numWinners) return;
-    // If payouts already exist, recalculate the whole distribution so the
-    // minimum floor is preserved for the new last position.
-    const hasPayouts = payouts.some(p => p > 0);
-    const next = hasPayouts
-      ? calcWithMin(totalPayout, n, minPayout)
-      : Array.from({ length: n }, (_, i) => payouts[i] || 0);
+    // Trim or pad with zeros — preserve existing values, don't redistribute
+    const next = Array.from({ length: n }, (_, i) => payouts[i] || 0);
     syncPayouts(next, n);
   }
 
@@ -162,47 +113,15 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
     const updated = [...rawInputs];
     updated[i] = val;
     setRawInputs(updated);
-    if (rowErrors[i]) {
-      const errs = [...rowErrors];
-      errs[i] = null;
-      setRowErrors(errs);
-    }
   }
 
   function handleInputBlur(i) {
     const evaluated = evalExpr(rawInputs[i]);
-
-    // Positions above this row are locked
-    const lockedAbove = payouts.slice(0, i).reduce((s, v) => s + (v || 0), 0);
-    const remainingForThisAndBelow = Math.max(0, totalPayout - lockedAbove);
-    const capped = Math.max(0, Math.min(evaluated, remainingForThisAndBelow));
-
-    const belowBudget = remainingForThisAndBelow - capped;
-    const minBelowCount = numWinners - i - 1;
-
-    // Redistribute below — may expand winner count to keep positions monotonically decreasing
-    let finalBelow, finalBelowCount;
-    if (minBelowCount <= 0 || belowBudget <= 0) {
-      finalBelow = Array(Math.max(0, minBelowCount)).fill(0);
-      finalBelowCount = Math.max(0, minBelowCount);
-    } else {
-      const result = redistributeBelow(belowBudget, minBelowCount, capped, minPayout);
-      finalBelow = result.dist;
-      finalBelowCount = result.count;
-    }
-
-    const newNumWinners = i + 1 + finalBelowCount;
-    const updated = [...payouts.slice(0, i), capped, ...finalBelow];
-
-    setNumWinners(newNumWinners);
+    const updated = [...payouts];
+    updated[i] = evaluated;
     setPayouts(updated);
-    setRawInputs(Array.from({ length: newNumWinners }, (_, j) => String(updated[j] || 0)));
-    const errs = Array(newNumWinners).fill(null);
-    if (evaluated > remainingForThisAndBelow) {
-      errs[i] = `Exceeds remaining balance — capped at $${remainingForThisAndBelow.toLocaleString()}`;
-    }
-    setRowErrors(errs);
-    onUpdateSettings({ payoutSettings: { totalPayout, numWinners: newNumWinners, minPayout, payouts: updated } });
+    setRawInputs(updated.map(String));
+    onUpdateSettings({ payoutSettings: { totalPayout, numWinners, minPayout, payouts: updated } });
   }
 
   const rowTotal = payouts.reduce((a, b) => a + (b || 0), 0);
@@ -280,39 +199,29 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
                     const pct = totalPayout > 0 ? ((amt / totalPayout) * 100).toFixed(1) : '0.0';
                     const runningBalance = totalPayout - payouts.slice(0, i + 1).reduce((s, v) => s + (v || 0), 0);
                     const balColor = runningBalance === 0 ? '#4CAF50' : runningBalance < 0 ? '#ff6b6b' : 'var(--header-bg)';
-                    const err = rowErrors[i];
                     return (
-                      <Fragment key={i}>
-                        <tr style={{ borderBottom: err ? 'none' : '1px solid rgba(139,180,225,0.08)' }}>
-                          <td style={{ padding: '5px 8px', color: 'var(--header-bg)', fontWeight: 600 }}>{placeLabel(i)}</td>
-                          <td style={{ padding: '5px 8px', textAlign: 'right' }}>
-                            <span style={{ color: 'var(--header-bg)', marginRight: 2 }}>$</span>
-                            <input
-                              type="text"
-                              inputMode="numeric"
-                              value={rawInputs[i] ?? String(amt)}
-                              disabled={locked}
-                              onChange={e => handleInputChange(i, e.target.value)}
-                              onBlur={() => handleInputBlur(i)}
-                              onKeyDown={e => { if (e.key === 'Enter') { e.target.blur(); } }}
-                              onFocus={e => e.target.select()}
-                              placeholder="0 or 100+50"
-                              style={{ width: 110, padding: '4px 6px', background: err ? 'rgba(255,107,107,0.12)' : 'rgba(255,255,255,0.08)', border: `1px solid ${err ? '#ff6b6b' : 'rgba(139,180,225,0.3)'}`, borderRadius: 5, color: 'var(--white)', fontSize: 13, textAlign: 'right', fontWeight: 600 }}
-                            />
-                          </td>
-                          <td style={{ padding: '5px 8px', textAlign: 'right', color: 'var(--header-bg)', fontSize: 12 }}>{pct}%</td>
-                          <td style={{ padding: '5px 8px', textAlign: 'right', fontSize: 12, fontWeight: 600, color: balColor }}>
-                            ${runningBalance.toLocaleString()}
-                          </td>
-                        </tr>
-                        {err && (
-                          <tr key={`err-${i}`} style={{ borderBottom: '1px solid rgba(139,180,225,0.08)' }}>
-                            <td colSpan={4} style={{ padding: '2px 8px 6px', color: '#ff6b6b', fontSize: 11, fontWeight: 600 }}>
-                              ⚠ {err}
-                            </td>
-                          </tr>
-                        )}
-                      </Fragment>
+                      <tr key={i} style={{ borderBottom: '1px solid rgba(139,180,225,0.08)' }}>
+                        <td style={{ padding: '5px 8px', color: 'var(--header-bg)', fontWeight: 600 }}>{placeLabel(i)}</td>
+                        <td style={{ padding: '5px 8px', textAlign: 'right' }}>
+                          <span style={{ color: 'var(--header-bg)', marginRight: 2 }}>$</span>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={rawInputs[i] ?? String(amt)}
+                            disabled={locked}
+                            onChange={e => handleInputChange(i, e.target.value)}
+                            onBlur={() => handleInputBlur(i)}
+                            onKeyDown={e => { if (e.key === 'Enter') { e.target.blur(); } }}
+                            onFocus={e => e.target.select()}
+                            placeholder="0 or 100+50"
+                            style={{ width: 110, padding: '4px 6px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(139,180,225,0.3)', borderRadius: 5, color: 'var(--white)', fontSize: 13, textAlign: 'right', fontWeight: 600 }}
+                          />
+                        </td>
+                        <td style={{ padding: '5px 8px', textAlign: 'right', color: 'var(--header-bg)', fontSize: 12 }}>{pct}%</td>
+                        <td style={{ padding: '5px 8px', textAlign: 'right', fontSize: 12, fontWeight: 600, color: balColor }}>
+                          ${runningBalance.toLocaleString()}
+                        </td>
+                      </tr>
                     );
                   })}
                 </tbody>
