@@ -112,6 +112,8 @@ export default function App() {
 
   const settingsSavePendingRef = useRef(0);
 
+  const pollInterval = isUnlocked ? 500 : 5000;
+
   useEffect(() => {
     let timer;
     async function poll() {
@@ -129,11 +131,11 @@ export default function App() {
           setSettings(prev => JSON.stringify(prev) !== JSON.stringify(merged) ? merged : prev);
         }
       } catch { /* silently skip if fetch fails */ }
-      timer = setTimeout(poll, 500);
+      timer = setTimeout(poll, pollInterval);
     }
-    timer = setTimeout(poll, 1000);
+    timer = setTimeout(poll, pollInterval);
     return () => clearTimeout(timer);
-  }, []);
+  }, [pollInterval]);
 
   async function handleUnlock(password) {
     await verifyPassword(password);
