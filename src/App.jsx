@@ -112,7 +112,7 @@ export default function App() {
 
   const settingsSavePendingRef = useRef(0);
 
-  const pollInterval = isUnlocked ? 750 : 5000;
+  const pollInterval = isUnlocked ? 750 : 2000;
 
   useEffect(() => {
     let timer;
