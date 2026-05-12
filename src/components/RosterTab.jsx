@@ -75,6 +75,10 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
     );
   }, [sorted, filter]);
 
+  const registeredCount = useMemo(() =>
+    entries.filter(e => (e.paid === 1 || e.paid === '1') && (e.appSigned === 1 || e.appSigned === '1')).length
+  , [entries]);
+
   const duplicateBoatNos = useMemo(() => {
     const counts = {};
     entries.forEach(e => { if (e.boatNo) counts[e.boatNo] = (counts[e.boatNo] || 0) + 1; });
@@ -155,8 +159,9 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
         {isUnlocked && <button className="btn btn-gold" onClick={onAdd}>+ Add Entry</button>}
 
         <span style={{ fontSize: 13, color: 'var(--header-bg)' }}>
-          <strong style={{ color: 'var(--gold-light)' }}>{displayed.length}</strong>
-          {filter ? ` of ${sorted.length}` : ''} entries
+          <strong style={{ color: 'var(--gold-light)' }}>{registeredCount}</strong>
+          {` / ${entries.length} registered`}
+          {filter && <span style={{ opacity: 0.65 }}>{` (${displayed.length} shown)`}</span>}
         </span>
 
         <div style={{ flex: 1 }} />
