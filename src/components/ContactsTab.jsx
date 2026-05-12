@@ -14,6 +14,13 @@ const FIELD_STYLE = {
   outline: 'none',
 };
 
+function formatLastSeen(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts.includes('T') ? ts : ts.replace(' ', 'T') + 'Z');
+  if (isNaN(d)) return '—';
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 function csvEscape(val) {
   if (!val) return '';
   if (val.includes(',') || val.includes('"') || val.includes('\n'))
@@ -255,9 +262,16 @@ export default function ContactsTab({ isUnlocked, contacts, contactsLoading, onC
       return `${c.firstName} ${c.lastName} ${c.phone} ${c.email}`.toLowerCase().includes(q);
     })
     .sort((a, b) => {
-      const av = sortKey === 'firstName' ? a.firstName : a.lastName;
-      const bv = sortKey === 'firstName' ? b.firstName : b.lastName;
-      const cmp = av.localeCompare(bv);
+      let cmp;
+      if (sortKey === 'lastSeen') {
+        const av = a.lastSeen || '';
+        const bv = b.lastSeen || '';
+        cmp = av < bv ? -1 : av > bv ? 1 : 0;
+      } else {
+        const av = sortKey === 'firstName' ? a.firstName : a.lastName;
+        const bv = sortKey === 'firstName' ? b.firstName : b.lastName;
+        cmp = av.localeCompare(bv);
+      }
       return sortDir === 'asc' ? cmp : -cmp;
     });
 
@@ -401,10 +415,11 @@ export default function ContactsTab({ isUnlocked, contacts, contactsLoading, onC
           <thead>
             <tr>
               {[
-                { key: 'firstName', label: 'First Name', width: '20%' },
-                { key: 'lastName',  label: 'Last Name',  width: '18%' },
-              ].map(({ key, label, width }) => (
-                <th key={key} style={{ width, cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
+                { key: 'firstName', label: 'First Name', width: '18%' },
+                { key: 'lastName',  label: 'Last Name',  width: '16%' },
+                { key: 'lastSeen',  label: 'Last Seen',  width: '13%', className: 'col-last-seen' },
+              ].map(({ key, label, width, className }) => (
+                <th key={key} className={className} style={{ width, cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
                     onClick={() => toggleSort(key)}>
                   {label}
                   <span style={{ marginLeft: 5, opacity: sortKey === key ? 1 : 0.3, fontSize: 11 }}>
@@ -412,22 +427,25 @@ export default function ContactsTab({ isUnlocked, contacts, contactsLoading, onC
                   </span>
                 </th>
               ))}
-              <th style={{ width: '25%' }}>Phone</th>
-              <th className="col-email" style={{ width: '25%' }}>Email</th>
-              {isUnlocked && <th style={{ width: 100, textAlign: 'center' }}>Actions</th>}
+              <th style={{ width: '22%' }}>Phone</th>
+              <th className="col-email" style={{ width: '22%' }}>Email</th>
+              {isUnlocked && <th style={{ width: 90, textAlign: 'center' }}>Actions</th>}
             </tr>
           </thead>
           <tbody>
             {contactsLoading ? (
-              <tr><td colSpan={isUnlocked ? 5 : 4} style={{ textAlign: 'center', color: 'var(--header-bg)', padding: 40 }}>Loading…</td></tr>
+              <tr><td colSpan={isUnlocked ? 6 : 5} style={{ textAlign: 'center', color: 'var(--header-bg)', padding: 40 }}>Loading…</td></tr>
             ) : displayed.length === 0 ? (
-              <tr><td colSpan={isUnlocked ? 5 : 4} style={{ textAlign: 'center', color: 'var(--header-bg)', padding: 40 }}>
+              <tr><td colSpan={isUnlocked ? 6 : 5} style={{ textAlign: 'center', color: 'var(--header-bg)', padding: 40 }}>
                 {filter ? 'No contacts match your filter.' : 'No contacts yet — they are saved automatically when signing up anglers.'}
               </td></tr>
             ) : displayed.map(c => (
               <tr key={c.id}>
                 <td style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.firstName}</td>
                 <td style={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.lastName}</td>
+                <td className="col-last-seen" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 12, color: 'var(--header-bg)' }}>
+                  {formatLastSeen(c.lastSeen)}
+                </td>
                 <td style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {c.phone
                     ? <a href={`tel:${c.phone}`} style={{ color: 'var(--water-light)', textDecoration: 'none' }}>{formatPhone(c.phone)}</a>

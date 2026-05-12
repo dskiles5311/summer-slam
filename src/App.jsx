@@ -184,8 +184,12 @@ export default function App() {
         const updated = await updateEntry(editingEntry.id, entryData);
         setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
         upsertContacts([
-          { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone,   email: entryData.boaterEmail   },
-          { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone, email: entryData.coAnglerEmail },
+          { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone,   email: entryData.boaterEmail,
+            ...(editingEntry.boaterFirst !== entryData.boaterFirst || editingEntry.boaterLast !== entryData.boaterLast
+              ? { oldFirstName: editingEntry.boaterFirst, oldLastName: editingEntry.boaterLast } : {}) },
+          { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone, email: entryData.coAnglerEmail,
+            ...(editingEntry.coAnglerFirst !== entryData.coAnglerFirst || editingEntry.coAnglerLast !== entryData.coAnglerLast
+              ? { oldFirstName: editingEntry.coAnglerFirst, oldLastName: editingEntry.coAnglerLast } : {}) },
         ]).then(refreshContacts).catch(() => {});
       } catch {
         setEntries(prevEntries);
@@ -315,8 +319,12 @@ export default function App() {
       const updated = await updateEntry(entryId, { ...entry, ...updates, preserveWeighTime: true });
       setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
       upsertContacts([
-        { firstName: updated.boaterFirst,   lastName: updated.boaterLast,   phone: updated.boaterPhone,   email: updated.boaterEmail   },
-        { firstName: updated.coAnglerFirst, lastName: updated.coAnglerLast, phone: updated.coAnglerPhone, email: updated.coAnglerEmail },
+        { firstName: updated.boaterFirst,   lastName: updated.boaterLast,   phone: updated.boaterPhone,   email: updated.boaterEmail,
+          ...(entry.boaterFirst !== updated.boaterFirst || entry.boaterLast !== updated.boaterLast
+            ? { oldFirstName: entry.boaterFirst, oldLastName: entry.boaterLast } : {}) },
+        { firstName: updated.coAnglerFirst, lastName: updated.coAnglerLast, phone: updated.coAnglerPhone, email: updated.coAnglerEmail,
+          ...(entry.coAnglerFirst !== updated.coAnglerFirst || entry.coAnglerLast !== updated.coAnglerLast
+            ? { oldFirstName: entry.coAnglerFirst, oldLastName: entry.coAnglerLast } : {}) },
       ]).then(refreshContacts).catch(() => {});
     } catch {
       setEntries(prevEntries);

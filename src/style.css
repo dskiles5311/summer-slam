@@ -672,6 +672,7 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
   .lb-payout .val { font-size: 20px; }
   .lb-payout .lbl { font-size: 11px; }
   .contacts-table .col-email { display: none; }
+  .contacts-table .col-last-seen { display: none; }
 
   .logo-icon { width: 56px; height: 56px; }
 

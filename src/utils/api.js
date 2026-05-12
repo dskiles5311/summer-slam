@@ -227,7 +227,7 @@ export async function upsertContacts(people) {
     fetchWithTimeout(`${BASE}/contacts`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify({ firstName: p.firstName, lastName: p.lastName, phone: p.phone || '', email: p.email || '' }),
+      body: JSON.stringify({ firstName: p.firstName, lastName: p.lastName, phone: p.phone || '', email: p.email || '', ...(p.oldFirstName ? { oldFirstName: p.oldFirstName, oldLastName: p.oldLastName } : {}) }),
     }).catch(() => {})
   ));
 }
