@@ -183,6 +183,15 @@ export async function backfillPhones() {
   return res.json();
 }
 
+export async function normalizePhones() {
+  const res = await fetch(`${BASE}/entries/normalize-phones`, {
+    method: 'POST',
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new Error('Failed to normalize phones');
+  return res.json();
+}
+
 export async function clearAllEntries() {
   const res = await fetch(`${BASE}/entries`, {
     method: 'DELETE',

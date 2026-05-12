@@ -114,21 +114,20 @@ export default function EditModal({ entry, onSave, onCancel }) {
             <div className="edit-grid-2">
               <div className="form-field">
                 <label>Boater First{isNew ? ' *' : ''}</label>
-                <ContactSuggest
-                  value={form.boaterFirst}
-                  placeholder="First"
-                  inputRef={firstInputRef}
-                  onChange={v => set('boaterFirst', v)}
-                  onSelect={c => setForm(prev => ({ ...prev, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || prev.boaterEmail }))}
-                  inputProps={{ style: errBorder('boaterFirst') }}
-                />
+                <input ref={firstInputRef} type="text" value={form.boaterFirst} placeholder="First"
+                       onChange={e => set('boaterFirst', e.target.value)}
+                       style={errBorder('boaterFirst')} />
                 {err('boaterFirst')}
               </div>
               <div className="form-field">
                 <label>Boater Last{isNew ? ' *' : ''}</label>
-                <input type="text" value={form.boaterLast} placeholder="Last"
-                       onChange={e => set('boaterLast', e.target.value)}
-                       style={errBorder('boaterLast')} />
+                <ContactSuggest
+                  value={form.boaterLast}
+                  placeholder="Last"
+                  onChange={v => set('boaterLast', v)}
+                  onSelect={c => setForm(prev => ({ ...prev, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || prev.boaterEmail }))}
+                  inputProps={{ style: errBorder('boaterLast') }}
+                />
                 {err('boaterLast')}
               </div>
               <div className="form-field">
@@ -146,17 +145,17 @@ export default function EditModal({ entry, onSave, onCancel }) {
               </div>
               <div className="form-field">
                 <label>Co-Angler First</label>
-                <ContactSuggest
-                  value={form.coAnglerFirst}
-                  placeholder="First"
-                  onChange={v => set('coAnglerFirst', v)}
-                  onSelect={c => setForm(prev => ({ ...prev, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || prev.coAnglerEmail }))}
-                />
+                <input type="text" value={form.coAnglerFirst} placeholder="First"
+                       onChange={e => set('coAnglerFirst', e.target.value)} />
               </div>
               <div className="form-field">
                 <label>Co-Angler Last</label>
-                <input type="text" value={form.coAnglerLast} placeholder="Last"
-                       onChange={e => set('coAnglerLast', e.target.value)} />
+                <ContactSuggest
+                  value={form.coAnglerLast}
+                  placeholder="Last"
+                  onChange={v => set('coAnglerLast', v)}
+                  onSelect={c => setForm(prev => ({ ...prev, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || prev.coAnglerEmail }))}
+                />
               </div>
               <div className="form-field">
                 <label>Co-Angler Phone{isNew && (form.coAnglerFirst || form.coAnglerLast) ? ' *' : ''}</label>

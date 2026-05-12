@@ -122,14 +122,9 @@ export default function SignUpTab({ onAddEntry }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
             <div>
               <label style={LABEL}>First Name *</label>
-              <ContactSuggest
-                value={form.boaterFirst}
-                placeholder="First"
-                inputRef={boaterFirstRef}
-                onChange={v => set('boaterFirst', v)}
-                onSelect={c => setForm(p => ({ ...p, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || p.boaterEmail }))}
-                inputProps={{ style: fieldBorder('boaterFirst') }}
-              />
+              <input ref={boaterFirstRef} type="text" value={form.boaterFirst} placeholder="First"
+                     onChange={e => set('boaterFirst', e.target.value)}
+                     style={fieldBorder('boaterFirst')} />
               {err('boaterFirst')}
             </div>
             <div>
@@ -169,13 +164,9 @@ export default function SignUpTab({ onAddEntry }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
             <div>
               <label style={LABEL}>First Name</label>
-              <ContactSuggest
-                value={form.coAnglerFirst}
-                placeholder="First"
-                onChange={v => set('coAnglerFirst', v)}
-                onSelect={c => setForm(p => ({ ...p, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || p.coAnglerEmail }))}
-                inputProps={{ style: fieldBorder('coAnglerFirst') }}
-              />
+              <input type="text" value={form.coAnglerFirst} placeholder="First"
+                     onChange={e => set('coAnglerFirst', e.target.value)}
+                     style={fieldBorder('coAnglerFirst')} />
               {err('coAnglerFirst')}
             </div>
             <div>

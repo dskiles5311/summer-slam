@@ -17,7 +17,7 @@ import {
   fetchEntries, createEntry, updateEntry, deleteEntry,
   fetchSettings, saveSettings, verifyPassword, storePassword, clearPassword, isPasswordStored, revalidatePassword,
   upsertContacts, fetchContacts, updateContact, deleteContact,
-  clearWeighLog, archiveEntries, backfillPhones,
+  clearWeighLog, archiveEntries, backfillPhones, normalizePhones,
   clearAllEntries, createEntriesBulk,
 } from './utils/api';
 import { calcRanks } from './utils/calculations';
@@ -451,6 +451,21 @@ export default function App() {
     }
   }
 
+  async function handleNormalizePhones() {
+    try {
+      const result = await normalizePhones();
+      const refreshed = await fetchEntries();
+      setEntries(refreshed);
+      if (result.total === 0) {
+        showToast('All phone numbers already formatted', 'info');
+      } else {
+        showToast(`Normalized ${result.total} phone number${result.total !== 1 ? 's' : ''} (${result.entriesUpdated} entries, ${result.contactsUpdated} contacts)`, 'success');
+      }
+    } catch {
+      showToast('Failed to normalize phones', 'error');
+    }
+  }
+
   async function handleImport(newEntries) {
     try {
       await createEntriesBulk(newEntries);
@@ -510,6 +525,7 @@ export default function App() {
             onClearDeductions={handleClearDeductions}
             onArchive={handleArchive}
             onBackfillPhones={handleBackfillPhones}
+            onNormalizePhones={handleNormalizePhones}
           />
         </div>
         <div style={{ display: activeTab === 'leaderboard' ? '' : 'none' }}>

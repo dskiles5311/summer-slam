@@ -34,7 +34,7 @@ export default function ContactSuggest({ value, placeholder, onChange, onSelect,
   const wrapRef = useRef(null);
 
   useEffect(() => {
-    if (value.length < 2) { setSuggestions([]); setOpen(false); return; }
+    if (value.length < 3) { setSuggestions([]); setOpen(false); return; }
     clearTimeout(timer.current);
     timer.current = setTimeout(async () => {
       const results = await searchContacts(value);
@@ -66,6 +66,10 @@ export default function ContactSuggest({ value, placeholder, onChange, onSelect,
     setActive(-1);
   }
 
+  function handleBlur() {
+    setTimeout(() => { setOpen(false); setActive(-1); }, 150);
+  }
+
   return (
     <div ref={wrapRef} style={{ position: 'relative' }}>
       <input
@@ -75,6 +79,7 @@ export default function ContactSuggest({ value, placeholder, onChange, onSelect,
         placeholder={placeholder}
         onChange={e => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
+        onBlur={handleBlur}
         autoComplete="off"
         {...inputProps}
       />
