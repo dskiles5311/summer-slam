@@ -11,6 +11,32 @@ const EMPTY = {
   rawWeight: null, deadFish: 0, shortFish: 0,
 };
 
+function ToggleButton({ value, onChange }) {
+  const isYes = value === 1 || value === '1';
+  const isNo  = value === 0 || value === '0';
+  function next() {
+    if (isYes) onChange(0);
+    else if (isNo) onChange('');
+    else onChange(1);
+  }
+  return (
+    <button
+      type="button"
+      onClick={next}
+      style={{
+        width: '100%', boxSizing: 'border-box',
+        padding: '9px 14px', borderRadius: 8, cursor: 'pointer',
+        fontSize: 14, fontWeight: 700,
+        border: `1px solid ${isYes ? 'rgba(76,175,80,0.5)' : isNo ? 'rgba(255,107,107,0.5)' : 'rgba(139,180,225,0.3)'}`,
+        background: isYes ? 'rgba(76,175,80,0.15)' : isNo ? 'rgba(255,107,107,0.15)' : 'rgba(255,255,255,0.06)',
+        color: isYes ? '#4CAF50' : isNo ? '#ff6b6b' : 'var(--header-bg)',
+      }}
+    >
+      {isYes ? '✓ Yes' : isNo ? '✗ No' : '—'}
+    </button>
+  );
+}
+
 export default function EditModal({ entry, onSave, onCancel }) {
   const [form, setForm] = useState({ ...EMPTY });
   const [errors, setErrors] = useState({});
@@ -220,38 +246,17 @@ export default function EditModal({ entry, onSave, onCancel }) {
 
             <div className="edit-section-label">Payment &amp; Status</div>
             <div className="edit-grid-4">
-              <div className="form-field">
-                <label>Lunker Paid</label>
-                <select value={form.lunker} onChange={e => set('lunker', e.target.value)}>
-                  <option value="">—</option>
-                  <option value="1">Yes</option>
-                  <option value="0">No</option>
-                </select>
-              </div>
-              <div className="form-field">
-                <label>Option Paid</label>
-                <select value={form.option} onChange={e => set('option', e.target.value)}>
-                  <option value="">—</option>
-                  <option value="1">Yes</option>
-                  <option value="0">No</option>
-                </select>
-              </div>
-              <div className="form-field">
-                <label>Entry Paid</label>
-                <select value={form.paid} onChange={e => set('paid', e.target.value)}>
-                  <option value="">—</option>
-                  <option value="1">Yes</option>
-                  <option value="0">No</option>
-                </select>
-              </div>
-              <div className="form-field">
-                <label>App Signed</label>
-                <select value={form.appSigned} onChange={e => set('appSigned', e.target.value)}>
-                  <option value="">—</option>
-                  <option value="1">Yes</option>
-                  <option value="0">No</option>
-                </select>
-              </div>
+              {[
+                { key: 'lunker',    label: 'Lunker Paid' },
+                { key: 'option',    label: 'Option Paid' },
+                { key: 'paid',      label: 'Entry Paid'  },
+                { key: 'appSigned', label: 'App Signed'  },
+              ].map(({ key, label }) => (
+                <div key={key} className="form-field">
+                  <label>{label}</label>
+                  <ToggleButton value={form[key]} onChange={v => set(key, v)} />
+                </div>
+              ))}
             </div>
 
             {form.needsAttention && (

@@ -45,6 +45,32 @@ const EMPTY = {
   lunker: '', option: '', paid: '', appSigned: '', buyIn: '',
 };
 
+function ToggleButton({ value, onChange }) {
+  const isYes = value === 1 || value === '1';
+  const isNo  = value === 0 || value === '0';
+  function next() {
+    if (isYes) onChange(0);
+    else if (isNo) onChange('');
+    else onChange(1);
+  }
+  return (
+    <button
+      type="button"
+      onClick={next}
+      style={{
+        width: '100%', minHeight: 44, boxSizing: 'border-box',
+        padding: '10px 14px', borderRadius: 8, cursor: 'pointer',
+        fontSize: 15, fontWeight: 700,
+        border: `1px solid ${isYes ? 'rgba(76,175,80,0.5)' : isNo ? 'rgba(255,107,107,0.5)' : 'rgba(139,180,225,0.3)'}`,
+        background: isYes ? 'rgba(76,175,80,0.15)' : isNo ? 'rgba(255,107,107,0.15)' : 'rgba(255,255,255,0.06)',
+        color: isYes ? '#4CAF50' : isNo ? '#ff6b6b' : 'var(--header-bg)',
+      }}
+    >
+      {isYes ? '✓ Yes' : isNo ? '✗ No' : '—'}
+    </button>
+  );
+}
+
 export default function SignUpTab({ onAddEntry }) {
   const [form, setForm]         = useState({ ...EMPTY });
   const [errors, setErrors]     = useState({});
@@ -223,15 +249,7 @@ export default function SignUpTab({ onAddEntry }) {
             ].map(({ key, label }) => (
               <div key={key}>
                 <label style={LABEL}>{label}</label>
-                <select
-                  value={form[key]}
-                  onChange={e => set(key, e.target.value)}
-                  style={{ ...FIELD, fontSize: 14, WebkitAppearance: 'none', appearance: 'none', cursor: 'pointer' }}
-                >
-                  <option value="">—</option>
-                  <option value="1">Yes</option>
-                  <option value="0">No</option>
-                </select>
+                <ToggleButton value={form[key]} onChange={v => set(key, v)} />
               </div>
             ))}
           </div>
