@@ -197,7 +197,8 @@ export default function CheckInTab({ entries, onSave }) {
 
                 {/* Expanded card */}
                 {isOpen && (
-                  <div style={{ padding: '10px 12px 12px', borderTop: '1px solid rgba(168,200,160,0.12)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <form onSubmit={e => { e.preventDefault(); handleSave(row); }}
+                    style={{ padding: '10px 12px 12px', borderTop: '1px solid rgba(168,200,160,0.12)', display: 'flex', flexDirection: 'column', gap: 8 }}>
 
                     {/* App not signed alert */}
                     {!isOn(draft.appSigned) && (
@@ -263,14 +264,14 @@ export default function CheckInTab({ entries, onSave }) {
 
                     {/* Actions */}
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <button className="btn btn-primary btn-sm" style={{ flex: 1 }} disabled={saving} onClick={() => handleSave(row)}>
+                      <button type="submit" className="btn btn-primary btn-sm" style={{ flex: 1 }} disabled={saving}>
                         {saving ? 'Saving…' : 'Save'}
                       </button>
-                      <button className="btn btn-outline btn-sm" onClick={() => { setExpandedId(null); setDraft({}); }}>
+                      <button type="button" className="btn btn-outline btn-sm" onClick={() => { setExpandedId(null); setDraft({}); }}>
                         Cancel
                       </button>
                     </div>
-                  </div>
+                  </form>
                 )}
               </div>
             );
