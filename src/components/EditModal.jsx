@@ -83,7 +83,9 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
       const next = { ...prev, [field]: val };
       if (field === 'buyIn') {
         const amount = parseFloat(val);
-        if (!isNaN(amount) && amount >= entryFee) next.paid = 1;
+        if (!isNaN(amount) && amount > 0) {
+          next.paid = amount >= entryFee ? 1 : 0;
+        }
       }
       return next;
     });
