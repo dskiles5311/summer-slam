@@ -44,7 +44,7 @@ export default function App() {
   const [theme, setTheme]               = useState(() => localStorage.getItem('ss_theme') || 'dark');
   const [activeTab, setActiveTab]       = useState(() => 'leaderboard');
   const [loading, setLoading]           = useState(true);
-  const [toast, setToast]               = useState(null);
+  const [toasts, setToasts]             = useState([]);
   const [editingEntry, setEditingEntry] = useState(null);
   const [isUnlocked, setIsUnlocked]     = useState(false);
   const [everUnlocked, setEverUnlocked] = useState(false);
@@ -60,9 +60,11 @@ export default function App() {
   const [showUnlock, setShowUnlock]     = useState(false);
 
   const showToast = useCallback((message, type = 'success') => {
-    setToast({ message, type, id: Date.now() });
+    setToasts(prev => [...prev, { message, type, id: Date.now() + Math.random() }]);
   }, []);
-  const clearToast = useCallback(() => setToast(null), []);
+  const clearToast = useCallback((id) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  }, []);
 
   const rankedEntries = calcRanks(entries);
 
@@ -393,7 +395,7 @@ export default function App() {
 
   async function handleClearWeighLog() {
     const prevEntries = entries;
-    setEntries(prev => prev.map(e => ({ ...e, weighedAt: null })));
+    setEntries(prev => prev.map(e => ({ ...e, weighedAt: null, rawWeight: null, deadFish: 0, shortFish: 0 })));
     showToast('Weigh-in log cleared', 'info');
     try {
       await clearWeighLog();
@@ -654,12 +656,12 @@ export default function App() {
         />
       )}
 
-      {toast && (
+      {toasts[0] && (
         <Toast
-          key={toast.id}
-          message={toast.message}
-          type={toast.type}
-          onDone={clearToast}
+          key={toasts[0].id}
+          message={toasts[0].message}
+          type={toasts[0].type}
+          onDone={() => clearToast(toasts[0].id)}
         />
       )}
     </div>

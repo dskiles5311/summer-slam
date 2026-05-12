@@ -1,6 +1,13 @@
 const BASE = '/api';
 const SESSION_PW_KEY = 'ss_password';
 
+function fetchWithTimeout(url, options = {}, ms = 10000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  return fetch(url, { ...options, signal: controller.signal })
+    .finally(() => clearTimeout(timer));
+}
+
 export function storePassword(pw) { sessionStorage.setItem(SESSION_PW_KEY, pw); }
 export function clearPassword() { sessionStorage.removeItem(SESSION_PW_KEY); }
 export function isPasswordStored() { return !!sessionStorage.getItem(SESSION_PW_KEY); }
@@ -39,7 +46,7 @@ function parseEntry(raw) {
 }
 
 export async function verifyPassword(password) {
-  const res = await fetch(`${BASE}/auth/verify`, {
+  const res = await fetchWithTimeout(`${BASE}/auth/verify`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ password }),
@@ -60,14 +67,14 @@ export async function revalidatePassword() {
 }
 
 export async function fetchEntries() {
-  const res = await fetch(`${BASE}/entries`, { headers: authHeaders() });
+  const res = await fetchWithTimeout(`${BASE}/entries`, { headers: authHeaders() });
   if (!res.ok) throw new Error('Failed to fetch entries');
   const data = await res.json();
   return data.map(parseEntry);
 }
 
 export async function createEntry(entry) {
-  const res = await fetch(`${BASE}/entries`, {
+  const res = await fetchWithTimeout(`${BASE}/entries`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify(entry),
@@ -77,7 +84,7 @@ export async function createEntry(entry) {
 }
 
 export async function updateEntry(id, entry) {
-  const res = await fetch(`${BASE}/entries/${id}`, {
+  const res = await fetchWithTimeout(`${BASE}/entries/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify(entry),
@@ -87,7 +94,7 @@ export async function updateEntry(id, entry) {
 }
 
 export async function deleteEntry(id) {
-  const res = await fetch(`${BASE}/entries/${id}`, {
+  const res = await fetchWithTimeout(`${BASE}/entries/${id}`, {
     method: 'DELETE',
     headers: authHeaders(),
   });
@@ -95,7 +102,7 @@ export async function deleteEntry(id) {
 }
 
 export async function clearWeighLog() {
-  const res = await fetch(`${BASE}/entries/clear-weigh-log`, {
+  const res = await fetchWithTimeout(`${BASE}/entries/clear-weigh-log`, {
     method: 'DELETE',
     headers: authHeaders(),
   });
@@ -103,13 +110,13 @@ export async function clearWeighLog() {
 }
 
 export async function fetchSettings() {
-  const res = await fetch(`${BASE}/settings`);
+  const res = await fetchWithTimeout(`${BASE}/settings`);
   if (!res.ok) throw new Error('Failed to fetch settings');
   return res.json();
 }
 
 export async function saveSettings(updates) {
-  const res = await fetch(`${BASE}/settings`, {
+  const res = await fetchWithTimeout(`${BASE}/settings`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify(updates),
@@ -119,14 +126,14 @@ export async function saveSettings(updates) {
 
 export async function fetchContacts() {
   try {
-    const res = await fetch(`${BASE}/contacts`, { headers: authHeaders() });
+    const res = await fetchWithTimeout(`${BASE}/contacts`, { headers: authHeaders() });
     if (!res.ok) return [];
     return res.json();
   } catch { return []; }
 }
 
 export async function updateContact(id, { phone, email }) {
-  const res = await fetch(`${BASE}/contacts/${id}`, {
+  const res = await fetchWithTimeout(`${BASE}/contacts/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify({ phone, email }),
@@ -136,7 +143,7 @@ export async function updateContact(id, { phone, email }) {
 }
 
 export async function deleteContact(id) {
-  const res = await fetch(`${BASE}/contacts/${id}`, {
+  const res = await fetchWithTimeout(`${BASE}/contacts/${id}`, {
     method: 'DELETE',
     headers: authHeaders(),
   });
@@ -146,26 +153,26 @@ export async function deleteContact(id) {
 export async function searchContacts(q) {
   if (!q || q.length < 2) return [];
   try {
-    const res = await fetch(`${BASE}/contacts?q=${encodeURIComponent(q)}`, { headers: authHeaders() });
+    const res = await fetchWithTimeout(`${BASE}/contacts?q=${encodeURIComponent(q)}`, { headers: authHeaders() });
     if (!res.ok) return [];
     return res.json();
   } catch { return []; }
 }
 
 export async function fetchArchiveYears() {
-  const res = await fetch(`${BASE}/archive`, { headers: authHeaders() });
+  const res = await fetchWithTimeout(`${BASE}/archive`, { headers: authHeaders() });
   if (!res.ok) throw new Error('Failed to fetch archive years');
   return res.json();
 }
 
 export async function fetchArchive(year) {
-  const res = await fetch(`${BASE}/archive/${encodeURIComponent(year)}`, { headers: authHeaders() });
+  const res = await fetchWithTimeout(`${BASE}/archive/${encodeURIComponent(year)}`, { headers: authHeaders() });
   if (!res.ok) throw new Error('Failed to fetch archive');
   return res.json();
 }
 
 export async function archiveEntries(year, entries) {
-  const res = await fetch(`${BASE}/archive`, {
+  const res = await fetchWithTimeout(`${BASE}/archive`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify({ year, entries }),
@@ -175,7 +182,7 @@ export async function archiveEntries(year, entries) {
 }
 
 export async function backfillPhones() {
-  const res = await fetch(`${BASE}/entries/backfill-phones`, {
+  const res = await fetchWithTimeout(`${BASE}/entries/backfill-phones`, {
     method: 'POST',
     headers: authHeaders(),
   });
@@ -184,7 +191,7 @@ export async function backfillPhones() {
 }
 
 export async function normalizePhones() {
-  const res = await fetch(`${BASE}/entries/normalize-phones`, {
+  const res = await fetchWithTimeout(`${BASE}/entries/normalize-phones`, {
     method: 'POST',
     headers: authHeaders(),
   });
@@ -196,7 +203,7 @@ export async function normalizePhones() {
 }
 
 export async function clearAllEntries() {
-  const res = await fetch(`${BASE}/entries`, {
+  const res = await fetchWithTimeout(`${BASE}/entries`, {
     method: 'DELETE',
     headers: authHeaders(),
   });
@@ -204,7 +211,7 @@ export async function clearAllEntries() {
 }
 
 export async function createEntriesBulk(entries) {
-  const res = await fetch(`${BASE}/entries/bulk`, {
+  const res = await fetchWithTimeout(`${BASE}/entries/bulk`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify({ entries }),
@@ -217,7 +224,7 @@ export async function upsertContacts(people) {
   const valid = people.filter(p => p.firstName && p.lastName);
   if (!valid.length) return;
   await Promise.all(valid.map(p =>
-    fetch(`${BASE}/contacts`, {
+    fetchWithTimeout(`${BASE}/contacts`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({ firstName: p.firstName, lastName: p.lastName, phone: p.phone || '', email: p.email || '' }),
