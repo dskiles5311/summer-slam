@@ -70,6 +70,15 @@ header {
   text-transform: uppercase;
 }
 
+.stats-bar {
+  padding: 6px 20px 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.stats-bar::-webkit-scrollbar { display: none; }
+
 .header-stats { display: flex; gap: 16px; }
 
 .stat-chip {
@@ -78,6 +87,7 @@ header {
   border-radius: 8px;
   padding: 6px 14px;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .stat-chip .val {
@@ -641,7 +651,11 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
-  .header-stats { display: none; }
+  .stats-bar { padding: 4px 12px 6px; }
+  .header-stats { gap: 8px; }
+  .stat-chip { padding: 4px 10px; }
+  .stat-chip .val { font-size: 15px; }
+  .stat-chip .lbl { font-size: 9px; }
   .summary-grid-top { grid-template-columns: repeat(3, 1fr); }
   .lb-card { grid-template-columns: 62px 64px 1fr auto auto; gap: 12px; padding: 16px 16px; }
   .lb-rank { font-size: 38px; }

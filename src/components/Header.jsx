@@ -37,6 +37,8 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
             {isUnlocked ? '🔓 Unlocked' : '🔒 Locked'}
           </button>
         </div>
+      </div>
+      <div className="stats-bar">
         <div className="header-stats">
           <div className="stat-chip">
             <span className="val">{stats.totalBoats}</span>
