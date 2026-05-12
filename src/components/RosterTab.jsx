@@ -191,7 +191,7 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
           <button className="btn btn-outline"
                   title="Reformat all phone numbers to xxx-xxx-xxxx"
                   onClick={() => confirmed('normalize all phone numbers to xxx-xxx-xxxx', onNormalizePhones)}>
-            📞 Normalize phones
+            📞 Format phone #'s
           </button>
         )}
 
