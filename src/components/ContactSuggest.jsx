@@ -32,8 +32,10 @@ export default function ContactSuggest({ value, placeholder, onChange, onSelect,
   const [active, setActive] = useState(-1);
   const timer = useRef(null);
   const wrapRef = useRef(null);
+  const justSelected = useRef(false);
 
   useEffect(() => {
+    if (justSelected.current) { justSelected.current = false; return; }
     if (value.length < 3) { setSuggestions([]); setOpen(false); return; }
     clearTimeout(timer.current);
     timer.current = setTimeout(async () => {
@@ -60,6 +62,7 @@ export default function ContactSuggest({ value, placeholder, onChange, onSelect,
   }
 
   function select(contact) {
+    justSelected.current = true;
     onSelect(contact);
     setOpen(false);
     setSuggestions([]);
