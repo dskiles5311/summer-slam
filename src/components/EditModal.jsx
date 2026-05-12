@@ -22,11 +22,11 @@ export default function EditModal({ entry, onSave, onCancel }) {
     setForm({
       boaterFirst:    entry.boaterFirst   ?? '',
       boaterLast:     entry.boaterLast    ?? '',
-      boaterPhone:    entry.boaterPhone   ?? '',
+      boaterPhone:    formatPhone(entry.boaterPhone   ?? ''),
       boaterEmail:    entry.boaterEmail   ?? '',
       coAnglerFirst:  entry.coAnglerFirst ?? '',
       coAnglerLast:   entry.coAnglerLast  ?? '',
-      coAnglerPhone:  entry.coAnglerPhone ?? '',
+      coAnglerPhone:  formatPhone(entry.coAnglerPhone ?? ''),
       coAnglerEmail:  entry.coAnglerEmail ?? '',
       boatNo:         entry.boatNo        ?? '',
       numFish:        entry.numFish       ?? '',
