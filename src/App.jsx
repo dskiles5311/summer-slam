@@ -118,6 +118,7 @@ export default function App() {
   useEffect(() => {
     let timer;
     async function poll() {
+      if (document.hidden) return;
       try {
         const [entriesData, settingsData] = await Promise.all([fetchEntries(), fetchSettings()]);
         setEntries(prev => JSON.stringify(prev) !== JSON.stringify(entriesData) ? entriesData : prev);
@@ -132,10 +133,24 @@ export default function App() {
           setSettings(prev => JSON.stringify(prev) !== JSON.stringify(merged) ? merged : prev);
         }
       } catch { /* silently skip if fetch fails */ }
-      timer = setTimeout(poll, pollInterval);
+      if (!document.hidden) timer = setTimeout(poll, pollInterval);
     }
-    timer = setTimeout(poll, pollInterval);
-    return () => clearTimeout(timer);
+
+    function handleVisibility() {
+      if (!document.hidden) {
+        clearTimeout(timer);
+        poll();
+      } else {
+        clearTimeout(timer);
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    if (!document.hidden) timer = setTimeout(poll, pollInterval);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, [pollInterval]);
 
   async function handleUnlock(password) {
