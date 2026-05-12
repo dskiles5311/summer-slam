@@ -113,7 +113,7 @@ export default function App() {
 
   const settingsSavePendingRef = useRef(0);
 
-  const pollInterval = isUnlocked ? 750 : 2000;
+  const pollInterval = isUnlocked ? 5000 : 10000;
 
   useEffect(() => {
     let timer;
@@ -167,27 +167,40 @@ export default function App() {
   }
 
   async function handleSaveEntry(entryData) {
-    try {
-      const duplicate = entryData.boatNo && entries.some(e =>
-        String(e.boatNo) === String(entryData.boatNo) && e.id !== editingEntry?.id
-      );
+    const duplicate = entryData.boatNo && entries.some(e =>
+      String(e.boatNo) === String(entryData.boatNo) && e.id !== editingEntry?.id
+    );
 
-      if (editingEntry?.id) {
+    if (editingEntry?.id) {
+      const prevEntries = entries;
+      setEntries(prev => prev.map(e => e.id === editingEntry.id ? { ...e, ...entryData } : e));
+      setEditingEntry(null);
+      showToast(duplicate ? `Warning: Boat #${entryData.boatNo} is already in use!` : 'Entry saved!', duplicate ? 'warning' : 'success');
+      try {
         const updated = await updateEntry(editingEntry.id, entryData);
         setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
-        showToast(duplicate ? `Warning: Boat #${entryData.boatNo} is already in use!` : 'Entry saved!', duplicate ? 'warning' : 'success');
-      } else {
+        upsertContacts([
+          { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone,   email: entryData.boaterEmail   },
+          { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone, email: entryData.coAnglerEmail },
+        ]).then(refreshContacts).catch(() => {});
+      } catch {
+        setEntries(prevEntries);
+        setEditingEntry(editingEntry);
+        showToast('Failed to save entry', 'error');
+      }
+    } else {
+      try {
         const created = await createEntry(entryData);
         setEntries(prev => [...prev, created]);
+        setEditingEntry(null);
         showToast(duplicate ? `Warning: Boat #${entryData.boatNo} is already in use!` : 'Entry added!', duplicate ? 'warning' : 'success');
+        upsertContacts([
+          { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone,   email: entryData.boaterEmail   },
+          { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone, email: entryData.coAnglerEmail },
+        ]).then(refreshContacts).catch(() => {});
+      } catch {
+        showToast('Failed to save entry', 'error');
       }
-      setEditingEntry(null);
-      upsertContacts([
-        { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone,   email: entryData.boaterEmail   },
-        { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone, email: entryData.coAnglerEmail },
-      ]).then(refreshContacts).catch(() => {});
-    } catch {
-      showToast('Failed to save entry', 'error');
     }
   }
 
@@ -201,11 +214,13 @@ export default function App() {
 
   async function handleDeleteEntry(id) {
     if (!confirm('Delete this entry?')) return;
+    const prevEntries = entries;
+    setEntries(prev => prev.filter(e => e.id !== id));
+    showToast('Entry deleted', 'info');
     try {
       await deleteEntry(id);
-      setEntries(prev => prev.filter(e => e.id !== id));
-      showToast('Entry deleted', 'info');
     } catch {
+      setEntries(prevEntries);
       showToast('Failed to delete entry', 'error');
     }
   }
@@ -232,10 +247,13 @@ export default function App() {
     const entry = entries.find(e => e.id === entryId);
     if (!entry) return;
     const next = (entry[field] === 1 || entry[field] === '1') ? 0 : 1;
+    const prevEntries = entries;
+    setEntries(prev => prev.map(e => e.id === entryId ? { ...e, [field]: next } : e));
     try {
       const updated = await updateEntry(entryId, { ...entry, [field]: next });
       setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
     } catch {
+      setEntries(prevEntries);
       showToast('Failed to update', 'error');
     }
   }
@@ -268,16 +286,17 @@ export default function App() {
     }
 
     const extraClears = field === 'totalWeight' ? { rawWeight: null, deadFish: 0, shortFish: 0 } : {};
-
+    const duplicate = parsed && field === 'boatNo' && entries.some(e =>
+      String(e.boatNo) === String(parsed) && e.id !== entryId
+    );
+    const prevEntries = entries;
+    setEntries(prev => prev.map(e => e.id === entryId ? { ...e, [field]: parsed, ...extraClears } : e));
+    showToast(duplicate ? `Warning: Boat #${parsed} is already in use!` : 'Updated!', duplicate ? 'warning' : 'success');
     try {
       const updated = await updateEntry(entryId, { ...entry, [field]: parsed, ...extraClears });
       setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
-
-      const duplicate = parsed && field === 'boatNo' && entries.some(e =>
-        String(e.boatNo) === String(parsed) && e.id !== entryId
-      );
-      showToast(duplicate ? `Warning: Boat #${parsed} is already in use!` : 'Updated!', duplicate ? 'warning' : 'success');
     } catch {
+      setEntries(prevEntries);
       showToast('Failed to update', 'error');
     }
   }
@@ -285,6 +304,9 @@ export default function App() {
   async function handleCheckInSave(entryId, updates) {
     const entry = entries.find(e => e.id === entryId);
     if (!entry) return;
+    const prevEntries = entries;
+    setEntries(prev => prev.map(e => e.id === entryId ? { ...e, ...updates } : e));
+    showToast('Entry updated!', 'success');
     try {
       const updated = await updateEntry(entryId, { ...entry, ...updates, preserveWeighTime: true });
       setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
@@ -292,8 +314,8 @@ export default function App() {
         { firstName: updated.boaterFirst,   lastName: updated.boaterLast,   phone: updated.boaterPhone,   email: updated.boaterEmail   },
         { firstName: updated.coAnglerFirst, lastName: updated.coAnglerLast, phone: updated.coAnglerPhone, email: updated.coAnglerEmail },
       ]).then(refreshContacts).catch(() => {});
-      showToast('Entry updated!', 'success');
     } catch {
+      setEntries(prevEntries);
       showToast('Failed to update entry', 'error');
     }
   }
@@ -301,11 +323,14 @@ export default function App() {
   async function handleClearDeductions(entryId) {
     const entry = entries.find(e => e.id === entryId);
     if (!entry) return;
+    const prevEntries = entries;
+    setEntries(prev => prev.map(e => e.id === entryId ? { ...e, rawWeight: null, deadFish: 0, shortFish: 0 } : e));
+    showToast('Deductions cleared', 'info');
     try {
       const updated = await updateEntry(entryId, { ...entry, rawWeight: null, deadFish: 0, shortFish: 0 });
       setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
-      showToast('Deductions cleared', 'info');
     } catch {
+      setEntries(prevEntries);
       showToast('Failed to clear deductions', 'error');
     }
   }
@@ -350,23 +375,28 @@ export default function App() {
   async function handleWeighIn(entryId, weighData) {
     const entry = entries.find(e => e.id === entryId);
     if (!entry) return false;
+    const prevEntries = entries;
+    setEntries(prev => prev.map(e => e.id === entryId ? { ...e, ...weighData } : e));
+    showToast(`Boat #${entry.boatNo} saved!`, 'success');
     try {
       const updated = await updateEntry(entryId, { ...entry, ...weighData });
       setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
-      showToast(`Boat #${entry.boatNo} saved!`, 'success');
       return true;
     } catch {
+      setEntries(prevEntries);
       showToast('Failed to save weigh-in', 'error');
       return false;
     }
   }
 
   async function handleClearWeighLog() {
+    const prevEntries = entries;
+    setEntries(prev => prev.map(e => ({ ...e, weighedAt: null })));
+    showToast('Weigh-in log cleared', 'info');
     try {
       await clearWeighLog();
-      setEntries(prev => prev.map(e => ({ ...e, weighedAt: null })));
-      showToast('Weigh-in log cleared', 'info');
     } catch {
+      setEntries(prevEntries);
       showToast('Failed to clear weigh-in log', 'error');
     }
   }
