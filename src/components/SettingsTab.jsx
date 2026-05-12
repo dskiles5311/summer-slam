@@ -455,7 +455,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
 
           {editingFlightIdx === 'new' && (
             <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(139,180,225,0.35)', borderRadius: 8, padding: '10px 14px', marginBottom: 8 }}>
-              <FlightForm draft={flightDraft} onChange={setFlightDraft} onSave={handleFlightSave} onCancel={handleFlightCancel} />
+              <FlightForm draft={flightDraft} onChange={setFlightDraft} onSave={handleFlightSave} onCancel={handleFlightCancel} error={flightError} />
             </div>
           )}
 
