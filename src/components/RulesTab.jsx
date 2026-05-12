@@ -1,6 +1,6 @@
 export default function RulesTab() {
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  const pdfPath = '/summer-slam-2026-rules.pdf';
+  const pdfPath = `/summer-slam-${new Date().getFullYear()}-rules.pdf`;
 
   if (isIOS) {
     const fullUrl = `${window.location.origin}${pdfPath}`;
