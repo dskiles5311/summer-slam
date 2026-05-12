@@ -52,7 +52,7 @@ header {
 }
 
 .logo { display: flex; align-items: center; gap: 12px; }
-.logo-icon { font-size: 28px; }
+.logo-icon { width: 80px; height: 80px; object-fit: contain; flex-shrink: 0; }
 
 .logo-text h1 {
   font-size: 22px;
@@ -95,11 +95,24 @@ header {
 }
 
 /* ── NAV TABS ── */
+.nav-tabs-wrap {
+  position: relative;
+  background: rgba(0,0,0,0.25);
+}
+.nav-tabs-wrap::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 40px;
+  background: linear-gradient(to right, transparent, rgba(15,20,12,0.9));
+  pointer-events: none;
+  display: none;
+}
 .nav-tabs {
   display: flex;
   gap: 2px;
   padding: 0 20px;
-  background: rgba(0,0,0,0.25);
+  background: transparent;
 }
 
 .nav-tab {
@@ -644,11 +657,13 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
   .lb-payout .lbl { font-size: 11px; }
   .contacts-table .col-email { display: none; }
 
+  .logo-icon { width: 56px; height: 56px; }
+
   /* Nav tabs: scroll horizontally, never wrap */
+  .nav-tabs-wrap::after { display: block; }
   .nav-tabs {
     overflow-x: auto;
     scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
     flex-wrap: nowrap;
     padding: 0 12px;
   }
@@ -676,7 +691,7 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
 @media (max-width: 600px) {
   /* Header: compact */
   .header-top { padding: 8px 12px; gap: 8px; }
-  .logo-icon { font-size: 22px; }
+  .logo-icon { width: 44px; height: 44px; }
   .logo-text h1 { font-size: 17px; letter-spacing: 1px; }
   .logo-text p { display: none; }
   .theme-toggle { font-size: 11px; padding: 5px 8px; }

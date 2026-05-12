@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
+import { formatPhone } from '../utils/phone';
 
 function isOn(v) { return v === 1 || v === '1'; }
 
@@ -24,12 +25,12 @@ const LABEL_STYLE = {
   marginBottom: 3,
 };
 
-function F({ label, value, onChange, type = 'text', inputMode }) {
+function F({ label, value, onChange, onBlur, type = 'text', inputMode }) {
   return (
     <div>
       <span style={LABEL_STYLE}>{label}</span>
       <input type={type} inputMode={inputMode} value={value}
-        onChange={e => onChange(e.target.value)} style={INPUT_STYLE} />
+        onChange={e => onChange(e.target.value)} onBlur={onBlur} style={INPUT_STYLE} />
     </div>
   );
 }
@@ -190,12 +191,12 @@ export default function CheckInTab({ entries, onSave }) {
                     <div className="checkin-person-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
                       <F label="Boater First" value={draft.boaterFirst} onChange={v => set('boaterFirst', v)} />
                       <F label="Last"         value={draft.boaterLast}  onChange={v => set('boaterLast', v)} />
-                      <div className="checkin-phone"><F label="Phone" type="tel" inputMode="tel" value={draft.boaterPhone} onChange={v => set('boaterPhone', v)} /></div>
+                      <div className="checkin-phone"><F label="Phone" type="tel" inputMode="tel" value={draft.boaterPhone} onChange={v => set('boaterPhone', v)} onBlur={() => set('boaterPhone', formatPhone(draft.boaterPhone))} /></div>
                     </div>
                     <div className="checkin-person-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
                       <F label="Co-Angler First" value={draft.coAnglerFirst} onChange={v => set('coAnglerFirst', v)} />
                       <F label="Last"            value={draft.coAnglerLast}  onChange={v => set('coAnglerLast', v)} />
-                      <div className="checkin-phone"><F label="Phone" type="tel" inputMode="tel" value={draft.coAnglerPhone} onChange={v => set('coAnglerPhone', v)} /></div>
+                      <div className="checkin-phone"><F label="Phone" type="tel" inputMode="tel" value={draft.coAnglerPhone} onChange={v => set('coAnglerPhone', v)} onBlur={() => set('coAnglerPhone', formatPhone(draft.coAnglerPhone))} /></div>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, alignItems: 'end' }}>
                       <F label="Boat #" inputMode="numeric" value={draft.boatNo} onChange={v => set('boatNo', v)} />

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import ContactSuggest from './ContactSuggest';
+import { formatPhone } from '../utils/phone';
 
 const EMPTY = {
   boaterFirst: '', boaterLast: '', boaterPhone: '', boaterEmail: '',
@@ -132,8 +133,9 @@ export default function EditModal({ entry, onSave, onCancel }) {
               </div>
               <div className="form-field">
                 <label>Boater Phone{isNew ? ' *' : ''}</label>
-                <input type="tel" value={form.boaterPhone} placeholder="(555) 123-4567"
+                <input type="tel" value={form.boaterPhone} placeholder="555-123-4567"
                        onChange={e => set('boaterPhone', e.target.value)}
+                       onBlur={e => set('boaterPhone', formatPhone(e.target.value))}
                        style={errBorder('boaterPhone')} />
                 {err('boaterPhone')}
               </div>
@@ -158,8 +160,9 @@ export default function EditModal({ entry, onSave, onCancel }) {
               </div>
               <div className="form-field">
                 <label>Co-Angler Phone{isNew && (form.coAnglerFirst || form.coAnglerLast) ? ' *' : ''}</label>
-                <input type="tel" value={form.coAnglerPhone} placeholder="(555) 123-4567"
+                <input type="tel" value={form.coAnglerPhone} placeholder="555-123-4567"
                        onChange={e => set('coAnglerPhone', e.target.value)}
+                       onBlur={e => set('coAnglerPhone', formatPhone(e.target.value))}
                        style={errBorder('coAnglerPhone')} />
                 {err('coAnglerPhone')}
               </div>

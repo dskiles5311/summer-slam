@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import ContactSuggest from './ContactSuggest';
+import { formatPhone } from '../utils/phone';
 
 const FIELD = {
   background: 'rgba(255,255,255,0.06)',
@@ -151,8 +152,9 @@ export default function SignUpTab({ onAddEntry }) {
           </div>
           <div>
             <label style={LABEL}>Phone *</label>
-            <input type="tel" value={form.boaterPhone} placeholder="(555) 123-4567"
+            <input type="tel" value={form.boaterPhone} placeholder="555-123-4567"
                    onChange={e => set('boaterPhone', e.target.value)}
+                   onBlur={e => set('boaterPhone', formatPhone(e.target.value))}
                    style={fieldBorder('boaterPhone')} />
             {err('boaterPhone')}
           </div>
@@ -198,8 +200,9 @@ export default function SignUpTab({ onAddEntry }) {
             <label style={LABEL}>
               Phone{(form.coAnglerFirst || form.coAnglerLast) ? ' *' : ''}
             </label>
-            <input type="tel" value={form.coAnglerPhone} placeholder="(555) 123-4567"
+            <input type="tel" value={form.coAnglerPhone} placeholder="555-123-4567"
                    onChange={e => set('coAnglerPhone', e.target.value)}
+                   onBlur={e => set('coAnglerPhone', formatPhone(e.target.value))}
                    style={fieldBorder('coAnglerPhone')} />
             {err('coAnglerPhone')}
           </div>

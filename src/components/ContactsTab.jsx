@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { upsertContacts, fetchContacts } from '../utils/api';
+import { formatPhone } from '../utils/phone';
 
 const FIELD_STYLE = {
   background: 'rgba(255,255,255,0.06)',
@@ -86,8 +87,10 @@ function EditModal({ contact, onSave, onCancel }) {
           <form onSubmit={handleSubmit}>
             <div className="form-field" style={{ marginBottom: 14 }}>
               <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--header-bg)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 5, display: 'block' }}>Phone</label>
-              <input ref={phoneRef} type="tel" value={phone} placeholder="(555) 123-4567"
-                     onChange={e => setPhone(e.target.value)} style={FIELD_STYLE} />
+              <input ref={phoneRef} type="tel" value={phone} placeholder="555-123-4567"
+                     onChange={e => setPhone(e.target.value)}
+                     onBlur={e => setPhone(formatPhone(e.target.value))}
+                     style={FIELD_STYLE} />
             </div>
             <div className="form-field" style={{ marginBottom: 20 }}>
               <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--header-bg)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 5, display: 'block' }}>Email</label>
@@ -173,7 +176,7 @@ function DuplicateReviewModal({ groups, onDelete, onClose }) {
                     }}>
                       <div style={{ flex: 1, fontSize: 13, display: 'flex', flexDirection: 'column', gap: 3 }}>
                         <span style={{ color: c.phone ? 'var(--white)' : 'var(--header-bg)' }}>
-                          📞 {c.phone || <em>no phone</em>}
+                          📞 {c.phone ? formatPhone(c.phone) : <em>no phone</em>}
                         </span>
                         <span style={{ color: c.email ? 'var(--white)' : 'var(--header-bg)' }}>
                           ✉ {c.email || <em>no email</em>}
@@ -427,7 +430,7 @@ export default function ContactsTab({ isUnlocked, contacts, contactsLoading, onC
                 <td style={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.lastName}</td>
                 <td style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {c.phone
-                    ? <a href={`tel:${c.phone}`} style={{ color: 'var(--water-light)', textDecoration: 'none' }}>{c.phone}</a>
+                    ? <a href={`tel:${c.phone}`} style={{ color: 'var(--water-light)', textDecoration: 'none' }}>{formatPhone(c.phone)}</a>
                     : <span style={{ color: 'var(--header-bg)' }}>—</span>}
                 </td>
                 <td className="col-email" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

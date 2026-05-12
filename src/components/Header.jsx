@@ -1,15 +1,24 @@
 
+import { useRef, useEffect } from 'react';
 import { getStats } from '../utils/calculations';
 
 export default function Header({ entries, settings, activeTab, onTabChange, onThemeToggle, isUnlocked, onToggleLock, buyInBlurred, onToggleBuyInBlur }) {
   const stats = getStats(entries, settings.fees);
   const buyInFilter = buyInBlurred ? 'blur(6px)' : 'none';
+  const navRef = useRef(null);
+
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+    const active = nav.querySelector('.nav-tab.active');
+    if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+  }, [activeTab]);
 
   return (
     <header>
       <div className="header-top">
         <div className="logo">
-          <img src="/SFT%20logo%20color.jpg" alt="SFT" className="logo-icon" style={{ width: 80, height: 80, objectFit: 'contain' }} />
+          <img src="/SFT%20logo%20color.jpg" alt="SFT" className="logo-icon" />
           <div className="logo-text">
             <h1>{new Date().getFullYear()} Summer Slam!</h1>
             <p>Susquehanna Fishing Tackle</p>
@@ -63,7 +72,8 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
           )}
         </div>
       </div>
-      <nav className="nav-tabs">
+      <div className="nav-tabs-wrap">
+      <nav className="nav-tabs" ref={navRef}>
         {isUnlocked && (
           <button
             className={`nav-tab ${activeTab === 'signup' ? 'active' : ''}`}
@@ -137,6 +147,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
           </button>
         )}
       </nav>
+      </div>
     </header>
   );
 }

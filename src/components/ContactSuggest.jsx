@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { searchContacts } from '../utils/api';
+import { formatPhone } from '../utils/phone';
 
 const ITEM_STYLE = {
   padding: '8px 12px',
@@ -87,7 +88,7 @@ export default function ContactSuggest({ value, placeholder, onChange, onSelect,
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                 <span style={{ fontWeight: 600, color: 'var(--white)' }}>{s.firstName} {s.lastName}</span>
-                {s.phone && <span style={{ color: 'var(--header-bg)', fontSize: 12 }}>{s.phone}</span>}
+                {s.phone && <span style={{ color: 'var(--header-bg)', fontSize: 12 }}>{formatPhone(s.phone)}</span>}
               </div>
               {s.email && <span style={{ color: 'var(--header-bg)', fontSize: 11, opacity: 0.8 }}>{s.email}</span>}
             </div>
