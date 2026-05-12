@@ -454,8 +454,9 @@ export default function App() {
   async function handleNormalizePhones() {
     try {
       const result = await normalizePhones();
-      const refreshed = await fetchEntries();
-      setEntries(refreshed);
+      const [refreshedEntries, refreshedContacts] = await Promise.all([fetchEntries(), fetchContacts()]);
+      setEntries(refreshedEntries);
+      setContacts(refreshedContacts);
       if (result.total === 0) {
         showToast('All phone numbers already formatted', 'info');
       } else {

@@ -18,26 +18,29 @@ export async function onRequestPost({ request, env }) {
     let entriesUpdated = 0;
     let contactsUpdated = 0;
 
-    const entries = await db.execute('SELECT id, boater_phone, co_angler_phone FROM entries');
+    const entries = await db.execute({ sql: 'SELECT id, boater_phone, co_angler_phone FROM entries', args: [] });
     for (const row of entries.rows) {
-      const bp = formatPhone(row.boater_phone);
-      const cp = formatPhone(row.co_angler_phone);
-      if (bp !== (row.boater_phone || '') || cp !== (row.co_angler_phone || '')) {
+      const origBp = row.boater_phone    ?? '';
+      const origCp = row.co_angler_phone ?? '';
+      const bp = formatPhone(origBp);
+      const cp = formatPhone(origCp);
+      if (bp !== origBp || cp !== origCp) {
         await db.execute({
           sql:  'UPDATE entries SET boater_phone=?, co_angler_phone=? WHERE id=?',
-          args: [bp, cp, row.id],
+          args: [bp, cp, Number(row.id)],
         });
         entriesUpdated++;
       }
     }
 
-    const contacts = await db.execute('SELECT id, phone FROM contacts');
+    const contacts = await db.execute({ sql: 'SELECT id, phone FROM contacts', args: [] });
     for (const row of contacts.rows) {
-      const p = formatPhone(row.phone);
-      if (p !== (row.phone || '')) {
+      const origP = row.phone ?? '';
+      const p = formatPhone(origP);
+      if (p !== origP) {
         await db.execute({
           sql:  'UPDATE contacts SET phone=? WHERE id=?',
-          args: [p, row.id],
+          args: [p, Number(row.id)],
         });
         contactsUpdated++;
       }
