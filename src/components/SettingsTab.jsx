@@ -717,14 +717,32 @@ function WeighInLogModal({ entries, penalties, onClose, onClearLog }) {
   );
 }
 
+function formatTime(raw) {
+  const s = String(raw || '').trim();
+  if (!s) return '';
+  const ampmMatch = s.match(/\s*(am|pm)$/i);
+  const ampm = ampmMatch ? ' ' + ampmMatch[1].toUpperCase() : '';
+  const timePart = ampmMatch ? s.slice(0, -ampmMatch[0].length).trim() : s;
+  const digits = timePart.replace(/\D/g, '');
+  if (!digits) return s;
+  let h, m;
+  if      (digits.length <= 2) { h = parseInt(digits);           m = 0; }
+  else if (digits.length === 3) { h = parseInt(digits[0]);        m = parseInt(digits.slice(1)); }
+  else if (digits.length === 4) { h = parseInt(digits.slice(0,2)); m = parseInt(digits.slice(2)); }
+  else return s;
+  if (isNaN(h) || isNaN(m) || m > 59 || h > 23) return s;
+  return `${h}:${String(m).padStart(2, '0')}${ampm}`;
+}
+
 function FlightForm({ draft, onChange, onSave, onCancel, error }) {
   return (
     <div style={{ width: '100%' }}>
       <div className="edit-grid-2" style={{ marginBottom: 8 }}>
         <div className="form-field">
           <label>Launch Time</label>
-          <input type="text" value={draft.launchTime} placeholder="e.g. 7:15 AM"
-                 onChange={e => onChange(prev => ({ ...prev, launchTime: e.target.value }))} />
+          <input type="text" value={draft.launchTime} placeholder="e.g. 715 AM"
+                 onChange={e => onChange(prev => ({ ...prev, launchTime: e.target.value }))}
+                 onBlur={e => onChange(prev => ({ ...prev, launchTime: formatTime(e.target.value) }))} />
         </div>
         <div className="form-field">
           <label>Boat # Start</label>
@@ -738,8 +756,9 @@ function FlightForm({ draft, onChange, onSave, onCancel, error }) {
         </div>
         <div className="form-field">
           <label>Check-In Time</label>
-          <input type="text" value={draft.checkInTime} placeholder="e.g. 3:15 PM"
-                 onChange={e => onChange(prev => ({ ...prev, checkInTime: e.target.value }))} />
+          <input type="text" value={draft.checkInTime} placeholder="e.g. 315 PM"
+                 onChange={e => onChange(prev => ({ ...prev, checkInTime: e.target.value }))}
+                 onBlur={e => onChange(prev => ({ ...prev, checkInTime: formatTime(e.target.value) }))} />
         </div>
       </div>
       {error && (
