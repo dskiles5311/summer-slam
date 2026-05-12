@@ -601,7 +601,7 @@ export default function App() {
         {everUnlocked && (
           <>
             <div style={{ display: activeTab === 'signup' ? '' : 'none' }}>
-              <SignUpTab onAddEntry={handleSignUpEntry} />
+              <SignUpTab onAddEntry={handleSignUpEntry} settings={settingsWithTheme} />
             </div>
             <div style={{ display: activeTab === 'checkin' ? '' : 'none' }}>
               <CheckInTab entries={rankedEntries} onSave={handleCheckInSave} />
@@ -648,6 +648,7 @@ export default function App() {
           entry={editingEntry}
           onSave={handleSaveEntry}
           onCancel={() => setEditingEntry(null)}
+          settings={settingsWithTheme}
         />
       )}
 

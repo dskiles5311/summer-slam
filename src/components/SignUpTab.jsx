@@ -71,7 +71,8 @@ function ToggleButton({ value, onChange }) {
   );
 }
 
-export default function SignUpTab({ onAddEntry }) {
+export default function SignUpTab({ onAddEntry, settings }) {
+  const entryFee = parseFloat(settings?.fees?.entryFee) || 249;
   const [form, setForm]         = useState({ ...EMPTY });
   const [errors, setErrors]     = useState({});
   const [recent, setRecent]     = useState([]);
@@ -79,7 +80,14 @@ export default function SignUpTab({ onAddEntry }) {
   const boaterFirstRef = useRef(null);
 
   function set(field, val) {
-    setForm(prev => ({ ...prev, [field]: val }));
+    setForm(prev => {
+      const next = { ...prev, [field]: val };
+      if (field === 'buyIn') {
+        const amount = parseFloat(evalMath(String(val)));
+        if (!isNaN(amount) && amount >= entryFee) next.paid = 1;
+      }
+      return next;
+    });
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: null }));
   }
 

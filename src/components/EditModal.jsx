@@ -37,7 +37,8 @@ function ToggleButton({ value, onChange }) {
   );
 }
 
-export default function EditModal({ entry, onSave, onCancel }) {
+export default function EditModal({ entry, onSave, onCancel, settings }) {
+  const entryFee = parseFloat(settings?.fees?.entryFee) || 249;
   const [form, setForm] = useState({ ...EMPTY });
   const [errors, setErrors] = useState({});
   const firstInputRef = useRef(null);
@@ -78,7 +79,14 @@ export default function EditModal({ entry, onSave, onCancel }) {
   }, [onCancel]);
 
   function set(field, val) {
-    setForm(prev => ({ ...prev, [field]: val }));
+    setForm(prev => {
+      const next = { ...prev, [field]: val };
+      if (field === 'buyIn') {
+        const amount = parseFloat(val);
+        if (!isNaN(amount) && amount >= entryFee) next.paid = 1;
+      }
+      return next;
+    });
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: null }));
   }
 
