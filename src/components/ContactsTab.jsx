@@ -229,7 +229,7 @@ export default function ContactsTab({ isUnlocked, contacts, contactsLoading, onC
   const dupGroups = useMemo(() => {
     const map = {};
     contacts.forEach(c => {
-      const key = `${c.firstName.trim().toLowerCase()}|${c.lastName.trim().toLowerCase()}|${(c.phone || '').trim()}`;
+      const key = `${c.firstName.trim().toLowerCase()}|${c.lastName.trim().toLowerCase()}|${(c.phone || '').replace(/\D/g, '')}`;
       if (!map[key]) map[key] = [];
       map[key].push(c);
     });
