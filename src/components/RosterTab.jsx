@@ -109,8 +109,8 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
       return 0;
     });
     return (
-      <div className="tab-panel active">
-        <div className="table-wrapper">
+      <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+        <div className="table-wrapper" style={{ flex: 1, minHeight: 0, maxHeight: 'none' }}>
           <table style={{ tableLayout: 'fixed', minWidth: 480 }}>
             <colgroup>
               <col style={{ width: '25%' }} />
@@ -150,8 +150,8 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
   }
 
   return (
-    <div className="tab-panel active">
-      <div className="toolbar">
+    <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      <div className="toolbar" style={{ flexShrink: 0 }}>
         {isUnlocked && <button className="btn btn-gold" onClick={onAdd}>+ Add Entry</button>}
 
         <span style={{ fontSize: 13, color: 'var(--header-bg)' }}>
@@ -235,7 +235,7 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
         )}
       </div>
 
-      <div className="table-wrapper">
+      <div className="table-wrapper" style={{ flex: 1, minHeight: 0, maxHeight: 'none' }}>
         <table className="roster-table" style={{ tableLayout: 'fixed', minWidth: isUnlocked ? 1340 : 1230 }}>
           <colgroup>
             <col style={{ width: 52 }} />   {/* Place      */}
