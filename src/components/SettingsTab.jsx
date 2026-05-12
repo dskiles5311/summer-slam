@@ -19,6 +19,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   const [localFlights, setLocalFlights]     = useState(() => (settings.flights || []).map((f, i) => ({ ...f, _key: i })));
   const [editingFlightIdx, setEditingFlightIdx] = useState(null);
   const [flightDraft, setFlightDraft]       = useState(null);
+  const [flightError, setFlightError]       = useState(null);
 
   useEffect(() => {
     setTotalPayout(payoutSettings.totalPayout || 0);
@@ -152,10 +153,38 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   }
 
   function handleFlightSave() {
+    const start = parseInt(flightDraft.boatStart) || 0;
+    const end   = parseInt(flightDraft.boatEnd)   || 0;
+
+    if (!start || !end) {
+      setFlightError('Boat # Start and End are required.');
+      return;
+    }
+    if (end < start) {
+      setFlightError('Boat # End must be greater than or equal to Start.');
+      return;
+    }
+
+    // Check for overlaps with other flights (skip the one being edited)
+    const others = editingFlightIdx === 'new'
+      ? localFlights
+      : localFlights.filter((_, i) => i !== editingFlightIdx);
+
+    const overlap = others.find(fl => {
+      const s = parseInt(fl.boatStart) || 0;
+      const e = parseInt(fl.boatEnd)   || 0;
+      return start <= e && end >= s;
+    });
+    if (overlap) {
+      setFlightError(`Overlaps with "${overlap.name || '(unnamed)'}" (boats #${overlap.boatStart}–#${overlap.boatEnd}).`);
+      return;
+    }
+
+    setFlightError(null);
     const f = {
       name:        (flightDraft.name        || '').trim(),
-      boatStart:   parseInt(flightDraft.boatStart)  || 0,
-      boatEnd:     parseInt(flightDraft.boatEnd)    || 0,
+      boatStart:   start,
+      boatEnd:     end,
       launchTime:  (flightDraft.launchTime  || '').trim(),
       checkInTime: (flightDraft.checkInTime || '').trim(),
     };
@@ -174,6 +203,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   function handleFlightCancel() {
     setEditingFlightIdx(null);
     setFlightDraft(null);
+    setFlightError(null);
   }
 
   const rowTotal = payouts.reduce((a, b) => a + (b || 0), 0);
@@ -401,7 +431,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           {localFlights.map((fl, idx) => (
             <div key={fl._key} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(139,180,225,0.2)', borderRadius: 8, padding: '10px 14px', marginBottom: 8 }}>
               {editingFlightIdx === idx ? (
-                <FlightForm draft={flightDraft} onChange={setFlightDraft} onSave={handleFlightSave} onCancel={handleFlightCancel} />
+                <FlightForm draft={flightDraft} onChange={setFlightDraft} onSave={handleFlightSave} onCancel={handleFlightCancel} error={flightError} />
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -687,7 +717,7 @@ function WeighInLogModal({ entries, penalties, onClose, onClearLog }) {
   );
 }
 
-function FlightForm({ draft, onChange, onSave, onCancel }) {
+function FlightForm({ draft, onChange, onSave, onCancel, error }) {
   return (
     <div style={{ width: '100%' }}>
       <div className="edit-grid-2" style={{ marginBottom: 8 }}>
@@ -717,6 +747,11 @@ function FlightForm({ draft, onChange, onSave, onCancel }) {
                  onChange={e => onChange(prev => ({ ...prev, checkInTime: e.target.value }))} />
         </div>
       </div>
+      {error && (
+        <div style={{ fontSize: 12, color: '#ff9090', background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.35)', borderRadius: 6, padding: '6px 10px', marginBottom: 6 }}>
+          ⚠️ {error}
+        </div>
+      )}
       <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
         <button className="btn btn-primary btn-sm" onClick={onSave}>Save</button>
         <button className="btn btn-outline btn-sm" onClick={onCancel}>Cancel</button>
