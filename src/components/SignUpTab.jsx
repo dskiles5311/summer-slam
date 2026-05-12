@@ -90,14 +90,14 @@ export default function SignUpTab({ onAddEntry }) {
       setRecent(prev => [entry, ...prev].slice(0, 10));
       setForm({ ...EMPTY });
       setErrors({});
-      boaterFirstRef.current?.focus();
+      setTimeout(() => boaterFirstRef.current?.focus(), 0);
     }
   }
 
   function handleClear() {
     setForm({ ...EMPTY });
     setErrors({});
-    boaterFirstRef.current?.focus();
+    setTimeout(() => boaterFirstRef.current?.focus(), 0);
   }
 
   const err = (field) => errors[field]
