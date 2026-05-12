@@ -188,7 +188,10 @@ export async function normalizePhones() {
     method: 'POST',
     headers: authHeaders(),
   });
-  if (!res.ok) throw new Error('Failed to normalize phones');
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `HTTP ${res.status}`);
+  }
   return res.json();
 }
 

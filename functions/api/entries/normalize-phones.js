@@ -18,7 +18,7 @@ export async function onRequestPost({ request, env }) {
     let entriesUpdated = 0;
     let contactsUpdated = 0;
 
-    const entries = await db.execute({ sql: 'SELECT id, boater_phone, co_angler_phone FROM entries', args: [] });
+    const entries = await db.execute('SELECT id, boater_phone, co_angler_phone FROM entries');
     for (const row of entries.rows) {
       const origBp = row.boater_phone    ?? '';
       const origCp = row.co_angler_phone ?? '';
@@ -33,7 +33,7 @@ export async function onRequestPost({ request, env }) {
       }
     }
 
-    const contacts = await db.execute({ sql: 'SELECT id, phone FROM contacts', args: [] });
+    const contacts = await db.execute('SELECT id, phone FROM contacts');
     for (const row of contacts.rows) {
       const origP = row.phone ?? '';
       const p = formatPhone(origP);

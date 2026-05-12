@@ -477,8 +477,8 @@ export default function App() {
       } else {
         showToast(`Normalized ${result.total} phone number${result.total !== 1 ? 's' : ''} (${result.entriesUpdated} entries, ${result.contactsUpdated} contacts)`, 'success');
       }
-    } catch {
-      showToast('Failed to normalize phones', 'error');
+    } catch (e) {
+      showToast(`Normalize phones failed: ${e.message}`, 'error');
     }
   }
 
