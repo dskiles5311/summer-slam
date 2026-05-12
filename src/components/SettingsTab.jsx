@@ -136,7 +136,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   }
 
   function handleFlightAdd() {
-    setFlightDraft({ name: '', boatStart: '', boatEnd: '', launchTime: '', checkInTime: '' });
+    setFlightDraft({ boatStart: '', boatEnd: '', launchTime: '', checkInTime: '' });
     setEditingFlightIdx('new');
   }
 
@@ -176,13 +176,13 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
       return start <= e && end >= s;
     });
     if (overlap) {
-      setFlightError(`Overlaps with "${overlap.name || '(unnamed)'}" (boats #${overlap.boatStart}–#${overlap.boatEnd}).`);
+      const overlapNum = localFlights.indexOf(overlap) + 1;
+      setFlightError(`Overlaps with Flight ${overlapNum} (boats #${overlap.boatStart}–#${overlap.boatEnd}).`);
       return;
     }
 
     setFlightError(null);
     const f = {
-      name:        (flightDraft.name        || '').trim(),
       boatStart:   start,
       boatEnd:     end,
       launchTime:  (flightDraft.launchTime  || '').trim(),
@@ -435,7 +435,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <span style={{ fontWeight: 700, color: 'var(--gold-light)', marginRight: 8 }}>{fl.name || '(unnamed)'}</span>
+                    <span style={{ fontWeight: 700, color: 'var(--gold-light)', marginRight: 8 }}>Flight {idx + 1}</span>
                     <span style={{ color: 'var(--header-bg)', fontSize: 13 }}>
                       Boats #{fl.boatStart}–#{fl.boatEnd}
                       {fl.launchTime  && <span> · 🚤 {fl.launchTime}</span>}
@@ -721,11 +721,6 @@ function FlightForm({ draft, onChange, onSave, onCancel, error }) {
   return (
     <div style={{ width: '100%' }}>
       <div className="edit-grid-2" style={{ marginBottom: 8 }}>
-        <div className="form-field">
-          <label>Flight Name</label>
-          <input type="text" value={draft.name} placeholder="e.g. Flight 1"
-                 onChange={e => onChange(prev => ({ ...prev, name: e.target.value }))} />
-        </div>
         <div className="form-field">
           <label>Launch Time</label>
           <input type="text" value={draft.launchTime} placeholder="e.g. 7:15 AM"

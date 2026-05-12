@@ -58,7 +58,7 @@ export default function FlightsTab({ entries, settings }) {
       <div style={{ maxWidth: 700, margin: '0 auto', paddingTop: 8 }}>
         {groups.map(({ flight, entries: flightEntries }, gIdx) => (
           <div key={gIdx} style={{ marginBottom: 24 }}>
-            <FlightDivider flight={flight} count={flightEntries.length} />
+            <FlightDivider flight={flight} flightNum={gIdx + 1} count={flightEntries.length} />
             {flightEntries.length === 0 ? (
               <p style={{ color: 'var(--header-bg)', fontSize: 13, padding: '10px 4px', fontStyle: 'italic' }}>
                 No boats in this flight range yet.
@@ -99,7 +99,7 @@ export default function FlightsTab({ entries, settings }) {
   );
 }
 
-function FlightDivider({ flight, count }) {
+function FlightDivider({ flight, flightNum, count }) {
   return (
     <div style={{
       background: 'rgba(200,169,106,0.12)',
@@ -114,7 +114,7 @@ function FlightDivider({ flight, count }) {
     }}>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontWeight: 800, color: 'var(--gold-light)', fontSize: 16 }}>
-          {flight.name || '(unnamed)'}
+          Flight {flightNum}
           <span style={{ fontWeight: 500, fontSize: 13, color: 'var(--header-bg)', marginLeft: 10 }}>
             Boats #{flight.boatStart}–#{flight.boatEnd}
           </span>
