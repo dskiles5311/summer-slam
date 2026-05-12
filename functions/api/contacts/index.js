@@ -5,6 +5,14 @@ function getDb(env) {
   return createClient({ url: env.TURSO_DATABASE_URL, authToken: env.TURSO_AUTH_TOKEN });
 }
 
+function formatPhone(raw) {
+  const digits = (raw || '').replace(/\D/g, '');
+  if (digits.length === 10) return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+  if (digits.length === 7)  return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  if (digits.length === 6)  return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  return raw || '';
+}
+
 export async function onRequestGet({ request, env }) {
   if (!checkAuth(request, env)) return Response.json({ error: 'Unauthorized' }, { status: 401 });
   try {
@@ -39,21 +47,34 @@ export async function onRequestGet({ request, env }) {
 export async function onRequestPost({ request, env }) {
   if (!checkAuth(request, env)) return Response.json({ error: 'Unauthorized' }, { status: 401 });
   try {
-    const db = getDb(env);
-    const body = await request.json();
+    const db        = getDb(env);
+    const body      = await request.json();
     const firstName = (body.firstName ?? '').trim();
     const lastName  = (body.lastName  ?? '').trim();
-    const phone     = (body.phone     ?? '').trim();
-    const email     = (body.email     ?? '').trim();
+    const phone     = formatPhone((body.phone ?? '').trim());
+    const email     = (body.email ?? '').trim();
     if (!firstName || !lastName) return Response.json({ error: 'firstName and lastName required' }, { status: 400 });
-    await db.execute({
-      sql: `INSERT INTO contacts (first_name, last_name, phone, email, last_seen)
-            VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-            ON CONFLICT(first_name, last_name, phone) DO UPDATE SET
-              email = CASE WHEN ? != '' THEN ? ELSE email END,
-              last_seen = CURRENT_TIMESTAMP`,
-      args: [firstName, lastName, phone, email, email, email],
+
+    const existing = await db.execute({
+      sql:  `SELECT id, phone, email FROM contacts WHERE first_name = ? AND last_name = ? COLLATE NOCASE ORDER BY last_seen DESC LIMIT 1`,
+      args: [firstName, lastName],
     });
+
+    if (existing.rows.length > 0) {
+      const row      = existing.rows[0];
+      const newPhone = phone !== '' ? phone : (row.phone || '');
+      const newEmail = email !== '' ? email : (row.email || '');
+      await db.execute({
+        sql:  `UPDATE OR IGNORE contacts SET phone=?, email=?, last_seen=CURRENT_TIMESTAMP WHERE id=?`,
+        args: [newPhone, newEmail, Number(row.id)],
+      });
+    } else {
+      await db.execute({
+        sql:  `INSERT OR IGNORE INTO contacts (first_name, last_name, phone, email, last_seen) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+        args: [firstName, lastName, phone, email],
+      });
+    }
+
     return Response.json({ success: true }, { status: 201 });
   } catch (e) {
     return Response.json({ error: e.message }, { status: 500 });
