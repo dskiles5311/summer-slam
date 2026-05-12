@@ -104,7 +104,7 @@ export default function SignUpTab({ onAddEntry, settings }) {
       if (!form.coAnglerLast.trim())  errs.coAnglerLast  = 'Required';
       if (!form.coAnglerPhone.trim()) errs.coAnglerPhone  = 'Required';
     }
-    if (form.buyIn.trim() && isNaN(evalMath(form.buyIn))) errs.buyIn = 'Invalid expression';
+    if (String(form.buyIn).trim() && isNaN(evalMath(form.buyIn))) errs.buyIn = 'Invalid expression';
     return errs;
   }
 
