@@ -121,6 +121,12 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
           🏆 Leaderboard
         </button>
         <button
+          className={`nav-tab ${activeTab === 'flights' ? 'active' : ''}`}
+          onClick={() => onTabChange('flights')}
+        >
+          ✈️ Flights
+        </button>
+        <button
           className={`nav-tab ${activeTab === 'rules' ? 'active' : ''}`}
           onClick={() => onTabChange('rules')}
         >

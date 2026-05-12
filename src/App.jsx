@@ -10,6 +10,7 @@ import SignUpTab from './components/SignUpTab';
 import CheckInTab from './components/CheckInTab';
 import ContactsTab from './components/ContactsTab';
 import ArchiveTab from './components/ArchiveTab';
+import FlightsTab from './components/FlightsTab';
 import EditModal from './components/EditModal';
 import UnlockModal from './components/UnlockModal';
 import Toast from './components/Toast';
@@ -34,6 +35,7 @@ const DEFAULT_SETTINGS = {
   boatCheck:       {},
   offWater:        {},
   recentWeighCount: 2,
+  flights: [],
 };
 
 export default function App() {
@@ -163,7 +165,7 @@ export default function App() {
   function handleLock() {
     clearPassword();
     setIsUnlocked(false);
-    setActiveTab(prev => (['rules', 'archive', 'leaderboard'].includes(prev) ? prev : 'leaderboard'));
+    setActiveTab(prev => (['rules', 'archive', 'leaderboard', 'flights'].includes(prev) ? prev : 'leaderboard'));
   }
 
   async function handleSaveEntry(entryData) {
@@ -539,8 +541,8 @@ export default function App() {
       <Header
         entries={rankedEntries}
         settings={settingsWithTheme}
-        activeTab={isUnlocked || activeTab === 'rules' || activeTab === 'archive' || activeTab === 'roster' ? activeTab : 'leaderboard'}
-        onTabChange={tab => { if (isUnlocked || tab === 'rules' || tab === 'leaderboard' || tab === 'archive' || tab === 'roster') setActiveTab(tab); }}
+        activeTab={isUnlocked || activeTab === 'rules' || activeTab === 'archive' || activeTab === 'roster' || activeTab === 'flights' ? activeTab : 'leaderboard'}
+        onTabChange={tab => { if (isUnlocked || tab === 'rules' || tab === 'leaderboard' || tab === 'archive' || tab === 'roster' || tab === 'flights') setActiveTab(tab); }}
         onThemeToggle={() => {
           const next = theme === 'dark' ? 'light' : theme === 'light' ? 'outdoor' : 'dark';
           setTheme(next);
@@ -586,6 +588,9 @@ export default function App() {
             rosterCount={entries.length}
             onLoadArchive={handleLoadArchive}
           />
+        </div>
+        <div style={{ display: activeTab === 'flights' ? '' : 'none' }}>
+          <FlightsTab entries={rankedEntries} settings={settingsWithTheme} />
         </div>
 
         {/* Private tabs — mount once after first unlock, then stay mounted */}

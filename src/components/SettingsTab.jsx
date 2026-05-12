@@ -16,6 +16,9 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   const [localFees, setLocalFees]           = useState(fees);
   const [localPenalties, setLocalPenalties] = useState(penalties);
   const [showLog, setShowLog]               = useState(false);
+  const [localFlights, setLocalFlights]     = useState(() => (settings.flights || []).map((f, i) => ({ ...f, _key: i })));
+  const [editingFlightIdx, setEditingFlightIdx] = useState(null);
+  const [flightDraft, setFlightDraft]       = useState(null);
 
   useEffect(() => {
     setTotalPayout(payoutSettings.totalPayout || 0);
@@ -27,6 +30,9 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
 
   useEffect(() => { setLocalFees(fees); }, [fees]);
   useEffect(() => { setLocalPenalties(penalties); }, [penalties]);
+  useEffect(() => {
+    setLocalFlights((settings.flights || []).map((f, i) => ({ ...f, _key: i })));
+  }, [settings.flights]);
 
   function evalExpr(str) {
     const cleaned = String(str).replace(/[^0-9+\-*/.() ]/g, '').trim();
@@ -121,6 +127,53 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
     setPayouts(updated);
     setRawInputs(updated.map(String));
     onUpdateSettings({ payoutSettings: { totalPayout, numWinners, minPayout, payouts: updated } });
+  }
+
+  function flightSortAndStrip(arr) {
+    const sorted = [...arr].sort((a, b) => (parseInt(a.boatStart) || 0) - (parseInt(b.boatStart) || 0));
+    return sorted.map(({ _key, ...rest }) => rest);
+  }
+
+  function handleFlightAdd() {
+    setFlightDraft({ name: '', boatStart: '', boatEnd: '', launchTime: '', checkInTime: '' });
+    setEditingFlightIdx('new');
+  }
+
+  function handleFlightEdit(idx) {
+    setFlightDraft({ ...localFlights[idx] });
+    setEditingFlightIdx(idx);
+  }
+
+  function handleFlightDelete(idx) {
+    if (!confirm('Delete this flight?')) return;
+    const updated = localFlights.filter((_, i) => i !== idx);
+    setLocalFlights(updated);
+    onUpdateSettings({ flights: flightSortAndStrip(updated) });
+  }
+
+  function handleFlightSave() {
+    const f = {
+      name:        (flightDraft.name        || '').trim(),
+      boatStart:   parseInt(flightDraft.boatStart)  || 0,
+      boatEnd:     parseInt(flightDraft.boatEnd)    || 0,
+      launchTime:  (flightDraft.launchTime  || '').trim(),
+      checkInTime: (flightDraft.checkInTime || '').trim(),
+    };
+    let updated;
+    if (editingFlightIdx === 'new') {
+      updated = [...localFlights, { ...f, _key: Date.now() }];
+    } else {
+      updated = localFlights.map((fl, i) => i === editingFlightIdx ? { ...fl, ...f } : fl);
+    }
+    setLocalFlights(updated);
+    onUpdateSettings({ flights: flightSortAndStrip(updated) });
+    setEditingFlightIdx(null);
+    setFlightDraft(null);
+  }
+
+  function handleFlightCancel() {
+    setEditingFlightIdx(null);
+    setFlightDraft(null);
   }
 
   const rowTotal = payouts.reduce((a, b) => a + (b || 0), 0);
@@ -333,6 +386,54 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           <p style={{ color: 'var(--header-bg)', fontSize: 11, marginTop: 8 }}>
             Shows the most recent weigh-ins in a bar above the leaderboard. Set to 0 to hide.
           </p>
+        </div>
+
+        {/* Flight Schedule */}
+        <div style={PANEL}>
+          <h3 style={H3}>Flight Schedule</h3>
+
+          {localFlights.length === 0 && editingFlightIdx === null && (
+            <p style={{ color: 'var(--header-bg)', fontSize: 13, marginBottom: 12 }}>
+              No flights configured.{!locked && ' Add a flight to assign boats to launch groups on the Flights tab.'}
+            </p>
+          )}
+
+          {localFlights.map((fl, idx) => (
+            <div key={fl._key} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(139,180,225,0.2)', borderRadius: 8, padding: '10px 14px', marginBottom: 8 }}>
+              {editingFlightIdx === idx ? (
+                <FlightForm draft={flightDraft} onChange={setFlightDraft} onSave={handleFlightSave} onCancel={handleFlightCancel} />
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ fontWeight: 700, color: 'var(--gold-light)', marginRight: 8 }}>{fl.name || '(unnamed)'}</span>
+                    <span style={{ color: 'var(--header-bg)', fontSize: 13 }}>
+                      Boats #{fl.boatStart}–#{fl.boatEnd}
+                      {fl.launchTime  && <span> · 🚤 {fl.launchTime}</span>}
+                      {fl.checkInTime && <span> · 📋 {fl.checkInTime}</span>}
+                    </span>
+                  </div>
+                  {!locked && (
+                    <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                      <button className="btn btn-outline btn-sm" onClick={() => handleFlightEdit(idx)}>✏️ Edit</button>
+                      <button className="btn btn-danger btn-sm"  onClick={() => handleFlightDelete(idx)}>🗑️</button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+
+          {editingFlightIdx === 'new' && (
+            <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(139,180,225,0.35)', borderRadius: 8, padding: '10px 14px', marginBottom: 8 }}>
+              <FlightForm draft={flightDraft} onChange={setFlightDraft} onSave={handleFlightSave} onCancel={handleFlightCancel} />
+            </div>
+          )}
+
+          {!locked && editingFlightIdx === null && (
+            <button className="btn btn-primary btn-sm" style={{ marginTop: 4 }} onClick={handleFlightAdd}>
+              + Add Flight
+            </button>
+          )}
         </div>
 
         {/* Data Management */}
@@ -581,6 +682,44 @@ function WeighInLogModal({ entries, penalties, onClose, onClearLog }) {
             <button className="btn btn-outline btn-lg" onClick={onClose}>Close</button>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function FlightForm({ draft, onChange, onSave, onCancel }) {
+  return (
+    <div style={{ width: '100%' }}>
+      <div className="edit-grid-2" style={{ marginBottom: 8 }}>
+        <div className="form-field">
+          <label>Flight Name</label>
+          <input type="text" value={draft.name} placeholder="e.g. Flight 1"
+                 onChange={e => onChange(prev => ({ ...prev, name: e.target.value }))} />
+        </div>
+        <div className="form-field">
+          <label>Launch Time</label>
+          <input type="text" value={draft.launchTime} placeholder="e.g. 7:15 AM"
+                 onChange={e => onChange(prev => ({ ...prev, launchTime: e.target.value }))} />
+        </div>
+        <div className="form-field">
+          <label>Boat # Start</label>
+          <input type="number" value={draft.boatStart} min="1" inputMode="numeric"
+                 onChange={e => onChange(prev => ({ ...prev, boatStart: e.target.value }))} />
+        </div>
+        <div className="form-field">
+          <label>Boat # End</label>
+          <input type="number" value={draft.boatEnd} min="1" inputMode="numeric"
+                 onChange={e => onChange(prev => ({ ...prev, boatEnd: e.target.value }))} />
+        </div>
+        <div className="form-field">
+          <label>Check-In Time</label>
+          <input type="text" value={draft.checkInTime} placeholder="e.g. 3:15 PM"
+                 onChange={e => onChange(prev => ({ ...prev, checkInTime: e.target.value }))} />
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+        <button className="btn btn-primary btn-sm" onClick={onSave}>Save</button>
+        <button className="btn btn-outline btn-sm" onClick={onCancel}>Cancel</button>
       </div>
     </div>
   );
