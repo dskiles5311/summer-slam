@@ -158,7 +158,10 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
       <div className="toolbar" style={{ flexShrink: 0 }}>
         {isUnlocked && <button className="btn btn-gold" onClick={onAdd}>+ Add Entry</button>}
 
-        <span style={{ fontSize: 13, color: 'var(--header-bg)' }}>
+        <span
+          title="Registered = entries with both Paid and App Signed marked Yes"
+          style={{ fontSize: 13, color: 'var(--header-bg)', cursor: 'help' }}
+        >
           <strong style={{ color: 'var(--gold-light)' }}>{registeredCount}</strong>
           {` / ${entries.length} registered`}
           {filter && <span style={{ opacity: 0.65 }}>{` (${displayed.length} shown)`}</span>}
