@@ -68,6 +68,7 @@ export default function SignUpTab({ onAddEntry }) {
       if (!form.coAnglerLast.trim())  errs.coAnglerLast  = 'Required';
       if (!form.coAnglerPhone.trim()) errs.coAnglerPhone  = 'Required';
     }
+    if (form.buyIn.trim() && isNaN(evalMath(form.buyIn))) errs.buyIn = 'Invalid expression';
     return errs;
   }
 
@@ -89,7 +90,7 @@ export default function SignUpTab({ onAddEntry }) {
       option:    form.option    === '' ? '' : parseInt(form.option),
       paid:      form.paid      === '' ? '' : parseInt(form.paid),
       appSigned: form.appSigned === '' ? '' : parseInt(form.appSigned),
-      buyIn:     isNaN(evalMath(form.buyIn)) ? 0 : parseFloat(evalMath(form.buyIn).toFixed(2)),
+      buyIn:     parseFloat((evalMath(form.buyIn) || 0).toFixed(2)),
       boatNo: '', numFish: 0, lunkerWeight: 0, totalWeight: 0,
     };
 
@@ -242,7 +243,8 @@ export default function SignUpTab({ onAddEntry }) {
                      const result = evalMath(e.target.value);
                      if (!isNaN(result)) set('buyIn', parseFloat(result.toFixed(2)));
                    }}
-                   style={FIELD} />
+                   style={fieldBorder('buyIn')} />
+            {err('buyIn')}
           </div>
         </div>
 
