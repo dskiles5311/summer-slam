@@ -101,6 +101,15 @@ export default function CheckInTab({ entries, onSave }) {
 
   function set(field, val) { setDraft(d => ({ ...d, [field]: val })); }
   function toggle(field)   { setDraft(d => ({ ...d, [field]: isOn(d[field]) ? 0 : 1 })); }
+  function swapAnglers()   {
+    setDraft(d => ({
+      ...d,
+      boaterFirst:   d.coAnglerFirst,  coAnglerFirst: d.boaterFirst,
+      boaterLast:    d.coAnglerLast,   coAnglerLast:  d.boaterLast,
+      boaterPhone:   d.coAnglerPhone,  coAnglerPhone: d.boaterPhone,
+      boaterEmail:   d.coAnglerEmail,  coAnglerEmail: d.boaterEmail,
+    }));
+  }
 
   async function handleSave(row) {
     setSaving(true);
@@ -227,8 +236,24 @@ export default function CheckInTab({ entries, onSave }) {
                          onChange={v => set('boaterEmail', v)} />
                     </div>
 
+                    {/* Swap button */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
+                      <div style={{ flex: 1, height: 1, background: 'rgba(168,200,160,0.12)' }} />
+                      <button type="button" onClick={swapAnglers} style={{
+                        padding: '4px 12px', borderRadius: 6, cursor: 'pointer',
+                        fontSize: 12, fontWeight: 700,
+                        border: '1px solid rgba(139,180,225,0.3)',
+                        background: 'rgba(255,255,255,0.05)',
+                        color: 'var(--header-bg)',
+                        whiteSpace: 'nowrap',
+                      }}>
+                        ⇅ Swap Boater / Co-Angler
+                      </button>
+                      <div style={{ flex: 1, height: 1, background: 'rgba(168,200,160,0.12)' }} />
+                    </div>
+
                     {/* Co-Angler */}
-                    <div style={{ ...SECTION_LABEL, marginTop: 6 }}>Co-Angler</div>
+                    <div style={{ ...SECTION_LABEL, marginTop: 2 }}>Co-Angler</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
                       <F label="First" value={draft.coAnglerFirst} onChange={v => set('coAnglerFirst', v)} />
                       <F label="Last"  value={draft.coAnglerLast}  onChange={v => set('coAnglerLast', v)} />
