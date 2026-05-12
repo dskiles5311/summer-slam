@@ -482,21 +482,23 @@ export default function App() {
     }
   }
 
-  async function handleBackfillPhones() {
+  async function handleBackfillInfo() {
     try {
       const result = await backfillPhones();
       const refreshed = await fetchEntries();
       setEntries(refreshed);
       if (result.total === 0) {
-        showToast('No matches found — entries already have phones or no contact record exists', 'info');
+        showToast('No matches found — entries already have info or no contact record exists', 'info');
       } else {
+        const phones = (result.boaterPhoneCount || 0) + (result.coAnglerPhoneCount || 0);
+        const emails = (result.boaterEmailCount || 0) + (result.coAnglerEmailCount || 0);
         const parts = [];
-        if (result.boaterCount)   parts.push(`${result.boaterCount} boater`);
-        if (result.coAnglerCount) parts.push(`${result.coAnglerCount} co-angler`);
-        showToast(`Filled in phones for: ${parts.join(', ')}`, 'success');
+        if (phones) parts.push(`${phones} phone${phones !== 1 ? 's' : ''}`);
+        if (emails) parts.push(`${emails} email${emails !== 1 ? 's' : ''}`);
+        showToast(`Filled in: ${parts.join(', ')}`, 'success');
       }
     } catch {
-      showToast('Failed to backfill phones', 'error');
+      showToast('Failed to backfill info', 'error');
     }
   }
 
@@ -574,7 +576,7 @@ export default function App() {
             onUpdateInlineField={handleUpdateInlineField}
             onClearDeductions={handleClearDeductions}
             onArchive={handleArchive}
-            onBackfillPhones={handleBackfillPhones}
+            onBackfillInfo={handleBackfillInfo}
             onNormalizePhones={handleNormalizePhones}
           />
         </div>

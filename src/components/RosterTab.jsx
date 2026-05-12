@@ -41,7 +41,7 @@ function sortEntries(entries, { field, dir }) {
 }
 
 
-export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred, onEdit, onAdd, onDelete, onClearAll, onImport, onToggleOffWater, onToggleField, onUpdateInlineField, onClearDeductions, onArchive, onBackfillPhones, onNormalizePhones }) {
+export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred, onEdit, onAdd, onDelete, onClearAll, onImport, onToggleOffWater, onToggleField, onUpdateInlineField, onClearDeductions, onArchive, onBackfillInfo, onNormalizePhones }) {
   const entryFee = parseFloat(settings.fees?.entryFee) || 249;
   const offWater = settings.offWater || {};
   const [sortKey, setSortKey] = useState(() => localStorage.getItem('ss_roster_sort_key') || '_rank');
@@ -180,11 +180,11 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
           }}
         />
 
-        {isUnlocked && onBackfillPhones && (
+        {isUnlocked && onBackfillInfo && (
           <button className="btn btn-outline"
-                  title="Fill in missing phone numbers from saved contacts (matched by name)"
-                  onClick={() => confirmed('backfill phones from contacts', onBackfillPhones)}>
-            📋 Backfill phones
+                  title="Fill in missing phones and emails from saved contacts (matched by name)"
+                  onClick={() => confirmed('backfill phones and emails from contacts', onBackfillInfo)}>
+            📋 Backfill info
           </button>
         )}
         {isUnlocked && onNormalizePhones && (
