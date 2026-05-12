@@ -39,7 +39,7 @@ export async function onRequestPost({ request, env }) {
       const p = formatPhone(origP);
       if (p !== origP) {
         await db.execute({
-          sql:  'UPDATE contacts SET phone=? WHERE id=?',
+          sql:  'UPDATE OR IGNORE contacts SET phone=? WHERE id=?',
           args: [p, Number(row.id)],
         });
         contactsUpdated++;
