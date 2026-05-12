@@ -2,6 +2,17 @@ import { useState, useRef } from 'react';
 import ContactSuggest from './ContactSuggest';
 import { formatPhone } from '../utils/phone';
 
+function evalMath(expr) {
+  const s = String(expr ?? '').trim();
+  if (!s) return NaN;
+  if (!/^[\d\s+\-*/().]+$/.test(s)) return NaN;
+  try {
+    // eslint-disable-next-line no-new-func
+    const result = Function('"use strict"; return (' + s + ')')();
+    return typeof result === 'number' && isFinite(result) ? result : NaN;
+  } catch { return NaN; }
+}
+
 const FIELD = {
   background: 'rgba(255,255,255,0.06)',
   border: '1px solid rgba(139,180,225,0.3)',
@@ -78,7 +89,7 @@ export default function SignUpTab({ onAddEntry }) {
       option:    form.option    === '' ? '' : parseInt(form.option),
       paid:      form.paid      === '' ? '' : parseInt(form.paid),
       appSigned: form.appSigned === '' ? '' : parseInt(form.appSigned),
-      buyIn:     parseFloat(form.buyIn) || 0,
+      buyIn:     isNaN(evalMath(form.buyIn)) ? 0 : parseFloat(evalMath(form.buyIn).toFixed(2)),
       boatNo: '', numFish: 0, lunkerWeight: 0, totalWeight: 0,
     };
 
@@ -225,8 +236,12 @@ export default function SignUpTab({ onAddEntry }) {
           </div>
           <div>
             <label style={LABEL}>Amount ($)</label>
-            <input type="number" value={form.buyIn} placeholder="0.00" step="0.01" min="0"
-                   inputMode="decimal" onChange={e => set('buyIn', e.target.value)}
+            <input type="text" inputMode="decimal" value={form.buyIn} placeholder="0.00"
+                   onChange={e => set('buyIn', e.target.value)}
+                   onBlur={e => {
+                     const result = evalMath(e.target.value);
+                     if (!isNaN(result)) set('buyIn', parseFloat(result.toFixed(2)));
+                   }}
                    style={FIELD} />
           </div>
         </div>
