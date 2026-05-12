@@ -46,7 +46,8 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
   const offWater = settings.offWater || {};
   const [sortKey, setSortKey] = useState(() => localStorage.getItem('ss_roster_sort_key') || '_rank');
   const [sortDir, setSortDir] = useState(() => localStorage.getItem('ss_roster_sort_dir') || 'asc');
-  const [filter, setFilter]   = useState('');
+  const [filter, setFilter]     = useState('');
+  const [regFilter, setRegFilter] = useState('all'); // 'all' | 'registered' | 'unregistered'
   const [editingId, setEditingId] = useState(null);
   const [editValues, setEditValues] = useState({});
   const [penaltyPopup, setPenaltyPopup] = useState(null); // { row, x, y }
@@ -67,13 +68,18 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
 
   const sorted = useMemo(() => sortEntries(entries, { field: sortKey, dir: sortDir }), [entries, sortKey, sortDir]);
 
+  const isRegistered = e => (e.paid === 1 || e.paid === '1') && (e.appSigned === 1 || e.appSigned === '1');
+
   const displayed = useMemo(() => {
-    if (!filter) return sorted;
+    let base = sorted;
+    if (regFilter === 'registered')   base = sorted.filter(isRegistered);
+    if (regFilter === 'unregistered') base = sorted.filter(e => !isRegistered(e));
+    if (!filter) return base;
     const q = filter.toLowerCase();
-    return sorted.filter(e =>
+    return base.filter(e =>
       `${e.boaterFirst} ${e.boaterLast} ${e.coAnglerFirst} ${e.coAnglerLast} ${e.boatNo}`.toLowerCase().includes(q)
     );
-  }, [sorted, filter]);
+  }, [sorted, filter, regFilter]);
 
   const registeredCount = useMemo(() =>
     entries.filter(e => (e.paid === 1 || e.paid === '1') && (e.appSigned === 1 || e.appSigned === '1')).length
@@ -158,14 +164,21 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
       <div className="toolbar" style={{ flexShrink: 0 }}>
         {isUnlocked && <button className="btn btn-gold" onClick={onAdd}>+ Add Entry</button>}
 
-        <span
-          title="Registered = entries with both Paid and App Signed marked Yes"
-          style={{ fontSize: 13, color: 'var(--header-bg)', cursor: 'help' }}
+        <button
+          className="btn btn-outline"
+          title="Click to cycle: All → Registered → Not Registered"
+          onClick={() => setRegFilter(f => f === 'all' ? 'registered' : f === 'registered' ? 'unregistered' : 'all')}
+          style={{
+            fontSize: 12,
+            borderColor: regFilter === 'registered' ? 'rgba(76,175,80,0.5)' : regFilter === 'unregistered' ? 'rgba(255,107,107,0.5)' : undefined,
+            color:       regFilter === 'registered' ? '#4CAF50'              : regFilter === 'unregistered' ? '#ff9090'               : undefined,
+          }}
         >
-          <strong style={{ color: 'var(--gold-light)' }}>{registeredCount}</strong>
-          {` / ${entries.length} registered`}
+          {regFilter === 'all'          && `All ${entries.length} entries`}
+          {regFilter === 'registered'   && `${registeredCount} / ${entries.length} registered`}
+          {regFilter === 'unregistered' && `${entries.length - registeredCount} / ${entries.length} not registered`}
           {filter && <span style={{ opacity: 0.65 }}>{` (${displayed.length} shown)`}</span>}
-        </span>
+        </button>
 
         <div style={{ flex: 1 }} />
 
