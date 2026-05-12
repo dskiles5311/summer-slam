@@ -25,6 +25,11 @@ const LABEL_STYLE = {
   marginBottom: 3,
 };
 
+const SECTION_LABEL = {
+  fontSize: 10, fontWeight: 700, color: 'var(--gold-light)',
+  textTransform: 'uppercase', letterSpacing: 0.6, marginTop: 4,
+};
+
 function F({ label, value, onChange, onBlur, type = 'text', inputMode }) {
   return (
     <div>
@@ -79,12 +84,18 @@ export default function CheckInTab({ entries, onSave }) {
     if (expandedId === row.id) { setExpandedId(null); setDraft({}); return; }
     setExpandedId(row.id);
     setDraft({
-      boaterFirst: row.boaterFirst || '', boaterLast: row.boaterLast || '',
-      boaterPhone: row.boaterPhone || '',
-      coAnglerFirst: row.coAnglerFirst || '', coAnglerLast: row.coAnglerLast || '',
-      coAnglerPhone: row.coAnglerPhone || '',
-      boatNo: row.boatNo || '',
-      lunker: row.lunker ?? '', option: row.option ?? '',
+      boaterFirst:   row.boaterFirst   || '',
+      boaterLast:    row.boaterLast    || '',
+      boaterPhone:   formatPhone(row.boaterPhone   || ''),
+      boaterEmail:   row.boaterEmail   || '',
+      coAnglerFirst: row.coAnglerFirst || '',
+      coAnglerLast:  row.coAnglerLast  || '',
+      coAnglerPhone: formatPhone(row.coAnglerPhone || ''),
+      coAnglerEmail: row.coAnglerEmail || '',
+      boatNo:    row.boatNo    || '',
+      lunker:    row.lunker    ?? '',
+      option:    row.option    ?? '',
+      appSigned: row.appSigned ?? '',
     });
   }
 
@@ -102,7 +113,7 @@ export default function CheckInTab({ entries, onSave }) {
       <div className="toolbar">
         <h2 style={{ color: 'var(--gold-light)', fontSize: 18, fontWeight: 800 }}>✅ Check In</h2>
       </div>
-      {/* Search bar — below sticky toolbar, above scrollable results */}
+
       <div style={{ maxWidth: 560, margin: '0 auto', paddingBottom: 12, borderBottom: '1px solid rgba(168,200,160,0.13)' }}>
         <input
           ref={searchRef}
@@ -121,13 +132,9 @@ export default function CheckInTab({ entries, onSave }) {
         />
       </div>
 
-      {/* Scrollable results — bounded so search bar never scrolls away */}
       <div style={{
-        maxWidth: 560,
-        margin: '0 auto',
-        paddingTop: 12,
+        maxWidth: 560, margin: '0 auto', paddingTop: 12,
         overflowY: 'auto',
-        /* 100dvh adjusts for iOS address bar; max() ensures ≥200px in landscape */
         maxHeight: 'max(200px, calc(100dvh - 330px))',
         WebkitOverflowScrolling: 'touch',
         overscrollBehavior: 'contain',
@@ -138,7 +145,6 @@ export default function CheckInTab({ entries, onSave }) {
             No entries match "{query.trim()}"
           </div>
         )}
-
         {!query.trim() && (
           <div style={{ textAlign: 'center', color: 'var(--header-bg)', padding: '32px 0', fontSize: 14 }}>
             Search by name, phone number, or boat # to look up an angler.
@@ -148,10 +154,11 @@ export default function CheckInTab({ entries, onSave }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {results.map(row => {
             const isOpen = expandedId === row.id;
+            const appNotSigned = !isOn(row.appSigned);
             return (
               <div key={row.id} style={{
                 borderRadius: 8,
-                border: `1.5px solid ${isOpen ? 'rgba(139,180,225,0.4)' : 'rgba(168,200,160,0.18)'}`,
+                border: `1.5px solid ${isOpen ? 'rgba(139,180,225,0.4)' : appNotSigned ? 'rgba(255,107,107,0.3)' : 'rgba(168,200,160,0.18)'}`,
                 background: isOpen ? 'rgba(255,255,255,0.03)' : 'transparent',
                 overflow: 'hidden',
               }}>
@@ -179,6 +186,9 @@ export default function CheckInTab({ entries, onSave }) {
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                    {appNotSigned && (
+                      <span style={{ fontSize: 10, background: 'rgba(255,107,107,0.2)', color: '#ff6b6b', borderRadius: 4, padding: '1px 6px', fontWeight: 700 }}>!</span>
+                    )}
                     {isOn(row.lunker) && <span style={{ fontSize: 10, background: 'rgba(232,200,118,0.2)', color: '#e8c876', borderRadius: 4, padding: '1px 6px', fontWeight: 700 }}>L</span>}
                     {isOn(row.option) && <span style={{ fontSize: 10, background: 'rgba(120,200,255,0.2)', color: '#78c8ff', borderRadius: 4, padding: '1px 6px', fontWeight: 700 }}>O</span>}
                   </div>
@@ -188,21 +198,70 @@ export default function CheckInTab({ entries, onSave }) {
                 {/* Expanded card */}
                 {isOpen && (
                   <div style={{ padding: '10px 12px 12px', borderTop: '1px solid rgba(168,200,160,0.12)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <div className="checkin-person-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
-                      <F label="Boater First" value={draft.boaterFirst} onChange={v => set('boaterFirst', v)} />
-                      <F label="Last"         value={draft.boaterLast}  onChange={v => set('boaterLast', v)} />
-                      <div className="checkin-phone"><F label="Phone" type="tel" inputMode="tel" value={draft.boaterPhone} onChange={v => set('boaterPhone', v)} onBlur={() => set('boaterPhone', formatPhone(draft.boaterPhone))} /></div>
+
+                    {/* App not signed alert */}
+                    {!isOn(draft.appSigned) && (
+                      <div style={{
+                        background: 'rgba(255,107,107,0.1)',
+                        border: '1px solid rgba(255,107,107,0.4)',
+                        borderRadius: 6,
+                        padding: '8px 12px',
+                        fontSize: 12, color: '#ff9090', fontWeight: 700,
+                      }}>
+                        ⚠️ Application not signed — collect signature before weigh-in.
+                      </div>
+                    )}
+
+                    {/* Boater */}
+                    <div style={SECTION_LABEL}>Boater</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                      <F label="First" value={draft.boaterFirst} onChange={v => set('boaterFirst', v)} />
+                      <F label="Last"  value={draft.boaterLast}  onChange={v => set('boaterLast', v)} />
+                      <F label="Phone" type="tel" inputMode="tel"
+                         value={draft.boaterPhone}
+                         onChange={v => set('boaterPhone', v)}
+                         onBlur={() => set('boaterPhone', formatPhone(draft.boaterPhone))} />
+                      <F label="Email" type="email"
+                         value={draft.boaterEmail}
+                         onChange={v => set('boaterEmail', v)} />
                     </div>
-                    <div className="checkin-person-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
-                      <F label="Co-Angler First" value={draft.coAnglerFirst} onChange={v => set('coAnglerFirst', v)} />
-                      <F label="Last"            value={draft.coAnglerLast}  onChange={v => set('coAnglerLast', v)} />
-                      <div className="checkin-phone"><F label="Phone" type="tel" inputMode="tel" value={draft.coAnglerPhone} onChange={v => set('coAnglerPhone', v)} onBlur={() => set('coAnglerPhone', formatPhone(draft.coAnglerPhone))} /></div>
+
+                    {/* Co-Angler */}
+                    <div style={{ ...SECTION_LABEL, marginTop: 6 }}>Co-Angler</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                      <F label="First" value={draft.coAnglerFirst} onChange={v => set('coAnglerFirst', v)} />
+                      <F label="Last"  value={draft.coAnglerLast}  onChange={v => set('coAnglerLast', v)} />
+                      <F label="Phone" type="tel" inputMode="tel"
+                         value={draft.coAnglerPhone}
+                         onChange={v => set('coAnglerPhone', v)}
+                         onBlur={() => set('coAnglerPhone', formatPhone(draft.coAnglerPhone))} />
+                      <F label="Email" type="email"
+                         value={draft.coAnglerEmail}
+                         onChange={v => set('coAnglerEmail', v)} />
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, alignItems: 'end' }}>
+
+                    {/* Boat #, Lunker, Option */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, alignItems: 'end', marginTop: 6 }}>
                       <F label="Boat #" inputMode="numeric" value={draft.boatNo} onChange={v => set('boatNo', v)} />
                       <ToggleField label="Lunker" on={isOn(draft.lunker)} onToggle={() => toggle('lunker')} />
                       <ToggleField label="Option" on={isOn(draft.option)} onToggle={() => toggle('option')} />
                     </div>
+
+                    {/* App Signed */}
+                    <div>
+                      <span style={LABEL_STYLE}>App Signed</span>
+                      <button type="button" onClick={() => toggle('appSigned')} style={{
+                        width: '100%', padding: '8px 0', borderRadius: 6,
+                        fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                        border: `1.5px solid ${isOn(draft.appSigned) ? '#4CAF50' : '#ff6b6b'}`,
+                        background: isOn(draft.appSigned) ? 'rgba(76,175,80,0.18)' : 'rgba(255,107,107,0.12)',
+                        color: isOn(draft.appSigned) ? '#4CAF50' : '#ff9090',
+                      }}>
+                        {isOn(draft.appSigned) ? '✓ Signed' : '✕ Not Signed — tap to mark signed'}
+                      </button>
+                    </div>
+
+                    {/* Actions */}
                     <div style={{ display: 'flex', gap: 8 }}>
                       <button className="btn btn-primary btn-sm" style={{ flex: 1 }} disabled={saving} onClick={() => handleSave(row)}>
                         {saving ? 'Saving…' : 'Save'}
