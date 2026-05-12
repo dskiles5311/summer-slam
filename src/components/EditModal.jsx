@@ -78,6 +78,16 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
     return () => window.removeEventListener('keydown', handler);
   }, [onCancel]);
 
+  function swapAnglers() {
+    setForm(prev => ({
+      ...prev,
+      boaterFirst:   prev.coAnglerFirst,  coAnglerFirst: prev.boaterFirst,
+      boaterLast:    prev.coAnglerLast,   coAnglerLast:  prev.boaterLast,
+      boaterPhone:   prev.coAnglerPhone,  coAnglerPhone: prev.boaterPhone,
+      boaterEmail:   prev.coAnglerEmail,  coAnglerEmail: prev.boaterEmail,
+    }));
+  }
+
   function set(field, val) {
     setForm(prev => {
       const next = { ...prev, [field]: val };
@@ -146,7 +156,7 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
           </div>
 
           <form onSubmit={handleSubmit}>
-            <div className="edit-section-label">Boater &amp; Co-Angler</div>
+            <div className="edit-section-label">Boater</div>
             <div className="edit-grid-2">
               <div className="form-field">
                 <label>Boater First{isNew ? ' *' : ''}</label>
@@ -179,6 +189,25 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
                 <input type="email" value={form.boaterEmail} placeholder="angler@example.com"
                        onChange={e => set('boaterEmail', e.target.value)} />
               </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '8px 0' }}>
+              <div style={{ flex: 1, height: 1, background: 'rgba(168,200,160,0.15)' }} />
+              <button type="button" onClick={swapAnglers} style={{
+                padding: '4px 12px', borderRadius: 6, cursor: 'pointer',
+                fontSize: 12, fontWeight: 700,
+                border: '1px solid rgba(139,180,225,0.3)',
+                background: 'rgba(255,255,255,0.05)',
+                color: 'var(--header-bg)',
+                whiteSpace: 'nowrap',
+              }}>
+                ⇅ Swap Boater / Co-Angler
+              </button>
+              <div style={{ flex: 1, height: 1, background: 'rgba(168,200,160,0.15)' }} />
+            </div>
+
+            <div className="edit-section-label">Co-Angler</div>
+            <div className="edit-grid-2">
               <div className="form-field">
                 <label>Co-Angler First</label>
                 <input type="text" value={form.coAnglerFirst} placeholder="First"
