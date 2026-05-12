@@ -124,7 +124,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
           className={`nav-tab ${activeTab === 'flights' ? 'active' : ''}`}
           onClick={() => onTabChange('flights')}
         >
-          ✈️ Flights
+          Flights
         </button>
         <button
           className={`nav-tab ${activeTab === 'rules' ? 'active' : ''}`}

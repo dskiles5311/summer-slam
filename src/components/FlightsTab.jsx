@@ -31,10 +31,10 @@ export default function FlightsTab({ entries, settings }) {
     return (
       <div className="tab-panel active">
         <div className="toolbar">
-          <h2 style={{ color: 'var(--gold-light)', fontSize: 18, fontWeight: 800 }}>✈️ Flights</h2>
+          <h2 style={{ color: 'var(--gold-light)', fontSize: 18, fontWeight: 800 }}>Flights</h2>
         </div>
         <div style={{ maxWidth: 700, margin: '40px auto', textAlign: 'center' }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>✈️</div>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>🎣</div>
           <p style={{ color: 'var(--header-bg)', fontSize: 15 }}>
             No flights have been configured yet.
           </p>
@@ -49,7 +49,7 @@ export default function FlightsTab({ entries, settings }) {
   return (
     <div className="tab-panel active">
       <div className="toolbar">
-        <h2 style={{ color: 'var(--gold-light)', fontSize: 18, fontWeight: 800 }}>✈️ Flights</h2>
+        <h2 style={{ color: 'var(--gold-light)', fontSize: 18, fontWeight: 800 }}>Flights</h2>
         <span style={{ fontSize: 12, color: 'var(--header-bg)' }}>
           {entries.length} boat{entries.length !== 1 ? 's' : ''} · sorted by boat #
         </span>
@@ -112,7 +112,6 @@ function FlightDivider({ flight, count }) {
       gap: 12,
       flexWrap: 'wrap',
     }}>
-      <span style={{ fontSize: 20 }}>✈️</span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontWeight: 800, color: 'var(--gold-light)', fontSize: 16 }}>
           {flight.name || '(unnamed)'}
