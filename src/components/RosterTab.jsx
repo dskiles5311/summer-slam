@@ -535,7 +535,7 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
               <div style={{ fontWeight: 800, color: '#ff9090', marginBottom: 10 }}>Deduction Details</div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                 <span>Scale weight</span>
-                <span style={{ fontWeight: 700 }}>{parseFloat(r.rawWeight).toFixed(2)} lbs</span>
+                <span style={{ fontWeight: 700 }}>{parseFloat(r.rawWeight ?? r.totalWeight).toFixed(2)} lbs</span>
               </div>
               {dead > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, color: '#ff9090' }}>
                 <span>Dead fish ({dead} × {deadRate.toFixed(2)})</span><span>−{deadPen.toFixed(2)} lbs</span>
