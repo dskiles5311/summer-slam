@@ -84,9 +84,9 @@ All protests must be submitted in writing to the Tournament Director prior to th
 
 ## #20 — Penalties
 
-- **Dead fish** — deduct 0.50 lbs
-- **Short fish** — deduct 1.00 lb plus loss of that fish
-- **Over 5 fish limit** — deduct 3.00 lbs per fish over limit
+- **Dead fish** — deduct {{DEAD_FISH_PEN}} lbs
+- **Short fish** — deduct {{SHORT_FISH_PEN}} lb plus loss of that fish
+- **Over {{MAX_FISH}} fish limit** — deduct {{OVER_LIMIT_PEN}} lbs per fish over limit
 - **Late penalty** — deduct 1.00 lb per minute late; disqualified after 15 minutes
 
 ## #21 — Landing Nets

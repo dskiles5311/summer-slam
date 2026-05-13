@@ -5,19 +5,27 @@ import rulesRaw from '../content/rules.md?raw';
 marked.setOptions({ breaks: true });
 
 export default function RulesTab({ settings }) {
-  const year       = new Date().getFullYear();
-  const entryFee   = parseFloat(settings?.fees?.entryFee  || 250).toFixed(2);
-  const opt1       = parseInt(settings?.fees?.option1Pct  || 70);
-  const opt2       = 100 - opt1;
+  const year          = new Date().getFullYear();
+  const entryFee      = parseFloat(settings?.fees?.entryFee             || 250).toFixed(2);
+  const opt1          = parseInt(settings?.fees?.option1Pct             || 70);
+  const opt2          = 100 - opt1;
+  const deadFishPen   = parseFloat(settings?.penalties?.deadFishPenalty  || 0.5).toFixed(2);
+  const shortFishPen  = parseFloat(settings?.penalties?.shortFishPenalty || 1.0).toFixed(2);
+  const overLimitPen  = parseFloat(settings?.penalties?.overLimitPenalty || 3.0).toFixed(2);
+  const maxFish       = parseInt(settings?.penalties?.maxFish            || 5);
 
   const html = useMemo(() => {
     const md = rulesRaw
-      .replace(/\{\{YEAR\}\}/g,        String(year))
-      .replace(/\{\{ENTRY_FEE\}\}/g,   entryFee)
-      .replace(/\{\{OPTION1_PCT\}\}/g, String(opt1))
-      .replace(/\{\{OPTION2_PCT\}\}/g, String(opt2));
+      .replace(/\{\{YEAR\}\}/g,          String(year))
+      .replace(/\{\{ENTRY_FEE\}\}/g,     entryFee)
+      .replace(/\{\{OPTION1_PCT\}\}/g,   String(opt1))
+      .replace(/\{\{OPTION2_PCT\}\}/g,   String(opt2))
+      .replace(/\{\{DEAD_FISH_PEN\}\}/g, deadFishPen)
+      .replace(/\{\{SHORT_FISH_PEN\}\}/g, shortFishPen)
+      .replace(/\{\{OVER_LIMIT_PEN\}\}/g, overLimitPen)
+      .replace(/\{\{MAX_FISH\}\}/g,      String(maxFish));
     return marked(md);
-  }, [year, entryFee, opt1, opt2]);
+  }, [year, entryFee, opt1, opt2, deadFishPen, shortFishPen, overLimitPen, maxFish]);
 
   return (
     <div className="tab-panel active" style={{ overflowY: 'auto', padding: '20px 24px', maxWidth: 760, margin: '0 auto' }}>
