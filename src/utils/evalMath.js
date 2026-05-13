@@ -54,6 +54,6 @@ export function evalMath(expr) {
 
   try {
     const result = parseAddSub();
-    return isFinite(result) ? result : NaN;
+    return Number.isFinite(result) ? result : NaN;
   } catch { return NaN; }
 }
