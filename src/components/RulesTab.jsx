@@ -12,20 +12,24 @@ export default function RulesTab({ settings }) {
   const deadFishPen   = parseFloat(settings?.penalties?.deadFishPenalty  || 0.5).toFixed(2);
   const shortFishPen  = parseFloat(settings?.penalties?.shortFishPenalty || 1.0).toFixed(2);
   const overLimitPen  = parseFloat(settings?.penalties?.overLimitPenalty || 3.0).toFixed(2);
-  const maxFish       = parseInt(settings?.penalties?.maxFish            || 5);
+  const maxFish       = parseInt(settings?.penalties?.maxFish              || 5);
+  const latePenPerMin = parseFloat(settings?.penalties?.latePenaltyPerMin  || 1.0).toFixed(2);
+  const lateDQMin     = parseInt(settings?.penalties?.latePenaltyDQMin     || 15);
 
   const html = useMemo(() => {
     const md = rulesRaw
-      .replace(/\{\{YEAR\}\}/g,          String(year))
-      .replace(/\{\{ENTRY_FEE\}\}/g,     entryFee)
-      .replace(/\{\{OPTION1_PCT\}\}/g,   String(opt1))
-      .replace(/\{\{OPTION2_PCT\}\}/g,   String(opt2))
-      .replace(/\{\{DEAD_FISH_PEN\}\}/g, deadFishPen)
-      .replace(/\{\{SHORT_FISH_PEN\}\}/g, shortFishPen)
-      .replace(/\{\{OVER_LIMIT_PEN\}\}/g, overLimitPen)
-      .replace(/\{\{MAX_FISH\}\}/g,      String(maxFish));
+      .replace(/\{\{YEAR\}\}/g,            String(year))
+      .replace(/\{\{ENTRY_FEE\}\}/g,       entryFee)
+      .replace(/\{\{OPTION1_PCT\}\}/g,     String(opt1))
+      .replace(/\{\{OPTION2_PCT\}\}/g,     String(opt2))
+      .replace(/\{\{DEAD_FISH_PEN\}\}/g,   deadFishPen)
+      .replace(/\{\{SHORT_FISH_PEN\}\}/g,  shortFishPen)
+      .replace(/\{\{OVER_LIMIT_PEN\}\}/g,  overLimitPen)
+      .replace(/\{\{MAX_FISH\}\}/g,        String(maxFish))
+      .replace(/\{\{LATE_PEN_PER_MIN\}\}/g, latePenPerMin)
+      .replace(/\{\{LATE_DQ_MIN\}\}/g,     String(lateDQMin));
     return marked(md);
-  }, [year, entryFee, opt1, opt2, deadFishPen, shortFishPen, overLimitPen, maxFish]);
+  }, [year, entryFee, opt1, opt2, deadFishPen, shortFishPen, overLimitPen, maxFish, latePenPerMin, lateDQMin]);
 
   return (
     <div className="tab-panel active" style={{ overflowY: 'auto', padding: '20px 24px', maxWidth: 760, margin: '0 auto' }}>

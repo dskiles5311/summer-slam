@@ -87,7 +87,7 @@ All protests must be submitted in writing to the Tournament Director prior to th
 - **Dead fish** — deduct {{DEAD_FISH_PEN}} lbs
 - **Short fish** — deduct {{SHORT_FISH_PEN}} lb plus loss of that fish
 - **Over {{MAX_FISH}} fish limit** — deduct {{OVER_LIMIT_PEN}} lbs per fish over limit
-- **Late penalty** — deduct 1.00 lb per minute late; disqualified after 15 minutes
+- **Late penalty** — deduct {{LATE_PEN_PER_MIN}} lb per minute past flight check-in time; disqualified after {{LATE_DQ_MIN}} minutes
 
 ## #21 — Landing Nets
 

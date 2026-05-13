@@ -1,25 +1,66 @@
-export function calcRanks(entries) {
-  const sorted = [...entries].sort((a, b) => {
-    const wa = parseFloat(a.totalWeight) || 0;
-    const wb = parseFloat(b.totalWeight) || 0;
+function parseFlightTime(timeStr, referenceDate) {
+  if (!timeStr) return null;
+  const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+  if (!match) return null;
+  let h = parseInt(match[1]);
+  const m = parseInt(match[2]);
+  const ap = match[3].toUpperCase();
+  if (ap === 'PM' && h !== 12) h += 12;
+  if (ap === 'AM' && h === 12) h = 0;
+  const d = new Date(referenceDate);
+  d.setHours(h, m, 0, 0);
+  return d;
+}
+
+export function calcRanks(entries, settings) {
+  const flights       = settings?.flights || [];
+  const latePenPerMin = parseFloat(settings?.penalties?.latePenaltyPerMin ?? 1.0);
+  const lateDQMin     = parseInt(settings?.penalties?.latePenaltyDQMin    ?? 15);
+
+  const withPenalties = entries.map(entry => {
+    const base = parseFloat(entry.totalWeight) || 0;
+    const noLate = { ...entry, _latePenalty: 0, _isDQ: false, _minsLate: 0, _effectiveWeight: base };
+
+    if (!entry.weighedAt || !entry.boatNo || !flights.length) return noLate;
+
+    const boatNum = parseInt(entry.boatNo);
+    const flight  = flights.find(f => boatNum >= parseInt(f.boatStart) && boatNum <= parseInt(f.boatEnd));
+    if (!flight?.checkInTime) return noLate;
+
+    const weighedDate = new Date(entry.weighedAt);
+    const checkIn     = parseFlightTime(flight.checkInTime, weighedDate);
+    if (!checkIn) return noLate;
+
+    const minsLate = Math.max(0, Math.floor((weighedDate - checkIn) / 60000));
+    if (minsLate === 0) return noLate;
+
+    if (minsLate >= lateDQMin) {
+      return { ...entry, _latePenalty: 0, _isDQ: true, _minsLate: minsLate, _effectiveWeight: 0 };
+    }
+
+    const penalty         = parseFloat((minsLate * latePenPerMin).toFixed(2));
+    const effectiveWeight = parseFloat(Math.max(0, base - penalty).toFixed(2));
+    return { ...entry, _latePenalty: penalty, _isDQ: false, _minsLate: minsLate, _effectiveWeight: effectiveWeight };
+  });
+
+  const sorted = [...withPenalties].sort((a, b) => {
+    const wa = a._effectiveWeight || 0;
+    const wb = b._effectiveWeight || 0;
     if (wa === 0 && wb === 0) return 0;
     if (wa === 0) return 1;
     if (wb === 0) return -1;
     if (wb !== wa) return wb - wa;
-    // Tiebreaker: heaviest lunker wins
     return (parseFloat(b.lunkerWeight) || 0) - (parseFloat(a.lunkerWeight) || 0);
   });
 
   const ranked = [];
   for (let i = 0; i < sorted.length; i++) {
     const entry = sorted[i];
-    if (!(parseFloat(entry.totalWeight) > 0)) {
-      ranked.push({ ...entry, _rank: null });
-      continue;
-    }
+    const ew = entry._effectiveWeight || 0;
+    if (!(ew > 0)) { ranked.push({ ...entry, _rank: null }); continue; }
     if (i === 0) { ranked.push({ ...entry, _rank: 1 }); continue; }
     const prev = sorted[i - 1];
-    const sameWeight = parseFloat(entry.totalWeight) === parseFloat(prev.totalWeight);
+    const sameWeight = ew === (prev._effectiveWeight || 0);
     const sameLunker = (parseFloat(entry.lunkerWeight) || 0) === (parseFloat(prev.lunkerWeight) || 0);
     ranked.push({ ...entry, _rank: sameWeight && sameLunker ? ranked[i - 1]._rank : i + 1 });
   }

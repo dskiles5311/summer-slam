@@ -392,11 +392,24 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
                      onChange={e => setLocalPenalties(prev => ({ ...prev, maxFish: parseInt(e.target.value) || 1 }))}
                      onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
             </div>
+            <div className="form-field">
+              <label>Late Penalty (lbs per minute)</label>
+              <input type="number" value={localPenalties?.latePenaltyPerMin ?? 1.0} min="0" step="0.01" disabled={locked}
+                     onChange={e => setLocalPenalties(prev => ({ ...prev, latePenaltyPerMin: parseFloat(e.target.value) || 0 }))}
+                     onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
+            </div>
+            <div className="form-field">
+              <label>Late DQ (minutes past check-in)</label>
+              <input type="number" value={localPenalties?.latePenaltyDQMin ?? 15} min="1" step="1" disabled={locked}
+                     onChange={e => setLocalPenalties(prev => ({ ...prev, latePenaltyDQMin: parseInt(e.target.value) || 15 }))}
+                     onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
+            </div>
           </div>
           <p style={{ color: 'var(--header-bg)', fontSize: 11, marginTop: 8 }}>
             Dead fish: deduct X lbs per dead fish from total weight.<br />
             Short fish: deduct X lbs from total weight and X from fish count per short fish.<br />
-            Over limit: deduct X lbs for each fish over the max limit.
+            Over limit: deduct X lbs for each fish over the max limit.<br />
+            Late penalty: deduct X lbs per minute past flight check-in time; team is DQ'd after Y minutes.
           </p>
         </div>
 
