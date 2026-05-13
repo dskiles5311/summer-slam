@@ -429,6 +429,7 @@ export default function App() {
     const year = window.prompt('Save current entries as which year?', String(new Date().getFullYear()));
     if (!year?.trim()) return;
     const label = year.trim();
+    if (!/^\d{4}$/.test(label)) { alert('Year must be a 4-digit number (e.g. 2025).'); return; }
     if (!confirm(`Archive ${rankedEntries.length} entries as "${label}"?\n\nAny existing archive for ${label} will be replaced.`)) return;
     try {
       const payload = rankedEntries.map(e => ({
