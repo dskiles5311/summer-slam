@@ -1,17 +1,7 @@
 import { useState, useRef } from 'react';
 import ContactSuggest from './ContactSuggest';
 import { formatPhone } from '../utils/phone';
-
-function evalMath(expr) {
-  const s = String(expr ?? '').trim();
-  if (!s) return NaN;
-  if (!/^[\d\s+\-*/().]+$/.test(s)) return NaN;
-  try {
-    // eslint-disable-next-line no-new-func
-    const result = Function('"use strict"; return (' + s + ')')();
-    return typeof result === 'number' && isFinite(result) ? result : NaN;
-  } catch { return NaN; }
-}
+import { evalMath } from '../utils/evalMath';
 
 const FIELD = {
   background: 'rgba(255,255,255,0.06)',

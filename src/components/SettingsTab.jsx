@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { calcWeightedPayouts } from '../utils/calculations';
 import { exportCSV, importCSV } from '../utils/csv';
+import { evalMath } from '../utils/evalMath';
 
 const PANEL = { background: 'var(--settings-panel-bg)', border: '1px solid rgba(139,180,225,0.2)', borderRadius: 10, padding: 20, marginBottom: 16 };
 const H3 = { color: 'var(--header-bg)', fontSize: 14, marginBottom: 14, textTransform: 'uppercase', letterSpacing: 1 };
@@ -36,12 +37,8 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   }, [settings.flights]);
 
   function evalExpr(str) {
-    const cleaned = String(str).replace(/[^0-9+\-*/.() ]/g, '').trim();
-    if (!cleaned) return 0;
-    try {
-      const result = Function('"use strict"; return (' + cleaned + ')')();
-      return isFinite(result) ? Math.round(result) : 0;
-    } catch { return 0; }
+    const result = evalMath(String(str));
+    return isNaN(result) ? 0 : Math.round(result);
   }
 
   // Weighted distribution guaranteeing the last-place floor.
