@@ -21,11 +21,13 @@ export async function onRequestGet({ request, env }) {
     let result;
     if (q.length >= 2) {
       const like = `%${q}%`;
+      const digits = q.replace(/\D/g, '');
+      const useDigits = digits.length >= 2;
       result = await db.execute({
         sql: `SELECT id, first_name, last_name, phone, email, last_seen FROM contacts
-              WHERE first_name LIKE ? OR last_name LIKE ? OR (first_name || ' ' || last_name) LIKE ? OR phone LIKE ?
+              WHERE first_name LIKE ? OR last_name LIKE ? OR (first_name || ' ' || last_name) LIKE ? OR phone LIKE ?${useDigits ? ` OR REPLACE(phone, '-', '') LIKE ?` : ''}
               ORDER BY last_seen DESC LIMIT 10`,
-        args: [like, like, like, like],
+        args: useDigits ? [like, like, like, like, `%${digits}%`] : [like, like, like, like],
       });
     } else {
       result = await db.execute(
