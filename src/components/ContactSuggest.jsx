@@ -26,7 +26,7 @@ const DROP_STYLE = {
   boxShadow: '0 6px 24px rgba(0,0,0,0.4)',
 };
 
-export default function ContactSuggest({ value, placeholder, onChange, onSelect, inputRef, inputProps = {} }) {
+export default function ContactSuggest({ value, placeholder, onChange, onSelect, onBlur, inputRef, inputProps = {} }) {
   const [suggestions, setSuggestions] = useState([]);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
@@ -69,8 +69,9 @@ export default function ContactSuggest({ value, placeholder, onChange, onSelect,
     setActive(-1);
   }
 
-  function handleBlur() {
+  function handleBlur(e) {
     setTimeout(() => { setOpen(false); setActive(-1); }, 150);
+    if (onBlur) onBlur(e);
   }
 
   return (

@@ -195,10 +195,14 @@ export default function SignUpTab({ onAddEntry, settings }) {
           </div>
           <div>
             <label style={LABEL}>Phone *</label>
-            <input type="tel" value={form.boaterPhone} placeholder="555-123-4567"
-                   onChange={e => set('boaterPhone', e.target.value)}
-                   onBlur={e => set('boaterPhone', formatPhone(e.target.value))}
-                   style={fieldBorder('boaterPhone')} />
+            <ContactSuggest
+              value={form.boaterPhone}
+              placeholder="555-123-4567"
+              onChange={v => set('boaterPhone', v)}
+              onSelect={c => setForm(p => ({ ...p, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || p.boaterEmail }))}
+              onBlur={e => set('boaterPhone', formatPhone(e.target.value))}
+              inputProps={{ style: fieldBorder('boaterPhone'), type: 'tel' }}
+            />
             {err('boaterPhone')}
           </div>
         </div>
@@ -239,10 +243,14 @@ export default function SignUpTab({ onAddEntry, settings }) {
             <label style={LABEL}>
               Phone{(form.coAnglerFirst || form.coAnglerLast) ? ' *' : ''}
             </label>
-            <input type="tel" value={form.coAnglerPhone} placeholder="555-123-4567"
-                   onChange={e => set('coAnglerPhone', e.target.value)}
-                   onBlur={e => set('coAnglerPhone', formatPhone(e.target.value))}
-                   style={fieldBorder('coAnglerPhone')} />
+            <ContactSuggest
+              value={form.coAnglerPhone}
+              placeholder="555-123-4567"
+              onChange={v => set('coAnglerPhone', v)}
+              onSelect={c => setForm(p => ({ ...p, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || p.coAnglerEmail }))}
+              onBlur={e => set('coAnglerPhone', formatPhone(e.target.value))}
+              inputProps={{ style: fieldBorder('coAnglerPhone'), type: 'tel' }}
+            />
             {err('coAnglerPhone')}
           </div>
         </div>
