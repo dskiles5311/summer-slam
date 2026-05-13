@@ -46,6 +46,7 @@ export async function onRequestPut({ params, request, env }) {
 
     const newTotalWeight    = Number(body.totalWeight) || 0;
     const preserveWeighTime = body.preserveWeighTime ? 1 : 0;
+    const clientWeighedAt   = body.weighedAt ? String(body.weighedAt) : null;
     await db.execute({
       sql: `UPDATE entries SET
               boater_first=?, boater_last=?, boater_phone=?, boater_email=?,
@@ -53,7 +54,7 @@ export async function onRequestPut({ params, request, env }) {
               boat_no=?, num_fish=?, lunker_weight=?, total_weight=?,
               lunker=?, option_field=?, paid=?, app_signed=?, buy_in=?,
               raw_weight=?, dead_fish=?, short_fish=?, needs_attention=?,
-              weighed_at = CASE WHEN ? > 0 AND ? = 0 THEN CURRENT_TIMESTAMP ELSE weighed_at END
+              weighed_at = CASE WHEN ? > 0 AND ? = 0 THEN COALESCE(?, CURRENT_TIMESTAMP) ELSE weighed_at END
             WHERE id=?`,
       args: [
         t(body.boaterFirst),   t(body.boaterLast),    t(body.boaterPhone),   t(body.boaterEmail),
@@ -71,7 +72,7 @@ export async function onRequestPut({ params, request, env }) {
         Number(body.deadFish)  || 0,
         Number(body.shortFish) || 0,
         body.needsAttention ? 1 : 0,
-        newTotalWeight, preserveWeighTime,
+        newTotalWeight, preserveWeighTime, clientWeighedAt,
         params.id,
       ],
     });

@@ -731,16 +731,24 @@ function formatTime(raw) {
   const s = String(raw || '').trim();
   if (!s) return '';
   const ampmMatch = s.match(/\s*(am|pm)$/i);
-  const ampm = ampmMatch ? ' ' + ampmMatch[1].toUpperCase() : '';
   const timePart = ampmMatch ? s.slice(0, -ampmMatch[0].length).trim() : s;
   const digits = timePart.replace(/\D/g, '');
   if (!digits) return s;
   let h, m;
-  if      (digits.length <= 2) { h = parseInt(digits);           m = 0; }
-  else if (digits.length === 3) { h = parseInt(digits[0]);        m = parseInt(digits.slice(1)); }
-  else if (digits.length === 4) { h = parseInt(digits.slice(0,2)); m = parseInt(digits.slice(2)); }
+  if      (digits.length <= 2) { h = parseInt(digits);            m = 0; }
+  else if (digits.length === 3) { h = parseInt(digits[0]);         m = parseInt(digits.slice(1)); }
+  else if (digits.length === 4) { h = parseInt(digits.slice(0, 2)); m = parseInt(digits.slice(2)); }
   else return s;
   if (isNaN(h) || isNaN(m) || m > 59 || h > 23) return s;
+  // Always include AM/PM: use explicit input, or infer from 24-hour value
+  let ampm;
+  if (ampmMatch) {
+    ampm = ' ' + ampmMatch[1].toUpperCase();
+  } else {
+    ampm = h < 12 ? ' AM' : ' PM';
+    if (h > 12) h -= 12;
+    if (h === 0) h = 12;
+  }
   return `${h}:${String(m).padStart(2, '0')}${ampm}`;
 }
 

@@ -1,15 +1,27 @@
 function parseFlightTime(timeStr, referenceDate) {
   if (!timeStr) return null;
-  const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
-  if (!match) return null;
-  let h = parseInt(match[1]);
-  const m = parseInt(match[2]);
-  const ap = match[3].toUpperCase();
-  if (ap === 'PM' && h !== 12) h += 12;
-  if (ap === 'AM' && h === 12) h = 0;
-  const d = new Date(referenceDate);
-  d.setHours(h, m, 0, 0);
-  return d;
+  const ampmMatch = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+  if (ampmMatch) {
+    let h = parseInt(ampmMatch[1]);
+    const m = parseInt(ampmMatch[2]);
+    const ap = ampmMatch[3].toUpperCase();
+    if (ap === 'PM' && h !== 12) h += 12;
+    if (ap === 'AM' && h === 12) h = 0;
+    const d = new Date(referenceDate);
+    d.setHours(h, m, 0, 0);
+    return d;
+  }
+  // fallback: bare HH:MM treated as 24-hour local time
+  const bareMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
+  if (bareMatch) {
+    const h = parseInt(bareMatch[1]);
+    const m = parseInt(bareMatch[2]);
+    if (h > 23 || m > 59) return null;
+    const d = new Date(referenceDate);
+    d.setHours(h, m, 0, 0);
+    return d;
+  }
+  return null;
 }
 
 export function calcRanks(entries, settings) {
