@@ -424,8 +424,11 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
                         style={{ display: 'block', width: '100%', padding: '8px 10px', border: 'none', background: 'transparent', color: 'inherit', fontSize: 'inherit', lineHeight: 'inherit', textAlign: 'right', boxSizing: 'border-box' }}
                       />
                     ) : (
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
-                        {parseFloat(row.totalWeight) > 0 ? parseFloat(row.totalWeight).toFixed(2) : '—'}
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                        {row._isDQ
+                          ? <span style={{ fontSize: 12, background: 'rgba(255,107,107,0.3)', color: '#ff6b6b', borderRadius: 4, padding: '1px 6px', fontWeight: 800 }}>DQ</span>
+                          : (parseFloat(row.totalWeight) > 0 ? parseFloat(row.totalWeight).toFixed(2) : '—')
+                        }
                         {row.rawWeight > 0 && (
                           <span
                             title="Deductions applied — click for details"
@@ -433,6 +436,24 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
                             style={{ fontSize: 11, background: 'rgba(255,107,107,0.25)', color: '#ff9090', borderRadius: 4, padding: '1px 5px', cursor: 'pointer', fontWeight: 700, whiteSpace: 'nowrap' }}
                           >
                             −{(row.rawWeight - parseFloat(row.totalWeight)).toFixed(2)}
+                          </span>
+                        )}
+                        {row._isDQ && (
+                          <span
+                            title="Disqualified — late check-in — click for details"
+                            onClick={e => { e.stopPropagation(); setPenaltyPopup(p => p?.row?.id === row.id ? null : { row, x: e.clientX, y: e.clientY }); }}
+                            style={{ fontSize: 11, background: 'rgba(255,107,107,0.25)', color: '#ff9090', borderRadius: 4, padding: '1px 5px', cursor: 'pointer', fontWeight: 700, whiteSpace: 'nowrap' }}
+                          >
+                            {row._minsLate}m late
+                          </span>
+                        )}
+                        {!row._isDQ && row._latePenalty > 0 && (
+                          <span
+                            title="Late penalty applied — click for details"
+                            onClick={e => { e.stopPropagation(); setPenaltyPopup(p => p?.row?.id === row.id ? null : { row, x: e.clientX, y: e.clientY }); }}
+                            style={{ fontSize: 11, background: 'rgba(255,165,0,0.25)', color: '#ffb450', borderRadius: 4, padding: '1px 5px', cursor: 'pointer', fontWeight: 700, whiteSpace: 'nowrap' }}
+                          >
+                            −{row._latePenalty.toFixed(2)} late
                           </span>
                         )}
                       </span>
@@ -525,10 +546,30 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
               {over > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, color: '#ff9090' }}>
                 <span>Over limit ({over} × {overRate.toFixed(2)})</span><span>−{overPen.toFixed(2)} lbs</span>
               </div>}
-              <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', marginTop: 8, paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontWeight: 800 }}>
-                <span style={{ color: 'var(--gold-light, #e8c876)' }}>Adjusted weight</span>
+              <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', marginTop: 8, paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontWeight: 800, marginBottom: (r._isDQ || r._latePenalty > 0) ? 8 : 0 }}>
+                <span style={{ color: 'var(--gold-light, #e8c876)' }}>After fish penalties</span>
                 <span style={{ color: 'var(--gold-light, #e8c876)' }}>{parseFloat(r.totalWeight).toFixed(2)} lbs</span>
               </div>
+              {r._isDQ && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, color: '#ff6b6b', fontWeight: 800 }}>
+                  <span>⛔ DQ — {r._minsLate} min late (≥{settings?.penalties?.latePenaltyDQMin ?? 15} min)</span>
+                  <span>DQ</span>
+                </div>
+              )}
+              {!r._isDQ && r._latePenalty > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, color: '#ffb450' }}>
+                  <span>Late ({r._minsLate} min × {parseFloat(settings?.penalties?.latePenaltyPerMin ?? 1).toFixed(2)})</span>
+                  <span>−{r._latePenalty.toFixed(2)} lbs</span>
+                </div>
+              )}
+              {(r._isDQ || r._latePenalty > 0) && (
+                <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', marginTop: 8, paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontWeight: 800 }}>
+                  <span style={{ color: 'var(--gold-light, #e8c876)' }}>Final weight</span>
+                  <span style={{ color: r._isDQ ? '#ff6b6b' : 'var(--gold-light, #e8c876)' }}>
+                    {r._isDQ ? 'DQ' : `${(r._effectiveWeight ?? 0).toFixed(2)} lbs`}
+                  </span>
+                </div>
+              )}
               {isUnlocked && (
                 <button
                   className="btn btn-danger btn-sm"
