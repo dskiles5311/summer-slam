@@ -528,12 +528,12 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
             <div onClick={() => setPenaltyPopup(null)} style={{ position: 'fixed', inset: 0, zIndex: 999 }} />
             <div style={{
               position: 'fixed', left, top, zIndex: 1000, minWidth: 240,
-              background: 'var(--modal-bg, #1a2a3a)', border: '1px solid rgba(255,107,107,0.4)',
+              background: '#1a2a3a', border: '1px solid rgba(255,107,107,0.4)',
               borderRadius: 10, padding: '14px 16px', boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-              fontSize: 13,
+              fontSize: 13, color: '#e0e8f0',
             }}>
               <div style={{ fontWeight: 800, color: '#ff9090', marginBottom: 10 }}>Deduction Details</div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, color: 'var(--white, #fff)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                 <span>Scale weight</span>
                 <span style={{ fontWeight: 700 }}>{parseFloat(r.rawWeight).toFixed(2)} lbs</span>
               </div>
@@ -546,9 +546,9 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
               {over > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, color: '#ff9090' }}>
                 <span>Over limit ({over} × {overRate.toFixed(2)})</span><span>−{overPen.toFixed(2)} lbs</span>
               </div>}
-              <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', marginTop: 8, paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontWeight: 800, marginBottom: (r._isDQ || r._latePenalty > 0) ? 8 : 0 }}>
-                <span style={{ color: 'var(--gold-light, #e8c876)' }}>After fish penalties</span>
-                <span style={{ color: 'var(--gold-light, #e8c876)' }}>{parseFloat(r.totalWeight).toFixed(2)} lbs</span>
+              <div style={{ borderTop: '1px solid rgba(255,255,255,0.15)', marginTop: 8, paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontWeight: 800, marginBottom: (r._isDQ || r._latePenalty > 0) ? 8 : 0 }}>
+                <span style={{ color: '#e8c876' }}>After fish penalties</span>
+                <span style={{ color: '#e8c876' }}>{parseFloat(r.totalWeight).toFixed(2)} lbs</span>
               </div>
               {r._isDQ && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, color: '#ff6b6b', fontWeight: 800 }}>
@@ -563,9 +563,9 @@ export default function RosterTab({ entries, settings, isUnlocked, buyInBlurred,
                 </div>
               )}
               {(r._isDQ || r._latePenalty > 0) && (
-                <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', marginTop: 8, paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontWeight: 800 }}>
-                  <span style={{ color: 'var(--gold-light, #e8c876)' }}>Final weight</span>
-                  <span style={{ color: r._isDQ ? '#ff6b6b' : 'var(--gold-light, #e8c876)' }}>
+                <div style={{ borderTop: '1px solid rgba(255,255,255,0.15)', marginTop: 8, paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontWeight: 800 }}>
+                  <span style={{ color: '#e8c876' }}>Final weight</span>
+                  <span style={{ color: r._isDQ ? '#ff6b6b' : '#e8c876' }}>
                     {r._isDQ ? 'DQ' : `${(r._effectiveWeight ?? 0).toFixed(2)} lbs`}
                   </span>
                 </div>
