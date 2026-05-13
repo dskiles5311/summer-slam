@@ -131,8 +131,9 @@ export default function LeaderboardTab({ entries, settings }) {
           <div className="rw-label">⚖️ Recently Weighed</div>
           <div className="rw-cards">
             {recentEntries.map((row, i) => {
-              const lw = parseFloat(row.lunkerWeight) || 0;
-              const tw = parseFloat(row.totalWeight) || 0;
+              const lw  = parseFloat(row.lunkerWeight) || 0;
+              const raw = parseFloat(row.totalWeight) || 0;
+              const tw  = row._isDQ ? 0 : (row._effectiveWeight ?? raw);
               const coName = [row.coAnglerFirst, row.coAnglerLast].filter(Boolean).join(' ');
               return (
                 <div key={row.id} className={`rw-card${i === 0 ? ' rw-latest' : ''}`}>
@@ -161,8 +162,12 @@ export default function LeaderboardTab({ entries, settings }) {
                       </div>
                     )}
                     <div className="rw-stat rw-highlight">
-                      <div className="rw-stat-val">{tw > 0 ? `${tw.toFixed(2)} lbs` : '—'}</div>
-                      <div className="rw-stat-lbl">Total Wt</div>
+                      <div className="rw-stat-val">
+                        {row._isDQ ? 'DQ' : tw > 0 ? `${tw.toFixed(2)} lbs` : '—'}
+                      </div>
+                      <div className="rw-stat-lbl">
+                        Total Wt{row._latePenalty > 0 ? ` (−${row._latePenalty.toFixed(2)} late)` : ''}
+                      </div>
                     </div>
                   </div>
                 </div>
