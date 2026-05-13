@@ -42,6 +42,7 @@ function parseEntry(raw) {
     shortFish:      raw.short_fish      ?? raw.shortFish      ?? 0,
     needsAttention: Boolean(raw.needs_attention ?? raw.needsAttention ?? false),
     weighedAt:      raw.weighed_at ?? raw.weighedAt ?? null,
+    updatedAt:      raw.updated_at ?? raw.updatedAt ?? null,
   };
 }
 
@@ -89,6 +90,11 @@ export async function updateEntry(id, entry) {
     headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify(entry),
   });
+  if (res.status === 409) {
+    const err = new Error('Entry was modified by another device.');
+    err.isConflict = true;
+    throw err;
+  }
   if (!res.ok) throw new Error('Failed to update entry');
   return parseEntry(await res.json());
 }

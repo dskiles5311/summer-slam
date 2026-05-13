@@ -33,6 +33,7 @@ function toJS(row) {
     shortFish:      row.short_fish      ?? 0,
     needsAttention: Boolean(row.needs_attention),
     weighedAt:      row.weighed_at      ?? null,
+    updatedAt:      row.updated_at      ?? null,
   };
 }
 
@@ -46,16 +47,19 @@ export async function onRequestPut({ params, request, env }) {
 
     const newTotalWeight    = Number(body.totalWeight) || 0;
     const preserveWeighTime = body.preserveWeighTime ? 1 : 0;
-    const clientWeighedAt   = body.weighedAt ? String(body.weighedAt) : null;
-    await db.execute({
+    const clientWeighedAt   = body.weighedAt  ? String(body.weighedAt)  : null;
+    const clientUpdatedAt   = body.updatedAt  ? String(body.updatedAt)  : null;
+
+    const result = await db.execute({
       sql: `UPDATE entries SET
               boater_first=?, boater_last=?, boater_phone=?, boater_email=?,
               co_angler_first=?, co_angler_last=?, co_angler_phone=?, co_angler_email=?,
               boat_no=?, num_fish=?, lunker_weight=?, total_weight=?,
               lunker=?, option_field=?, paid=?, app_signed=?, buy_in=?,
               raw_weight=?, dead_fish=?, short_fish=?, needs_attention=?,
-              weighed_at = CASE WHEN ? > 0 AND ? = 0 THEN COALESCE(?, CURRENT_TIMESTAMP) ELSE weighed_at END
-            WHERE id=?`,
+              weighed_at  = CASE WHEN ? > 0 AND ? = 0 THEN COALESCE(?, CURRENT_TIMESTAMP) ELSE weighed_at END,
+              updated_at  = CURRENT_TIMESTAMP
+            WHERE id=? AND (? IS NULL OR updated_at = ?)`,
       args: [
         t(body.boaterFirst),   t(body.boaterLast),    t(body.boaterPhone),   t(body.boaterEmail),
         t(body.coAnglerFirst), t(body.coAnglerLast),  t(body.coAnglerPhone), t(body.coAnglerEmail),
@@ -73,15 +77,20 @@ export async function onRequestPut({ params, request, env }) {
         Number(body.shortFish) || 0,
         body.needsAttention ? 1 : 0,
         newTotalWeight, preserveWeighTime, clientWeighedAt,
-        params.id,
+        params.id, clientUpdatedAt, clientUpdatedAt,
       ],
     });
+
+    if (result.rowsAffected === 0) {
+      const check = await db.execute({ sql: 'SELECT id FROM entries WHERE id=?', args: [params.id] });
+      if (!check.rows[0]) return Response.json({ error: 'Not found' }, { status: 404 });
+      return Response.json({ error: 'conflict' }, { status: 409 });
+    }
 
     const updated = await db.execute({
       sql:  'SELECT * FROM entries WHERE id = ?',
       args: [params.id],
     });
-    if (!updated.rows[0]) return Response.json({ error: 'Not found' }, { status: 404 });
     return Response.json(toJS(updated.rows[0]));
   } catch (e) {
     return Response.json({ error: e.message }, { status: 500 });

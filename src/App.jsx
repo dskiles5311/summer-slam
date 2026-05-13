@@ -157,9 +157,9 @@ export default function App() {
                 ? { oldFirstName: prev.coAnglerFirst, oldLastName: prev.coAnglerLast } : {}) },
           ]);
         },
-        onError: () => {
+        onError: (err) => {
           setEditingEntry(prev);
-          showToast('Failed to save entry', 'error');
+          showToast(err.isConflict ? 'This entry was modified by another device — your changes were not saved.' : 'Failed to save entry', 'error');
         },
       });
     } else {
@@ -190,7 +190,7 @@ export default function App() {
     if (!entry) return;
     const next = (entry[field] === 1 || entry[field] === '1') ? 0 : 1;
     updateEntryMut.mutate({ id: entryId, data: { ...entry, [field]: next } }, {
-      onError: () => showToast('Failed to update', 'error'),
+      onError: (err) => showToast(err.isConflict ? 'This entry was modified by another device — your changes were not saved.' : 'Failed to update', 'error'),
     });
   }
 
@@ -213,7 +213,7 @@ export default function App() {
     );
     showToast(duplicate ? `Warning: Boat #${parsed} is already in use!` : 'Updated!', duplicate ? 'warning' : 'success');
     updateEntryMut.mutate({ id: entryId, data: { ...entry, [field]: parsed, ...extraClears } }, {
-      onError: () => showToast('Failed to update', 'error'),
+      onError: (err) => showToast(err.isConflict ? 'This entry was modified by another device — your changes were not saved.' : 'Failed to update', 'error'),
     });
   }
 
@@ -232,7 +232,7 @@ export default function App() {
               ? { oldFirstName: entry.coAnglerFirst, oldLastName: entry.coAnglerLast } : {}) },
         ]);
       },
-      onError: () => showToast('Failed to update entry', 'error'),
+      onError: (err) => showToast(err.isConflict ? 'This entry was modified by another device — your changes were not saved.' : 'Failed to update entry', 'error'),
     });
   }
 
@@ -241,7 +241,7 @@ export default function App() {
     if (!entry) return;
     showToast('Deductions cleared', 'info');
     updateEntryMut.mutate({ id: entryId, data: { ...entry, rawWeight: null, deadFish: 0, shortFish: 0 } }, {
-      onError: () => showToast('Failed to clear deductions', 'error'),
+      onError: (err) => showToast(err.isConflict ? 'This entry was modified by another device — your changes were not saved.' : 'Failed to clear deductions', 'error'),
     });
   }
 
@@ -252,8 +252,8 @@ export default function App() {
       await updateEntryMut.mutateAsync({ id: entryId, data: { ...entry, ...weighData } });
       showToast(`Boat #${entry.boatNo} saved!`, 'success');
       return true;
-    } catch {
-      showToast('Failed to save weigh-in', 'error');
+    } catch (err) {
+      showToast(err.isConflict ? 'This entry was modified by another device — your changes were not saved.' : 'Failed to save weigh-in', 'error');
       return false;
     }
   }
