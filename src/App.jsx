@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Header from './components/Header';
 import RosterTab from './components/RosterTab';
 import BoatCheckTab from './components/BoatCheckTab';
@@ -14,14 +14,11 @@ import FlightsTab from './components/FlightsTab';
 import EditModal from './components/EditModal';
 import UnlockModal from './components/UnlockModal';
 import Toast from './components/Toast';
-import {
-  fetchEntries, createEntry, updateEntry, deleteEntry,
-  fetchSettings, saveSettings, verifyPassword, storePassword, clearPassword, isPasswordStored, revalidatePassword,
-  upsertContacts, fetchContacts, updateContact, deleteContact,
-  clearWeighLog, archiveEntries, backfillPhones, normalizePhones,
-  clearAllEntries, createEntriesBulk,
-} from './utils/api';
+import { verifyPassword, storePassword, clearPassword, isPasswordStored, revalidatePassword, archiveEntries } from './utils/api';
 import { calcRanks } from './utils/calculations';
+import { useEntries, useCreateEntry, useUpdateEntry, useDeleteEntry, useClearWeighLog, useClearAllEntries, useCreateEntriesBulk, useBackfillPhones, useNormalizePhones } from './hooks/useEntries';
+import { useSettings, useSaveSettings } from './hooks/useSettings';
+import { useContacts, useUpdateContact, useDeleteContact, useUpsertContacts } from './hooks/useContacts';
 
 const DEFAULT_SETTINGS = {
   fees:            { entryFee: 249, lunkerFee: 10, optFee: 20, option1Pct: 70 },
@@ -38,26 +35,26 @@ const DEFAULT_SETTINGS = {
   flights: [],
 };
 
+function mergeSettings(raw) {
+  if (!raw || !Object.keys(raw).length) return DEFAULT_SETTINGS;
+  return {
+    ...DEFAULT_SETTINGS,
+    ...raw,
+    fees:           { ...DEFAULT_SETTINGS.fees,           ...(raw.fees           || {}) },
+    payoutSettings: { ...DEFAULT_SETTINGS.payoutSettings, ...(raw.payoutSettings || {}) },
+    penalties:      { ...DEFAULT_SETTINGS.penalties,      ...(raw.penalties      || {}) },
+  };
+}
+
 export default function App() {
-  const [entries, setEntries]           = useState([]);
-  const [settings, setSettings]         = useState(DEFAULT_SETTINGS);
   const [theme, setTheme]               = useState(() => localStorage.getItem('ss_theme') || 'dark');
-  const [activeTab, setActiveTab]       = useState(() => 'leaderboard');
-  const [loading, setLoading]           = useState(true);
+  const [activeTab, setActiveTab]       = useState('leaderboard');
   const [toasts, setToasts]             = useState([]);
   const [editingEntry, setEditingEntry] = useState(null);
   const [isUnlocked, setIsUnlocked]     = useState(false);
   const [everUnlocked, setEverUnlocked] = useState(false);
-  const [contacts, setContacts]         = useState([]);
-  const [contactsLoading, setContactsLoading] = useState(true);
-  const [buyInBlurred, setBuyInBlurred] = useState(() => localStorage.getItem('ss_buyin_blur') !== 'false');
-
-  function handleToggleBuyInBlur() {
-    const next = !buyInBlurred;
-    setBuyInBlurred(next);
-    localStorage.setItem('ss_buyin_blur', String(next));
-  }
   const [showUnlock, setShowUnlock]     = useState(false);
+  const [buyInBlurred, setBuyInBlurred] = useState(() => localStorage.getItem('ss_buyin_blur') !== 'false');
 
   const showToast = useCallback((message, type = 'success') => {
     setToasts(prev => [...prev, { message, type, id: Date.now() + Math.random() }]);
@@ -66,8 +63,34 @@ export default function App() {
     setToasts(prev => prev.filter(t => t.id !== id));
   }, []);
 
-  const rankedEntries = calcRanks(entries, settings);
+  const pollInterval = isUnlocked ? 5000 : 10000;
 
+  // --- Queries ---
+  const entriesQuery  = useEntries({ refetchInterval: pollInterval });
+  const settingsQuery = useSettings({ refetchInterval: pollInterval });
+  const contactsQuery = useContacts({ enabled: isUnlocked });
+
+  const rawEntries = entriesQuery.data  || [];
+  const settings   = useMemo(() => mergeSettings(settingsQuery.data), [settingsQuery.data]);
+  const contacts   = contactsQuery.data || [];
+
+  const rankedEntries = useMemo(() => calcRanks(rawEntries, settings), [rawEntries, settings]);
+
+  // --- Mutations ---
+  const createEntryMut    = useCreateEntry();
+  const updateEntryMut    = useUpdateEntry();
+  const deleteEntryMut    = useDeleteEntry();
+  const clearWeighLogMut  = useClearWeighLog();
+  const clearAllMut       = useClearAllEntries();
+  const bulkCreateMut     = useCreateEntriesBulk();
+  const backfillMut       = useBackfillPhones();
+  const normalizePhonesMut = useNormalizePhones();
+  const saveSettingsMut   = useSaveSettings();
+  const updateContactMut  = useUpdateContact();
+  const deleteContactMut  = useDeleteContact();
+  const upsertContactsMut = useUpsertContacts();
+
+  // --- Auth ---
   useEffect(() => {
     if (isPasswordStored()) {
       revalidatePassword().then(ok => { if (ok) setIsUnlocked(true); });
@@ -77,85 +100,9 @@ export default function App() {
   useEffect(() => { if (isUnlocked) setEverUnlocked(true); }, [isUnlocked]);
 
   useEffect(() => {
-    if (!isUnlocked) return;
-    setContactsLoading(true);
-    fetchContacts()
-      .then(data => { setContacts(data); setContactsLoading(false); })
-      .catch(() => setContactsLoading(false));
-  }, [isUnlocked]);
-
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const [entriesData, settingsData] = await Promise.all([fetchEntries(), fetchSettings()]);
-        setEntries(entriesData);
-        if (settingsData && Object.keys(settingsData).length > 0) {
-          setSettings({
-            ...DEFAULT_SETTINGS,
-            ...settingsData,
-            fees:           { ...DEFAULT_SETTINGS.fees,           ...(settingsData.fees           || {}) },
-            payoutSettings: { ...DEFAULT_SETTINGS.payoutSettings, ...(settingsData.payoutSettings || {}) },
-            penalties:      { ...DEFAULT_SETTINGS.penalties,      ...(settingsData.penalties      || {}) },
-          });
-        }
-      } catch {
-        showToast('Failed to connect to database', 'error');
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadData();
-  }, [showToast]);
-
-  useEffect(() => {
     document.body.classList.remove('light', 'outdoor');
     if (theme === 'light' || theme === 'outdoor') document.body.classList.add(theme);
   }, [theme]);
-
-  const activeTabRef = useRef(activeTab);
-  useEffect(() => { activeTabRef.current = activeTab; }, [activeTab]);
-
-  const settingsSavePendingRef = useRef(0);
-
-  const pollInterval = isUnlocked ? 5000 : 10000;
-
-  useEffect(() => {
-    let timer;
-    async function poll() {
-      if (document.hidden) return;
-      try {
-        const [entriesData, settingsData] = await Promise.all([fetchEntries(), fetchSettings()]);
-        setEntries(prev => JSON.stringify(prev) !== JSON.stringify(entriesData) ? entriesData : prev);
-        if (settingsSavePendingRef.current === 0 && settingsData && Object.keys(settingsData).length > 0) {
-          const merged = {
-            ...DEFAULT_SETTINGS,
-            ...settingsData,
-            fees:           { ...DEFAULT_SETTINGS.fees,           ...(settingsData.fees           || {}) },
-            payoutSettings: { ...DEFAULT_SETTINGS.payoutSettings, ...(settingsData.payoutSettings || {}) },
-            penalties:      { ...DEFAULT_SETTINGS.penalties,      ...(settingsData.penalties      || {}) },
-          };
-          setSettings(prev => JSON.stringify(prev) !== JSON.stringify(merged) ? merged : prev);
-        }
-      } catch { /* silently skip if fetch fails */ }
-      if (!document.hidden) timer = setTimeout(poll, pollInterval);
-    }
-
-    function handleVisibility() {
-      if (!document.hidden) {
-        clearTimeout(timer);
-        poll();
-      } else {
-        clearTimeout(timer);
-      }
-    }
-
-    document.addEventListener('visibilitychange', handleVisibility);
-    if (!document.hidden) timer = setTimeout(poll, pollInterval);
-    return () => {
-      clearTimeout(timer);
-      document.removeEventListener('visibilitychange', handleVisibility);
-    };
-  }, [pollInterval]);
 
   async function handleUnlock(password) {
     await verifyPassword(password);
@@ -170,69 +117,13 @@ export default function App() {
     setActiveTab(prev => (['rules', 'archive', 'leaderboard', 'flights'].includes(prev) ? prev : 'leaderboard'));
   }
 
-  async function handleSaveEntry(entryData) {
-    const duplicate = entryData.boatNo && entries.some(e =>
-      String(e.boatNo) === String(entryData.boatNo) && e.id !== editingEntry?.id
-    );
-
-    if (editingEntry?.id) {
-      const prevEntries = entries;
-      setEntries(prev => prev.map(e => e.id === editingEntry.id ? { ...e, ...entryData } : e));
-      setEditingEntry(null);
-      showToast(duplicate ? `Warning: Boat #${entryData.boatNo} is already in use!` : 'Entry saved!', duplicate ? 'warning' : 'success');
-      try {
-        const updated = await updateEntry(editingEntry.id, entryData);
-        setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
-        upsertContacts([
-          { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone,   email: entryData.boaterEmail,
-            ...(editingEntry.boaterFirst !== entryData.boaterFirst || editingEntry.boaterLast !== entryData.boaterLast
-              ? { oldFirstName: editingEntry.boaterFirst, oldLastName: editingEntry.boaterLast } : {}) },
-          { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone, email: entryData.coAnglerEmail,
-            ...(editingEntry.coAnglerFirst !== entryData.coAnglerFirst || editingEntry.coAnglerLast !== entryData.coAnglerLast
-              ? { oldFirstName: editingEntry.coAnglerFirst, oldLastName: editingEntry.coAnglerLast } : {}) },
-        ]).then(refreshContacts).catch(() => {});
-      } catch {
-        setEntries(prevEntries);
-        setEditingEntry(editingEntry);
-        showToast('Failed to save entry', 'error');
-      }
-    } else {
-      try {
-        const created = await createEntry(entryData);
-        setEntries(prev => [...prev, created]);
-        setEditingEntry(null);
-        showToast(duplicate ? `Warning: Boat #${entryData.boatNo} is already in use!` : 'Entry added!', duplicate ? 'warning' : 'success');
-        upsertContacts([
-          { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone,   email: entryData.boaterEmail   },
-          { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone, email: entryData.coAnglerEmail },
-        ]).then(refreshContacts).catch(() => {});
-      } catch {
-        showToast('Failed to save entry', 'error');
-      }
-    }
+  function handleToggleBuyInBlur() {
+    const next = !buyInBlurred;
+    setBuyInBlurred(next);
+    localStorage.setItem('ss_buyin_blur', String(next));
   }
 
-  async function refreshContacts() {
-    if (!isUnlocked) return;
-    try {
-      const data = await fetchContacts();
-      setContacts(data);
-    } catch { /* ignore */ }
-  }
-
-  async function handleDeleteEntry(id) {
-    if (!confirm('Delete this entry?')) return;
-    const prevEntries = entries;
-    setEntries(prev => prev.filter(e => e.id !== id));
-    showToast('Entry deleted', 'info');
-    try {
-      await deleteEntry(id);
-    } catch {
-      setEntries(prevEntries);
-      showToast('Failed to delete entry', 'error');
-    }
-  }
-
+  // --- Settings ---
   async function handleUpdateSettings(updates) {
     const newSettings = {
       ...settings,
@@ -240,29 +131,161 @@ export default function App() {
       fees:           updates.fees           ? { ...settings.fees,           ...updates.fees           } : settings.fees,
       payoutSettings: updates.payoutSettings ? { ...settings.payoutSettings, ...updates.payoutSettings } : settings.payoutSettings,
     };
-    setSettings(newSettings);
-    settingsSavePendingRef.current += 1;
-    try {
-      await saveSettings(newSettings);
-    } catch {
-      showToast('Failed to save settings', 'error');
-    } finally {
-      settingsSavePendingRef.current -= 1;
+    saveSettingsMut.mutate(newSettings, {
+      onError: () => showToast('Failed to save settings', 'error'),
+    });
+  }
+
+  // --- Entries ---
+  async function handleSaveEntry(entryData) {
+    const duplicate = entryData.boatNo && rawEntries.some(e =>
+      String(e.boatNo) === String(entryData.boatNo) && e.id !== editingEntry?.id
+    );
+
+    if (editingEntry?.id) {
+      const prev = editingEntry;
+      setEditingEntry(null);
+      showToast(duplicate ? `Warning: Boat #${entryData.boatNo} is already in use!` : 'Entry saved!', duplicate ? 'warning' : 'success');
+      updateEntryMut.mutate({ id: prev.id, data: entryData }, {
+        onSuccess: () => {
+          upsertContactsMut.mutate([
+            { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone,   email: entryData.boaterEmail,
+              ...(prev.boaterFirst !== entryData.boaterFirst || prev.boaterLast !== entryData.boaterLast
+                ? { oldFirstName: prev.boaterFirst, oldLastName: prev.boaterLast } : {}) },
+            { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone, email: entryData.coAnglerEmail,
+              ...(prev.coAnglerFirst !== entryData.coAnglerFirst || prev.coAnglerLast !== entryData.coAnglerLast
+                ? { oldFirstName: prev.coAnglerFirst, oldLastName: prev.coAnglerLast } : {}) },
+          ]);
+        },
+        onError: () => {
+          setEditingEntry(prev);
+          showToast('Failed to save entry', 'error');
+        },
+      });
+    } else {
+      try {
+        await createEntryMut.mutateAsync(entryData);
+        setEditingEntry(null);
+        showToast(duplicate ? `Warning: Boat #${entryData.boatNo} is already in use!` : 'Entry added!', duplicate ? 'warning' : 'success');
+        upsertContactsMut.mutate([
+          { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone,   email: entryData.boaterEmail   },
+          { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone, email: entryData.coAnglerEmail },
+        ]);
+      } catch {
+        showToast('Failed to save entry', 'error');
+      }
     }
   }
 
+  async function handleDeleteEntry(id) {
+    if (!confirm('Delete this entry?')) return;
+    showToast('Entry deleted', 'info');
+    deleteEntryMut.mutate(id, {
+      onError: () => showToast('Failed to delete entry', 'error'),
+    });
+  }
+
   async function handleToggleEntryField(entryId, field) {
-    const entry = entries.find(e => e.id === entryId);
+    const entry = rawEntries.find(e => e.id === entryId);
     if (!entry) return;
     const next = (entry[field] === 1 || entry[field] === '1') ? 0 : 1;
-    const prevEntries = entries;
-    setEntries(prev => prev.map(e => e.id === entryId ? { ...e, [field]: next } : e));
+    updateEntryMut.mutate({ id: entryId, data: { ...entry, [field]: next } }, {
+      onError: () => showToast('Failed to update', 'error'),
+    });
+  }
+
+  async function handleUpdateInlineField(entryId, field, value) {
+    const entry = rawEntries.find(e => e.id === entryId);
+    if (!entry) return;
+
+    let parsed = value;
+    if (field === 'numFish') {
+      parsed = Math.max(0, Math.min(10, parseInt(value) || 0));
+    } else if (field === 'lunkerWeight' || field === 'totalWeight') {
+      parsed = parseFloat(value) || 0;
+    } else if (field === 'boatNo') {
+      parsed = String(value).trim();
+    }
+
+    const extraClears = field === 'totalWeight' ? { rawWeight: null, deadFish: 0, shortFish: 0 } : {};
+    const duplicate = parsed && field === 'boatNo' && rawEntries.some(e =>
+      String(e.boatNo) === String(parsed) && e.id !== entryId
+    );
+    showToast(duplicate ? `Warning: Boat #${parsed} is already in use!` : 'Updated!', duplicate ? 'warning' : 'success');
+    updateEntryMut.mutate({ id: entryId, data: { ...entry, [field]: parsed, ...extraClears } }, {
+      onError: () => showToast('Failed to update', 'error'),
+    });
+  }
+
+  async function handleCheckInSave(entryId, updates) {
+    const entry = rawEntries.find(e => e.id === entryId);
+    if (!entry) return;
+    showToast('Entry updated!', 'success');
+    updateEntryMut.mutate({ id: entryId, data: { ...entry, ...updates, preserveWeighTime: true } }, {
+      onSuccess: (updated) => {
+        upsertContactsMut.mutate([
+          { firstName: updated.boaterFirst,   lastName: updated.boaterLast,   phone: updated.boaterPhone,   email: updated.boaterEmail,
+            ...(entry.boaterFirst !== updated.boaterFirst || entry.boaterLast !== updated.boaterLast
+              ? { oldFirstName: entry.boaterFirst, oldLastName: entry.boaterLast } : {}) },
+          { firstName: updated.coAnglerFirst, lastName: updated.coAnglerLast, phone: updated.coAnglerPhone, email: updated.coAnglerEmail,
+            ...(entry.coAnglerFirst !== updated.coAnglerFirst || entry.coAnglerLast !== updated.coAnglerLast
+              ? { oldFirstName: entry.coAnglerFirst, oldLastName: entry.coAnglerLast } : {}) },
+        ]);
+      },
+      onError: () => showToast('Failed to update entry', 'error'),
+    });
+  }
+
+  async function handleClearDeductions(entryId) {
+    const entry = rawEntries.find(e => e.id === entryId);
+    if (!entry) return;
+    showToast('Deductions cleared', 'info');
+    updateEntryMut.mutate({ id: entryId, data: { ...entry, rawWeight: null, deadFish: 0, shortFish: 0 } }, {
+      onError: () => showToast('Failed to clear deductions', 'error'),
+    });
+  }
+
+  async function handleWeighIn(entryId, weighData) {
+    const entry = rawEntries.find(e => e.id === entryId);
+    if (!entry) return false;
     try {
-      const updated = await updateEntry(entryId, { ...entry, [field]: next });
-      setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
+      await updateEntryMut.mutateAsync({ id: entryId, data: { ...entry, ...weighData } });
+      showToast(`Boat #${entry.boatNo} saved!`, 'success');
+      return true;
     } catch {
-      setEntries(prevEntries);
-      showToast('Failed to update', 'error');
+      showToast('Failed to save weigh-in', 'error');
+      return false;
+    }
+  }
+
+  async function handleSignUpEntry(entryData) {
+    try {
+      await createEntryMut.mutateAsync(entryData);
+      showToast(`${entryData.boaterFirst} ${entryData.boaterLast} signed up!`, 'success');
+      upsertContactsMut.mutate([
+        { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone,   email: entryData.boaterEmail   },
+        { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone, email: entryData.coAnglerEmail },
+      ]);
+      return true;
+    } catch {
+      showToast('Failed to sign up entry', 'error');
+      return false;
+    }
+  }
+
+  async function handleAddWeighInEntry(boatNo, weighData) {
+    try {
+      await createEntryMut.mutateAsync({
+        boatNo, boaterFirst: '', boaterLast: '', coAnglerFirst: '', coAnglerLast: '',
+        lunker: 0, option: 0, paid: 0, appSigned: 0, buyIn: 0,
+        ...weighData,
+        needsAttention: true,
+      });
+      showToast(`Boat #${boatNo} added and flagged for attention`, 'warning');
+      return true;
+    } catch {
+      showToast('Failed to add entry', 'error');
+      return false;
     }
   }
 
@@ -280,144 +303,21 @@ export default function App() {
     await handleUpdateSettings({ offWater: { ...current, [id]: !current[id] } });
   }
 
-  async function handleUpdateInlineField(entryId, field, value) {
-    const entry = entries.find(e => e.id === entryId);
-    if (!entry) return;
-
-    let parsed = value;
-    if (field === 'numFish') {
-      parsed = Math.max(0, Math.min(10, parseInt(value) || 0));
-    } else if (field === 'lunkerWeight' || field === 'totalWeight') {
-      parsed = parseFloat(value) || 0;
-    } else if (field === 'boatNo') {
-      parsed = String(value).trim();
-    }
-
-    const extraClears = field === 'totalWeight' ? { rawWeight: null, deadFish: 0, shortFish: 0 } : {};
-    const duplicate = parsed && field === 'boatNo' && entries.some(e =>
-      String(e.boatNo) === String(parsed) && e.id !== entryId
-    );
-    const prevEntries = entries;
-    setEntries(prev => prev.map(e => e.id === entryId ? { ...e, [field]: parsed, ...extraClears } : e));
-    showToast(duplicate ? `Warning: Boat #${parsed} is already in use!` : 'Updated!', duplicate ? 'warning' : 'success');
-    try {
-      const updated = await updateEntry(entryId, { ...entry, [field]: parsed, ...extraClears });
-      setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
-    } catch {
-      setEntries(prevEntries);
-      showToast('Failed to update', 'error');
-    }
-  }
-
-  async function handleCheckInSave(entryId, updates) {
-    const entry = entries.find(e => e.id === entryId);
-    if (!entry) return;
-    const prevEntries = entries;
-    setEntries(prev => prev.map(e => e.id === entryId ? { ...e, ...updates } : e));
-    showToast('Entry updated!', 'success');
-    try {
-      const updated = await updateEntry(entryId, { ...entry, ...updates, preserveWeighTime: true });
-      setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
-      upsertContacts([
-        { firstName: updated.boaterFirst,   lastName: updated.boaterLast,   phone: updated.boaterPhone,   email: updated.boaterEmail,
-          ...(entry.boaterFirst !== updated.boaterFirst || entry.boaterLast !== updated.boaterLast
-            ? { oldFirstName: entry.boaterFirst, oldLastName: entry.boaterLast } : {}) },
-        { firstName: updated.coAnglerFirst, lastName: updated.coAnglerLast, phone: updated.coAnglerPhone, email: updated.coAnglerEmail,
-          ...(entry.coAnglerFirst !== updated.coAnglerFirst || entry.coAnglerLast !== updated.coAnglerLast
-            ? { oldFirstName: entry.coAnglerFirst, oldLastName: entry.coAnglerLast } : {}) },
-      ]).then(refreshContacts).catch(() => {});
-    } catch {
-      setEntries(prevEntries);
-      showToast('Failed to update entry', 'error');
-    }
-  }
-
-  async function handleClearDeductions(entryId) {
-    const entry = entries.find(e => e.id === entryId);
-    if (!entry) return;
-    const prevEntries = entries;
-    setEntries(prev => prev.map(e => e.id === entryId ? { ...e, rawWeight: null, deadFish: 0, shortFish: 0 } : e));
-    showToast('Deductions cleared', 'info');
-    try {
-      const updated = await updateEntry(entryId, { ...entry, rawWeight: null, deadFish: 0, shortFish: 0 });
-      setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
-    } catch {
-      setEntries(prevEntries);
-      showToast('Failed to clear deductions', 'error');
-    }
-  }
-
   async function handleResetBoatCheck() {
     await handleUpdateSettings({ boatCheck: {}, offWater: {} });
   }
 
-  async function handleSignUpEntry(entryData) {
-    try {
-      const created = await createEntry(entryData);
-      setEntries(prev => [...prev, created]);
-      showToast(`${entryData.boaterFirst} ${entryData.boaterLast} signed up!`, 'success');
-      upsertContacts([
-        { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone,   email: entryData.boaterEmail   },
-        { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone, email: entryData.coAnglerEmail },
-      ]).then(refreshContacts).catch(() => {});
-      return true;
-    } catch {
-      showToast('Failed to sign up entry', 'error');
-      return false;
-    }
-  }
-
-  async function handleAddWeighInEntry(boatNo, weighData) {
-    try {
-      const created = await createEntry({
-        boatNo, boaterFirst: '', boaterLast: '', coAnglerFirst: '', coAnglerLast: '',
-        lunker: 0, option: 0, paid: 0, appSigned: 0, buyIn: 0,
-        ...weighData,
-        needsAttention: true,
-      });
-      setEntries(prev => [...prev, created]);
-      showToast(`Boat #${boatNo} added and flagged for attention`, 'warning');
-      return true;
-    } catch {
-      showToast('Failed to add entry', 'error');
-      return false;
-    }
-  }
-
-  async function handleWeighIn(entryId, weighData) {
-    const entry = entries.find(e => e.id === entryId);
-    if (!entry) return false;
-    const prevEntries = entries;
-    setEntries(prev => prev.map(e => e.id === entryId ? { ...e, ...weighData } : e));
-    showToast(`Boat #${entry.boatNo} saved!`, 'success');
-    try {
-      const updated = await updateEntry(entryId, { ...entry, ...weighData });
-      setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
-      return true;
-    } catch {
-      setEntries(prevEntries);
-      showToast('Failed to save weigh-in', 'error');
-      return false;
-    }
-  }
-
   async function handleClearWeighLog() {
-    const prevEntries = entries;
-    setEntries(prev => prev.map(e => ({ ...e, weighedAt: null, rawWeight: null, deadFish: 0, shortFish: 0 })));
     showToast('Weigh-in log cleared', 'info');
-    try {
-      await clearWeighLog();
-    } catch {
-      setEntries(prevEntries);
-      showToast('Failed to clear weigh-in log', 'error');
-    }
+    clearWeighLogMut.mutate(undefined, {
+      onError: () => showToast('Failed to clear weigh-in log', 'error'),
+    });
   }
 
   async function handleClearAll() {
     if (!confirm('Clear ALL data? This cannot be undone!')) return;
     try {
-      await clearAllEntries();
-      setEntries([]);
+      await clearAllMut.mutateAsync();
       await handleUpdateSettings({ boatCheck: {}, offWater: {} });
       showToast('All data cleared', 'info');
     } catch {
@@ -459,7 +359,7 @@ export default function App() {
   }
 
   async function handleLoadArchive(archivedEntries) {
-    if (entries.length > 0) {
+    if (rawEntries.length > 0) {
       showToast('Clear the roster first before loading an archive', 'error');
       return;
     }
@@ -481,9 +381,7 @@ export default function App() {
         buyIn:         e.buyIn,
         needsAttention: e.needsAttention,
       }));
-      await createEntriesBulk(payload);
-      const loaded = await fetchEntries();
-      setEntries(loaded);
+      await bulkCreateMut.mutateAsync(payload);
       showToast(`Loaded ${payload.length} entries from archive — switch to Roster to edit`, 'success');
       setActiveTab('roster');
     } catch {
@@ -493,9 +391,7 @@ export default function App() {
 
   async function handleBackfillInfo() {
     try {
-      const result = await backfillPhones();
-      const refreshed = await fetchEntries();
-      setEntries(refreshed);
+      const result = await backfillMut.mutateAsync();
       if (result.total === 0) {
         showToast('No matches found — entries already have info or no contact record exists', 'info');
       } else {
@@ -513,10 +409,7 @@ export default function App() {
 
   async function handleNormalizePhones() {
     try {
-      const result = await normalizePhones();
-      const [refreshedEntries, refreshedContacts] = await Promise.all([fetchEntries(), fetchContacts()]);
-      setEntries(refreshedEntries);
-      setContacts(refreshedContacts);
+      const result = await normalizePhonesMut.mutateAsync();
       if (result.total === 0) {
         showToast('All phone numbers already formatted', 'info');
       } else {
@@ -529,16 +422,16 @@ export default function App() {
 
   async function handleImport(newEntries) {
     try {
-      await createEntriesBulk(newEntries);
-      const all = await fetchEntries();
-      setEntries(all);
+      await bulkCreateMut.mutateAsync(newEntries);
       showToast(`Imported ${newEntries.length} entries`, 'success');
     } catch {
       showToast('Import failed', 'error');
     }
   }
 
-  if (loading) {
+  const isInitialLoading = entriesQuery.isLoading || settingsQuery.isLoading;
+
+  if (isInitialLoading) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', gap: 16 }}>
         <div style={{ fontSize: 56 }}>🎣</div>
@@ -568,7 +461,6 @@ export default function App() {
       />
 
       <main>
-        {/* Public tabs — always mounted */}
         <div style={{ display: activeTab === 'roster' ? '' : 'none' }}>
           <RosterTab
             entries={rankedEntries}
@@ -598,7 +490,7 @@ export default function App() {
         <div style={{ display: activeTab === 'archive' ? '' : 'none' }}>
           <ArchiveTab
             isUnlocked={isUnlocked}
-            rosterCount={entries.length}
+            rosterCount={rawEntries.length}
             onLoadArchive={handleLoadArchive}
           />
         </div>
@@ -606,7 +498,6 @@ export default function App() {
           <FlightsTab entries={rankedEntries} settings={settingsWithTheme} />
         </div>
 
-        {/* Private tabs — mount once after first unlock, then stay mounted */}
         {everUnlocked && (
           <>
             <div style={{ display: activeTab === 'signup' ? '' : 'none' }}>
@@ -625,16 +516,16 @@ export default function App() {
               />
             </div>
             <div style={{ display: activeTab === 'weighin' ? '' : 'none' }}>
-              <WeighInTab entries={entries} settings={settingsWithTheme} onWeighIn={handleWeighIn} onAddEntry={handleAddWeighInEntry} />
+              <WeighInTab entries={rawEntries} settings={settingsWithTheme} onWeighIn={handleWeighIn} onAddEntry={handleAddWeighInEntry} />
             </div>
             <div style={{ display: activeTab === 'contacts' ? '' : 'none' }}>
               <ContactsTab
                 isUnlocked={isUnlocked}
                 contacts={contacts}
-                contactsLoading={contactsLoading}
-                onContactsChange={setContacts}
-                updateContact={updateContact}
-                deleteContact={deleteContact}
+                contactsLoading={contactsQuery.isLoading}
+                onContactsChange={() => {}}
+                updateContact={(id, data) => updateContactMut.mutateAsync({ id, data })}
+                deleteContact={(id) => deleteContactMut.mutateAsync(id)}
               />
             </div>
             <div style={{ display: activeTab === 'settings' ? '' : 'none' }}>
