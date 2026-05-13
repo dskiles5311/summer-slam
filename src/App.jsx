@@ -593,7 +593,7 @@ export default function App() {
           <LeaderboardTab entries={rankedEntries} settings={settingsWithTheme} />
         </div>
         <div style={{ display: activeTab === 'rules' ? '' : 'none' }}>
-          <RulesTab />
+          <RulesTab settings={settings} />
         </div>
         <div style={{ display: activeTab === 'archive' ? '' : 'none' }}>
           <ArchiveTab

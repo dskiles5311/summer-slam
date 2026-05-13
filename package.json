@@ -10,9 +10,10 @@
     "pages:dev": "wrangler pages dev --proxy 5173 --compatibility-date=2024-09-23"
   },
   "dependencies": {
+    "@libsql/client": "^0.14.0",
+    "marked": "^18.0.3",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "@libsql/client": "^0.14.0"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
