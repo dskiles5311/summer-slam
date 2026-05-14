@@ -52,7 +52,7 @@ header {
 }
 
 .logo { display: flex; align-items: center; gap: 12px; }
-.logo-icon { width: 80px; height: 80px; object-fit: contain; flex-shrink: 0; }
+.logo-icon { width: 80px; height: 80px; object-fit: contain; flex-shrink: 0; background: #fff; border-radius: 6px; padding: 3px; }
 
 .logo-text h1 {
   font-size: 22px;
@@ -920,9 +920,9 @@ body.light .form-field select:focus { border-color: #2d6e38; background: #ffffff
 body.light .edit-panel-close   { background: rgba(0,0,0,0.05); border-color: #b8ccb4; color: #3d5c40; }
 body.light .edit-panel-header h3 { color: #6b5018; }
 
-/* Leaderboard watermark — white in dark mode, dark in light mode */
-.lb-watermark { filter: brightness(0) invert(1); }
-body.light .lb-watermark { filter: brightness(0); }
+/* Leaderboard watermark — screen blend makes black bg transparent in dark mode */
+.lb-watermark { mix-blend-mode: screen; }
+body.light .lb-watermark { opacity: 0 !important; }
 
 body.light .nav-tab.active     { color: #e0c48a; border-bottom-color: #e0c48a; }
 body.light .logo-text h1       { color: #f0ede6; }
@@ -1066,4 +1066,4 @@ body.outdoor .edit-panel-close       { background: #e6f2e6; border-color: #3a6e3
 body.outdoor .edit-section-label     { color: #1a5c28; border-bottom-color: #3a6e3a; font-size: 11px; }
 
 /* Watermark */
-body.outdoor .lb-watermark { filter: brightness(0); }
+body.outdoor .lb-watermark { opacity: 0 !important; }
