@@ -37,7 +37,7 @@ body {
 header {
   background:
     linear-gradient(rgba(26,51,32,0.78), rgba(26,51,32,0.78)),
-    url('/Summer_Slam_2.jpg') left center/contain no-repeat #1a3320;
+    url('/Summer_Slam_2.jpg') left top/contain no-repeat #1a3320;
   padding: 0;
   border-bottom: 3px solid var(--gold);
   box-shadow: 0 2px 8px rgba(0,0,0,0.4);
@@ -75,7 +75,6 @@ header {
 .stats-bar {
   display: flex;
   justify-content: center;
-  background: #1a3320;
   padding: 6px 20px 8px;
   overflow-x: auto;
   overflow-y: hidden;
@@ -861,7 +860,7 @@ body.light {
   --settings-panel-bg: #ffffff;
 }
 
-body.light header    { background: linear-gradient(rgba(26,51,32,0.78), rgba(26,51,32,0.78)), url('/Summer_Slam_2.jpg') left center/contain no-repeat #1a3320; }
+body.light header    { background: linear-gradient(rgba(26,51,32,0.78), rgba(26,51,32,0.78)), url('/Summer_Slam_2.jpg') left top/contain no-repeat #1a3320; }
 body.light .nav-tabs { background: rgba(0,0,0,0.2); }
 body.light main      { background: #f2f5ee; }
 
@@ -956,8 +955,8 @@ body.outdoor {
   --settings-panel-bg: #ffffff;
 }
 
-body.outdoor header         { background: linear-gradient(rgba(22,61,32,0.78), rgba(22,61,32,0.78)), url('/Summer_Slam_2.jpg') left center/contain no-repeat #163d20; }
-body.outdoor .stats-bar     { background: #163d20; }
+body.outdoor header         { background: linear-gradient(rgba(22,61,32,0.78), rgba(22,61,32,0.78)), url('/Summer_Slam_2.jpg') left top/contain no-repeat #163d20; }
+
 body.outdoor .nav-tabs-wrap { background: #163d20; }
 body.outdoor .nav-tabs { background: #0d2914; }
 body.outdoor main      { background: #f0f5f0; }
