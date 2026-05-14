@@ -43,7 +43,6 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
   const [form, setForm] = useState({ ...EMPTY });
   const [errors, setErrors] = useState({});
   const firstInputRef = useRef(null);
-  const overlayDownRef = useRef(false);
 
   useEffect(() => {
     setErrors({});
@@ -144,11 +143,7 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
   const errBorder = (field) => errors[field] ? { borderColor: '#ff6b6b' } : undefined;
 
   return (
-    <div
-      className="edit-overlay"
-      onPointerDown={e => { overlayDownRef.current = e.target === e.currentTarget; }}
-      onPointerUp={e => { if (overlayDownRef.current && e.target === e.currentTarget) onCancel(); }}
-    >
+    <div className="edit-overlay">
       <div className="edit-panel">
         <div className="edit-panel-inner">
           <div className="edit-panel-header">
