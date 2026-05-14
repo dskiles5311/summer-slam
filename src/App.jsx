@@ -460,6 +460,26 @@ export default function App() {
         onToggleBuyInBlur={handleToggleBuyInBlur}
       />
 
+      {activeTab === 'leaderboard' && (
+        <img
+          src="/Summer_Slam.png"
+          alt=""
+          aria-hidden="true"
+          className="lb-watermark"
+          style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '80vmin',
+            height: '80vmin',
+            objectFit: 'contain',
+            pointerEvents: 'none',
+            zIndex: 2,
+          }}
+        />
+      )}
+
       <main>
         <div style={{ display: activeTab === 'roster' ? '' : 'none' }}>
           <RosterTab

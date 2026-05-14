@@ -41,24 +41,7 @@ export default function LeaderboardTab({ entries, settings }) {
     : [];
 
   return (
-    <div className="tab-panel active" style={{ position: 'relative' }}>
-      <img
-        src="/Summer_Slam.png"
-        alt=""
-        aria-hidden="true"
-        className="lb-watermark"
-        style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '80vmin',
-          height: '80vmin',
-          objectFit: 'contain',
-          pointerEvents: 'none',
-          zIndex: 0,
-        }}
-      />
+    <div className="tab-panel active">
       <div className="leaderboard-header">
         <h2>🎣 Summer Slam! 🎣</h2>
         <p style={{ color: 'var(--header-bg)', fontSize: 12, letterSpacing: 2, textTransform: 'uppercase', marginTop: 4 }}>
