@@ -17,13 +17,12 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
   return (
     <header>
       <div className="header-top">
-        <div className="logo">
-          <div className="logo-text">
-            <h1>{new Date().getFullYear()} Summer Slam!</h1>
-            <p>Susquehanna Fishing Tackle</p>
-          </div>
+        <div style={{ flex: 1 }} />
+        <div className="logo-text" style={{ textAlign: 'center' }}>
+          <h1>{new Date().getFullYear()} Summer Slam!</h1>
+          <p>Susquehanna Fishing Tackle</p>
         </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div style={{ flex: 1, display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'flex-end' }}>
           <button className="theme-toggle" onClick={onThemeToggle}>
             {settings.theme === 'dark' ? '☀️ Light' : settings.theme === 'light' ? '🏕️ Outdoor' : '🌙 Dark'}
           </button>
