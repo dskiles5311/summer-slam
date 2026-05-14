@@ -922,11 +922,8 @@ body.light .form-field select:focus { border-color: #2d6e38; background: #ffffff
 body.light .edit-panel-close   { background: rgba(0,0,0,0.05); border-color: #b8ccb4; color: #3d5c40; }
 body.light .edit-panel-header h3 { color: #6b5018; }
 
-/* Leaderboard watermark
-   dark:          plain opacity — #0f1f0f bg makes black image bg nearly invisible
-   light/outdoor: invert flips black bg → white; multiply blend makes white transparent */
-.lb-watermark { opacity: 0.18; }
-body.light .lb-watermark   { opacity: 0.25 !important; filter: invert(1); mix-blend-mode: multiply; }
+/* Leaderboard watermark — transparent bg PNG, plain opacity works on all themes */
+.lb-watermark { opacity: 0.15; }
 
 
 body.light .nav-tab.active     { color: #e0c48a; border-bottom-color: #e0c48a; }
@@ -1071,4 +1068,3 @@ body.outdoor .edit-panel-close       { background: #e6f2e6; border-color: #3a6e3
 body.outdoor .edit-section-label     { color: #1a5c28; border-bottom-color: #3a6e3a; font-size: 11px; }
 
 /* Watermark */
-body.outdoor .lb-watermark { opacity: 0.25 !important; filter: invert(1); mix-blend-mode: multiply; }
