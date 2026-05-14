@@ -139,6 +139,7 @@ header {
   border-bottom: 3px solid transparent;
   transition: all 0.2s;
   text-transform: uppercase;
+  min-height: 44px;
 }
 
 .nav-tab:hover { color: #ffffff; background: rgba(255,255,255,0.05); }
@@ -231,7 +232,7 @@ main { flex: 1; min-height: 0; padding: 0 20px 16px; overflow-y: auto; overflow-
 .table-wrapper {
   overflow-x: auto;
   overflow-y: auto;
-  max-height: calc(100dvh - 260px);
+  max-height: max(200px, calc(100dvh - 260px));
   border-radius: 10px;
   border: 1px solid rgba(168,200,160,0.2);
   background: rgba(255,255,255,0.02);
@@ -613,7 +614,7 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
 /* ── TOAST ── */
 .toast {
   position: fixed;
-  bottom: 20px;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
   right: 20px;
   padding: 12px 20px;
   border-radius: 8px;
@@ -682,6 +683,7 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
+  .btn { min-height: 44px; }
   .stats-bar { padding: 4px 12px 6px; }
   .header-stats { gap: 8px; }
   .stat-chip { padding: 4px 10px; }
@@ -782,7 +784,7 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
   .contacts-table td.col-email { display: block !important; order: 5; width: 100%; font-size: 13px; padding-top: 2px; }
   /* Actions — right of name row */
   .contacts-table td:nth-child(6) { order: 3; flex-shrink: 0; }
-  .edit-panel { border-radius: 16px 16px 0 0; max-height: 93vh; }
+  .edit-panel { border-radius: 16px 16px 0 0; max-height: 93vh; padding-bottom: env(safe-area-inset-bottom, 0px); }
 
   .edit-grid-2 { grid-template-columns: 1fr 1fr; }
   .edit-grid-3 { grid-template-columns: 1fr 1fr; }
@@ -819,6 +821,17 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
   /* Check In card: name cols 2-up, phone full-width on very small screens */
   .checkin-person-grid { grid-template-columns: 1fr 1fr !important; }
   .checkin-phone       { grid-column: 1 / -1; }
+}
+
+/* ── LANDSCAPE / SHORT VIEWPORT ── */
+@media (max-height: 500px) {
+  .stats-bar { display: none; }
+  .header-top { padding: 4px 12px; }
+  .logo-icon { width: 32px; height: 32px; }
+  .logo-text h1 { font-size: 14px; letter-spacing: 1px; }
+  .nav-tab { padding: 6px 14px; min-height: 36px; }
+  .table-wrapper { max-height: max(160px, calc(100dvh - 120px)); }
+  .toolbar { margin-bottom: 8px; padding: 8px 20px; }
 }
 
 /* ── LIGHT THEME ── */

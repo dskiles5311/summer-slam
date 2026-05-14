@@ -494,7 +494,7 @@ export default function RosterTab({
           onChange={e => setGlobalFilter(f => ({ ...f, text: e.target.value }))}
           style={{
             background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(139,180,225,0.3)',
-            borderRadius: 8, color: 'var(--white)', fontSize: 14, padding: '7px 12px',
+            borderRadius: 8, color: 'var(--white)', fontSize: 16, padding: '7px 12px',
             flex: '1 1 120px', maxWidth: 220, minWidth: 0, outline: 'none',
           }}
         />

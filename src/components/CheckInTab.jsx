@@ -8,7 +8,7 @@ const INPUT_STYLE = {
   border: '1px solid rgba(139,180,225,0.28)',
   borderRadius: 6,
   color: 'var(--white)',
-  fontSize: 13,
+  fontSize: 16,
   padding: '6px 9px',
   width: '100%',
   boxSizing: 'border-box',
@@ -137,7 +137,7 @@ export default function CheckInTab({ entries, onSave }) {
             background: 'rgba(255,255,255,0.07)',
             border: '1px solid rgba(139,180,225,0.35)',
             borderRadius: 8, color: 'var(--white)',
-            fontSize: 15, padding: '10px 13px', outline: 'none',
+            fontSize: 16, padding: '10px 13px', outline: 'none',
             boxSizing: 'border-box',
           }}
         />
