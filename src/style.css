@@ -796,17 +796,12 @@ body.light .btn-primary:hover  { background: #254d30; }
 body.light .add-row-btn        { background: rgba(0,0,0,0.02); border-color: #b8ccb4; color: #3d5c40; }
 body.light .add-row-btn:hover  { background: rgba(0,0,0,0.05); color: #1a2e1a; }
 
-body.light .summary-card  { background: #ffffff; border-color: #b8ccb4; }
 body.light .summary-chip  { background: #ffffff; border-color: #b8ccb4; }
 body.light .summary-chip .sc-lbl    { color: #1a2e1a; }
 body.light .summary-chip .sc-val    { color: #1a3320; }
 body.light .summary-chip .sc-boat   { color: #1a3320; }
 body.light .summary-chip .sc-name   { color: #1a2e1a; }
 body.light .summary-chip .sc-co     { color: #3d5c40; }
-body.light .summary-card .s-lbl   { color: #1a2e1a; }
-body.light .summary-card .s-name  { color: #1a2e1a; }
-body.light .summary-card .s-name.s-co { color: #3d5c40; }
-body.light .summary-card .s-boat  { color: #1a3320; }
 body.light .stat-chip             { background: rgba(255,255,255,0.15); }
 
 body.light .lb-card.normal-card  { background: rgba(45,110,56,0.04); border-color: #b8ccb4; }
@@ -916,12 +911,6 @@ body.outdoor .summary-chip .sc-boat { color: #5c3c00; }
 body.outdoor .summary-chip .sc-name { color: #0a120a; }
 body.outdoor .summary-chip .sc-co   { color: #1a5c28; }
 
-body.outdoor .summary-card         { background: #ffffff; border: 1.5px solid #3a6e3a; }
-body.outdoor .summary-card .s-lbl  { color: #0a120a; }
-body.outdoor .summary-card .s-name { color: #0a120a; }
-body.outdoor .summary-card .s-name.s-co { color: #1a5c28; }
-body.outdoor .summary-card .s-boat { color: #5c3c00; }
-body.outdoor .summary-card .s-val  { color: #5c3c00; }
 
 /* Leaderboard cards — white, solid borders, bigger text */
 body.outdoor .lb-card.normal-card  { background: #ffffff;  border: 1.5px solid #3a6e3a; }

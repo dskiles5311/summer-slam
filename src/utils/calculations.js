@@ -114,7 +114,6 @@ export function getStats(entries, fees) {
     optionPaidCount,
   };
 }
-//Adjust this function to use weighted payouts instead of flat percentages
 export function calcWeightedPayouts(total, n) {
   if (!n || n <= 0 || !total || total <= 0) return Array(Math.max(n || 0, 0)).fill(0);
   const weights = [];
