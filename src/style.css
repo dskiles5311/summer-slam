@@ -743,6 +743,44 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
 
   /* Edit modal: bottom sheet */
   .edit-overlay { padding: 0; align-items: flex-end; }
+
+  /* Contacts: card layout */
+  .contacts-table,
+  .contacts-table tbody { display: block; width: 100%; }
+  .contacts-table thead { display: none; }
+  .contacts-table tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 4px;
+    border: 1px solid rgba(139,180,225,0.15);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: rgba(255,255,255,0.03);
+  }
+  .contacts-table tr:hover { background: rgba(255,255,255,0.05); }
+  .contacts-table td {
+    display: block;
+    border: none !important;
+    padding: 0;
+    overflow: visible;
+    white-space: normal;
+    text-overflow: clip;
+    font-size: 15px;
+  }
+  /* First name */
+  .contacts-table td:nth-child(1) { order: 1; font-weight: 700; }
+  /* Last name — fills space between name and actions */
+  .contacts-table td:nth-child(2) { order: 2; font-weight: 700; flex: 1; min-width: 0; }
+  /* Last seen — keep hidden */
+  .contacts-table td:nth-child(3) { display: none !important; }
+  /* Phone — full-width second line */
+  .contacts-table td:nth-child(4) { order: 4; width: 100%; font-size: 13px; padding-top: 5px; }
+  /* Email — re-show as full-width third line */
+  .contacts-table td.col-email { display: block !important; order: 5; width: 100%; font-size: 13px; padding-top: 2px; }
+  /* Actions — right of name row */
+  .contacts-table td:nth-child(6) { order: 3; flex-shrink: 0; }
   .edit-panel { border-radius: 16px 16px 0 0; max-height: 93vh; }
 
   .edit-grid-2 { grid-template-columns: 1fr 1fr; }
@@ -811,6 +849,12 @@ body.light .nav-tabs { background: rgba(0,0,0,0.2); }
 body.light main      { background: #f2f5ee; }
 
 body.light .table-wrapper { background: #ffffff; border-color: #b8ccb4; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+@media (max-width: 600px) {
+  body.light .contacts-table tr { border-color: #b8ccb4; background: rgba(0,0,0,0.02); }
+  body.light .contacts-table tr:hover { background: rgba(0,0,0,0.04); }
+  body.outdoor .contacts-table tr { border-color: #3a6e3a; background: rgba(255,255,255,0.5); }
+  body.outdoor .contacts-table tr:hover { background: rgba(255,255,255,0.7); }
+}
 body.light thead th       { background: #254d30; color: #e0c48a; }
 body.light tbody tr       { border-bottom-color: #d4e0d0; }
 body.light tbody tr:hover { background: rgba(45,110,56,0.05); }
