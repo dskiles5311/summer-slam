@@ -55,7 +55,6 @@ export default function LeaderboardTab({ entries, settings }) {
           width: '80vmin',
           height: '80vmin',
           objectFit: 'contain',
-          opacity: 0.1,
           pointerEvents: 'none',
           zIndex: 0,
         }}
