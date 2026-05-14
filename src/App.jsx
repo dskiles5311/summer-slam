@@ -47,7 +47,7 @@ function mergeSettings(raw) {
 }
 
 export default function App() {
-  const [theme, setTheme]               = useState(() => localStorage.getItem('ss_theme') || 'dark');
+  const [theme, setTheme]               = useState(() => localStorage.getItem('ss_theme') || 'outdoor');
   const [activeTab, setActiveTab]       = useState('leaderboard');
   const [toasts, setToasts]             = useState([]);
   const [editingEntry, setEditingEntry] = useState(null);
