@@ -232,20 +232,20 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           <h3 style={H3}>Payout Structure</h3>
           <div className="edit-grid-3" style={{ marginBottom: 14 }}>
             <div className="form-field">
-              <label>Total Payout ($)</label>
-              <input type="number" value={totalPayout} min="0" step="1" inputMode="numeric" disabled={locked}
+              <label htmlFor="st-total-payout">Total Payout ($)</label>
+              <input id="st-total-payout" name="totalPayout" type="number" value={totalPayout} min="0" step="1" inputMode="numeric" disabled={locked}
                      onChange={e => setTotalPayout(parseInt(e.target.value) || 0)}
                      onBlur={() => onUpdateSettings({ payoutSettings: { totalPayout, numWinners, minPayout, payouts } })} />
             </div>
             <div className="form-field">
-              <label>Number of Winners</label>
-              <input type="number" value={numWinners} min="1" max="100" step="1" inputMode="numeric" disabled={locked}
+              <label htmlFor="st-num-winners">Number of Winners</label>
+              <input id="st-num-winners" name="numWinners" type="number" value={numWinners} min="1" max="100" step="1" inputMode="numeric" disabled={locked}
                      onChange={e => setNumWinners(parseInt(e.target.value) || 1)}
                      onBlur={handleNumWinnersBlur} />
             </div>
             <div className="form-field">
-              <label>Min Last Place ($)</label>
-              <input type="number" value={minPayout} min="0" step="1" inputMode="numeric" disabled={locked}
+              <label htmlFor="st-min-payout">Min Last Place ($)</label>
+              <input id="st-min-payout" name="minPayout" type="number" value={minPayout} min="0" step="1" inputMode="numeric" disabled={locked}
                      onChange={e => setMinPayout(parseInt(e.target.value) || 0)}
                      onBlur={() => onUpdateSettings({ payoutSettings: { totalPayout, numWinners, minPayout, payouts } })} />
             </div>
@@ -284,6 +284,8 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
                         <td style={{ padding: '5px 8px', textAlign: 'right' }}>
                           <span style={{ color: 'var(--header-bg)', marginRight: 2 }}>$</span>
                           <input
+                            id={`st-payout-${i}`}
+                            name={`payout-${i}`}
                             type="text"
                             inputMode="numeric"
                             value={rawInputs[i] ?? String(amt)}
@@ -319,34 +321,34 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           <h3 style={H3}>Fee Structure</h3>
           <div className="edit-grid-3" style={{ marginBottom: 12 }}>
             <div className="form-field">
-              <label>Entry Fee ($)</label>
-              <input type="number" value={localFees.entryFee} min="0" step="1" disabled={locked}
+              <label htmlFor="st-entry-fee">Entry Fee ($)</label>
+              <input id="st-entry-fee" name="entryFee" type="number" value={localFees.entryFee} min="0" step="1" disabled={locked}
                      onChange={e => setLocalFees(prev => ({ ...prev, entryFee: parseFloat(e.target.value) || 0 }))}
                      onBlur={() => onUpdateSettings({ fees: localFees })} />
             </div>
             <div className="form-field">
-              <label>Lunker Fee ($)</label>
-              <input type="number" value={localFees.lunkerFee} min="0" step="1" disabled={locked}
+              <label htmlFor="st-lunker-fee">Lunker Fee ($)</label>
+              <input id="st-lunker-fee" name="lunkerFee" type="number" value={localFees.lunkerFee} min="0" step="1" disabled={locked}
                      onChange={e => setLocalFees(prev => ({ ...prev, lunkerFee: parseFloat(e.target.value) || 0 }))}
                      onBlur={() => onUpdateSettings({ fees: localFees })} />
             </div>
             <div className="form-field">
-              <label>Option Fee ($)</label>
-              <input type="number" value={localFees.optFee} min="0" step="1" disabled={locked}
+              <label htmlFor="st-opt-fee">Option Fee ($)</label>
+              <input id="st-opt-fee" name="optFee" type="number" value={localFees.optFee} min="0" step="1" disabled={locked}
                      onChange={e => setLocalFees(prev => ({ ...prev, optFee: parseFloat(e.target.value) || 0 }))}
                      onBlur={() => onUpdateSettings({ fees: localFees })} />
             </div>
           </div>
           <div className="edit-grid-2">
             <div className="form-field">
-              <label>Option 1 Payout (%)</label>
-              <input type="number" value={localFees.option1Pct ?? 70} min="0" max="100" step="1" disabled={locked}
+              <label htmlFor="st-opt1-pct">Option 1 Payout (%)</label>
+              <input id="st-opt1-pct" name="option1Pct" type="number" value={localFees.option1Pct ?? 70} min="0" max="100" step="1" disabled={locked}
                      onChange={e => setLocalFees(prev => ({ ...prev, option1Pct: Math.min(100, Math.max(0, parseFloat(e.target.value) || 0)) }))}
                      onBlur={() => onUpdateSettings({ fees: localFees })} />
             </div>
             <div className="form-field">
-              <label>Option 2 Payout (%)</label>
-              <input type="number" value={100 - (localFees.option1Pct ?? 70)} disabled
+              <label htmlFor="st-opt2-pct">Option 2 Payout (%)</label>
+              <input id="st-opt2-pct" name="option2Pct" type="number" value={100 - (localFees.option1Pct ?? 70)} disabled
                      style={{ opacity: 0.6 }} />
             </div>
           </div>
@@ -363,44 +365,44 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           <h3 style={H3}>Penalties</h3>
           <div className="edit-grid-2" style={{ marginBottom: 12 }}>
             <div className="form-field">
-              <label>Dead Fish (lbs per fish)</label>
-              <input type="number" value={localPenalties?.deadFishPenalty ?? 0.5} min="0" step="0.01" disabled={locked}
+              <label htmlFor="st-dead-fish-pen">Dead Fish (lbs per fish)</label>
+              <input id="st-dead-fish-pen" name="deadFishPenalty" type="number" value={localPenalties?.deadFishPenalty ?? 0.5} min="0" step="0.01" disabled={locked}
                      onChange={e => setLocalPenalties(prev => ({ ...prev, deadFishPenalty: parseFloat(e.target.value) || 0 }))}
                      onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
             </div>
             <div className="form-field">
-              <label>Short Fish — weight deduction (lbs per fish)</label>
-              <input type="number" value={localPenalties?.shortFishPenalty ?? 1.0} min="0" step="0.01" disabled={locked}
+              <label htmlFor="st-short-fish-pen">Short Fish — weight deduction (lbs per fish)</label>
+              <input id="st-short-fish-pen" name="shortFishPenalty" type="number" value={localPenalties?.shortFishPenalty ?? 1.0} min="0" step="0.01" disabled={locked}
                      onChange={e => setLocalPenalties(prev => ({ ...prev, shortFishPenalty: parseFloat(e.target.value) || 0 }))}
                      onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
             </div>
             <div className="form-field">
-              <label>Short Fish — fish count deduction (per fish)</label>
-              <input type="number" value={localPenalties?.shortFishCountPenalty ?? 1} min="0" max="1" step="1" disabled={locked}
+              <label htmlFor="st-short-fish-count-pen">Short Fish — fish count deduction (per fish)</label>
+              <input id="st-short-fish-count-pen" name="shortFishCountPenalty" type="number" value={localPenalties?.shortFishCountPenalty ?? 1} min="0" max="1" step="1" disabled={locked}
                      onChange={e => setLocalPenalties(prev => ({ ...prev, shortFishCountPenalty: parseInt(e.target.value) || 0 }))}
                      onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
             </div>
             <div className="form-field">
-              <label>Over Limit (lbs per fish over max)</label>
-              <input type="number" value={localPenalties?.overLimitPenalty ?? 3.0} min="0" step="0.01" disabled={locked}
+              <label htmlFor="st-over-limit-pen">Over Limit (lbs per fish over max)</label>
+              <input id="st-over-limit-pen" name="overLimitPenalty" type="number" value={localPenalties?.overLimitPenalty ?? 3.0} min="0" step="0.01" disabled={locked}
                      onChange={e => setLocalPenalties(prev => ({ ...prev, overLimitPenalty: parseFloat(e.target.value) || 0 }))}
                      onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
             </div>
             <div className="form-field">
-              <label>Max Fish Limit</label>
-              <input type="number" value={localPenalties?.maxFish ?? 5} min="1" step="1" disabled={locked}
+              <label htmlFor="st-max-fish">Max Fish Limit</label>
+              <input id="st-max-fish" name="maxFish" type="number" value={localPenalties?.maxFish ?? 5} min="1" step="1" disabled={locked}
                      onChange={e => setLocalPenalties(prev => ({ ...prev, maxFish: parseInt(e.target.value) || 1 }))}
                      onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
             </div>
             <div className="form-field">
-              <label>Late Penalty (lbs per minute)</label>
-              <input type="number" value={localPenalties?.latePenaltyPerMin ?? 1.0} min="0" step="0.01" disabled={locked}
+              <label htmlFor="st-late-pen-per-min">Late Penalty (lbs per minute)</label>
+              <input id="st-late-pen-per-min" name="latePenaltyPerMin" type="number" value={localPenalties?.latePenaltyPerMin ?? 1.0} min="0" step="0.01" disabled={locked}
                      onChange={e => setLocalPenalties(prev => ({ ...prev, latePenaltyPerMin: parseFloat(e.target.value) || 0 }))}
                      onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
             </div>
             <div className="form-field">
-              <label>Late DQ (minutes past check-in)</label>
-              <input type="number" value={localPenalties?.latePenaltyDQMin ?? 15} min="1" step="1" disabled={locked}
+              <label htmlFor="st-late-dq-min">Late DQ (minutes past check-in)</label>
+              <input id="st-late-dq-min" name="latePenaltyDQMin" type="number" value={localPenalties?.latePenaltyDQMin ?? 15} min="1" step="1" disabled={locked}
                      onChange={e => setLocalPenalties(prev => ({ ...prev, latePenaltyDQMin: parseInt(e.target.value) || 15 }))}
                      onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
             </div>
@@ -418,8 +420,8 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           <h3 style={H3}>Leaderboard Display</h3>
           <div className="edit-grid-3">
             <div className="form-field">
-              <label>Recent Weigh-Ins to Show</label>
-              <input type="number" value={settings.recentWeighCount ?? 2} min="0" max="10" step="1" disabled={locked}
+              <label htmlFor="st-recent-weigh-count">Recent Weigh-Ins to Show</label>
+              <input id="st-recent-weigh-count" name="recentWeighCount" type="number" value={settings.recentWeighCount ?? 2} min="0" max="10" step="1" disabled={locked}
                      onChange={e => onUpdateSettings({ recentWeighCount: Math.max(0, parseInt(e.target.value) || 0) })} />
             </div>
           </div>
@@ -757,24 +759,24 @@ function FlightForm({ draft, onChange, onSave, onCancel, error }) {
     <div style={{ width: '100%' }}>
       <div className="edit-grid-2" style={{ marginBottom: 8 }}>
         <div className="form-field">
-          <label>Launch Time</label>
-          <input type="text" value={draft.launchTime} placeholder="e.g. 715 AM"
+          <label htmlFor="ff-launch-time">Launch Time</label>
+          <input id="ff-launch-time" name="launchTime" type="text" value={draft.launchTime} placeholder="e.g. 715 AM"
                  onChange={e => onChange(prev => ({ ...prev, launchTime: e.target.value }))}
                  onBlur={e => onChange(prev => ({ ...prev, launchTime: formatTime(e.target.value) }))} />
         </div>
         <div className="form-field">
-          <label>Boat # Start</label>
-          <input type="number" value={draft.boatStart} min="1" inputMode="numeric"
+          <label htmlFor="ff-boat-start">Boat # Start</label>
+          <input id="ff-boat-start" name="boatStart" type="number" value={draft.boatStart} min="1" inputMode="numeric"
                  onChange={e => onChange(prev => ({ ...prev, boatStart: e.target.value }))} />
         </div>
         <div className="form-field">
-          <label>Boat # End</label>
-          <input type="number" value={draft.boatEnd} min="1" inputMode="numeric"
+          <label htmlFor="ff-boat-end">Boat # End</label>
+          <input id="ff-boat-end" name="boatEnd" type="number" value={draft.boatEnd} min="1" inputMode="numeric"
                  onChange={e => onChange(prev => ({ ...prev, boatEnd: e.target.value }))} />
         </div>
         <div className="form-field">
-          <label>Check-In Time</label>
-          <input type="text" value={draft.checkInTime} placeholder="e.g. 315 PM"
+          <label htmlFor="ff-check-in-time">Check-In Time</label>
+          <input id="ff-check-in-time" name="checkInTime" type="text" value={draft.checkInTime} placeholder="e.g. 315 PM"
                  onChange={e => onChange(prev => ({ ...prev, checkInTime: e.target.value }))}
                  onBlur={e => onChange(prev => ({ ...prev, checkInTime: formatTime(e.target.value) }))} />
         </div>

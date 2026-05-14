@@ -161,6 +161,8 @@ export default function RosterTab({
   function InlineInput({ rowId, field, type = 'text', step, align = 'left' }) {
     return (
       <input
+        id={`roster-${rowId}-${field}`}
+        name={field}
         type={type} step={step}
         value={editValues[field] ?? ''}
         onChange={e => setEditValues(v => ({ ...v, [field]: e.target.value }))}
@@ -484,6 +486,8 @@ export default function RosterTab({
         <div style={{ flex: 1 }} />
 
         <input
+          id="roster-search"
+          name="search"
           type="search"
           placeholder="Filter by name, boat #…"
           value={globalFilter.text}

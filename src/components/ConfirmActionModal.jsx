@@ -60,6 +60,8 @@ export default function ConfirmActionModal({ label, onConfirm, onCancel }) {
             <div style={{ marginBottom: 16 }}>
               <input
                 ref={inputRef}
+                id="cam-password"
+                name="password"
                 type="password"
                 value={password}
                 placeholder="Password"

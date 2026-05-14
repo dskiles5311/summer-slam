@@ -30,11 +30,11 @@ const SECTION_LABEL = {
   textTransform: 'uppercase', letterSpacing: 0.6, marginTop: 4,
 };
 
-function F({ label, value, onChange, onBlur, type = 'text', inputMode }) {
+function F({ id, label, value, onChange, onBlur, type = 'text', inputMode }) {
   return (
     <div>
-      <span style={LABEL_STYLE}>{label}</span>
-      <input type={type} inputMode={inputMode} value={value}
+      <label htmlFor={id} style={LABEL_STYLE}>{label}</label>
+      <input id={id} name={id} type={type} inputMode={inputMode} value={value}
         onChange={e => onChange(e.target.value)} onBlur={onBlur} style={INPUT_STYLE} />
     </div>
   );
@@ -126,6 +126,8 @@ export default function CheckInTab({ entries, onSave }) {
       <div style={{ maxWidth: 560, margin: '0 auto', paddingBottom: 12, borderBottom: '1px solid rgba(168,200,160,0.13)' }}>
         <input
           ref={searchRef}
+          id="ci-search"
+          name="search"
           type="search"
           placeholder="Search by name, phone, or boat #…"
           value={query}
@@ -225,13 +227,13 @@ export default function CheckInTab({ entries, onSave }) {
                     {/* Boater */}
                     <div style={SECTION_LABEL}>Boater</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                      <F label="First" value={draft.boaterFirst} onChange={v => set('boaterFirst', v)} />
-                      <F label="Last"  value={draft.boaterLast}  onChange={v => set('boaterLast', v)} />
-                      <F label="Phone" type="tel" inputMode="tel"
+                      <F id="ci-boater-first" label="First" value={draft.boaterFirst} onChange={v => set('boaterFirst', v)} />
+                      <F id="ci-boater-last"  label="Last"  value={draft.boaterLast}  onChange={v => set('boaterLast', v)} />
+                      <F id="ci-boater-phone" label="Phone" type="tel" inputMode="tel"
                          value={draft.boaterPhone}
                          onChange={v => set('boaterPhone', v)}
                          onBlur={() => set('boaterPhone', formatPhone(draft.boaterPhone))} />
-                      <F label="Email" type="email"
+                      <F id="ci-boater-email" label="Email" type="email"
                          value={draft.boaterEmail}
                          onChange={v => set('boaterEmail', v)} />
                     </div>
@@ -255,20 +257,20 @@ export default function CheckInTab({ entries, onSave }) {
                     {/* Co-Angler */}
                     <div style={{ ...SECTION_LABEL, marginTop: 2 }}>Co-Angler</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                      <F label="First" value={draft.coAnglerFirst} onChange={v => set('coAnglerFirst', v)} />
-                      <F label="Last"  value={draft.coAnglerLast}  onChange={v => set('coAnglerLast', v)} />
-                      <F label="Phone" type="tel" inputMode="tel"
+                      <F id="ci-co-first" label="First" value={draft.coAnglerFirst} onChange={v => set('coAnglerFirst', v)} />
+                      <F id="ci-co-last"  label="Last"  value={draft.coAnglerLast}  onChange={v => set('coAnglerLast', v)} />
+                      <F id="ci-co-phone" label="Phone" type="tel" inputMode="tel"
                          value={draft.coAnglerPhone}
                          onChange={v => set('coAnglerPhone', v)}
                          onBlur={() => set('coAnglerPhone', formatPhone(draft.coAnglerPhone))} />
-                      <F label="Email" type="email"
+                      <F id="ci-co-email" label="Email" type="email"
                          value={draft.coAnglerEmail}
                          onChange={v => set('coAnglerEmail', v)} />
                     </div>
 
                     {/* Boat #, Lunker, Option */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, alignItems: 'end', marginTop: 6 }}>
-                      <F label="Boat #" inputMode="numeric" value={draft.boatNo} onChange={v => set('boatNo', v)} />
+                      <F id="ci-boat-no" label="Boat #" inputMode="numeric" value={draft.boatNo} onChange={v => set('boatNo', v)} />
                       <ToggleField label="Lunker" on={isOn(draft.lunker)} onToggle={() => toggle('lunker')} />
                       <ToggleField label="Option" on={isOn(draft.option)} onToggle={() => toggle('option')} />
                     </div>

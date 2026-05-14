@@ -46,9 +46,11 @@ export default function UnlockModal({ onUnlock, onCancel }) {
           </div>
           <form onSubmit={handleSubmit}>
             <div className="form-field" style={{ marginBottom: 16 }}>
-              <label>Password</label>
+              <label htmlFor="ul-password">Password</label>
               <input
                 ref={inputRef}
+                id="ul-password"
+                name="password"
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}

@@ -169,9 +169,10 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry })
 
         {/* Boat number */}
         <div>
-          <label style={LABEL}>Boat Number</label>
+          <label htmlFor="wi-boat-no" style={LABEL}>Boat Number</label>
           <input
             ref={boatRef}
+            id="wi-boat-no" name="boatNo"
             type="number" inputMode="numeric"
             value={boatNo}
             onChange={e => { setBoatNo(e.target.value); setStatus(null); }}
@@ -211,8 +212,8 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry })
         {/* Fish count + penalties row */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
           <div>
-            <label style={LABEL}># Fish</label>
-            <input ref={fishRef} type="number" inputMode="numeric" min="0" max="20"
+            <label htmlFor="wi-num-fish" style={LABEL}># Fish</label>
+            <input ref={fishRef} id="wi-num-fish" name="numFish" type="number" inputMode="numeric" min="0" max="20"
               value={numFish} onChange={e => setNumFish(e.target.value)}
               onKeyDown={e => advance(e, deadRef)}
               placeholder="0" style={FIELD} />
@@ -223,8 +224,8 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry })
             )}
           </div>
           <div>
-            <label style={LABEL}>Dead Fish</label>
-            <input ref={deadRef} type="number" inputMode="numeric" min="0"
+            <label htmlFor="wi-dead-fish" style={LABEL}>Dead Fish</label>
+            <input ref={deadRef} id="wi-dead-fish" name="deadFish" type="number" inputMode="numeric" min="0"
               value={deadFish} onChange={e => setDeadFish(e.target.value)}
               onKeyDown={e => advance(e, shortRef)}
               placeholder="0" style={{ ...FIELD, borderColor: pen.dead > 0 ? '#ff6b6b' : undefined }} />
@@ -235,8 +236,8 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry })
             )}
           </div>
           <div>
-            <label style={LABEL}>Short Fish</label>
-            <input ref={shortRef} type="number" inputMode="numeric" min="0"
+            <label htmlFor="wi-short-fish" style={LABEL}>Short Fish</label>
+            <input ref={shortRef} id="wi-short-fish" name="shortFish" type="number" inputMode="numeric" min="0"
               value={shortFish} onChange={e => setShortFish(e.target.value)}
               onKeyDown={e => advance(e, lunkerRef)}
               placeholder="0" style={{ ...FIELD, borderColor: pen.shrt > 0 ? '#ff6b6b' : undefined }} />
@@ -251,15 +252,15 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry })
         {/* Weights row */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div>
-            <label style={LABEL}>Lunker Wt (lbs)</label>
-            <input ref={lunkerRef} type="number" inputMode="decimal" step="0.01" min="0"
+            <label htmlFor="wi-lunker-wt" style={LABEL}>Lunker Wt (lbs)</label>
+            <input ref={lunkerRef} id="wi-lunker-wt" name="lunkerWeight" type="number" inputMode="decimal" step="0.01" min="0"
               value={lunkerWeight} onChange={e => setLunkerWeight(e.target.value)}
               onKeyDown={e => advance(e, totalRef)}
               placeholder="0.00" style={FIELD} />
           </div>
           <div>
-            <label style={LABEL}>Total Wt — Scale (lbs)</label>
-            <input ref={totalRef} type="number" inputMode="decimal" step="0.01" min="0"
+            <label htmlFor="wi-total-wt" style={LABEL}>Total Wt — Scale (lbs)</label>
+            <input ref={totalRef} id="wi-total-wt" name="totalWeight" type="number" inputMode="decimal" step="0.01" min="0"
               value={totalWeight} onChange={e => setTotalWeight(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleSubmit(); } }}
               placeholder="0.00" style={FIELD} />

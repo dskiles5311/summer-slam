@@ -93,15 +93,15 @@ function EditModal({ contact, onSave, onCancel }) {
           </p>
           <form onSubmit={handleSubmit}>
             <div className="form-field" style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--header-bg)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 5, display: 'block' }}>Phone</label>
-              <input ref={phoneRef} type="tel" value={phone} placeholder="555-123-4567"
+              <label htmlFor="ct-phone" style={{ fontSize: 12, fontWeight: 700, color: 'var(--header-bg)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 5, display: 'block' }}>Phone</label>
+              <input ref={phoneRef} id="ct-phone" name="phone" type="tel" value={phone} placeholder="555-123-4567"
                      onChange={e => setPhone(e.target.value)}
                      onBlur={e => setPhone(formatPhone(e.target.value))}
                      style={FIELD_STYLE} />
             </div>
             <div className="form-field" style={{ marginBottom: 20 }}>
-              <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--header-bg)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 5, display: 'block' }}>Email</label>
-              <input type="email" value={email} placeholder="angler@example.com"
+              <label htmlFor="ct-email" style={{ fontSize: 12, fontWeight: 700, color: 'var(--header-bg)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 5, display: 'block' }}>Email</label>
+              <input id="ct-email" name="email" type="email" value={email} placeholder="angler@example.com"
                      onChange={e => setEmail(e.target.value)} style={FIELD_STYLE} />
             </div>
             <div className="edit-panel-actions">
@@ -378,6 +378,8 @@ export default function ContactsTab({ isUnlocked, contacts, contactsLoading, onC
         />
 
         <input
+          id="ct-search"
+          name="search"
           type="search"
           placeholder="Filter by name, phone, email…"
           value={filter}
