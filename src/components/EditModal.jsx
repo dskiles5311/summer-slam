@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import ContactSuggest from './ContactSuggest';
+import EmailInput from './EmailInput';
 import { formatPhone } from '../utils/phone';
 
 const EMPTY = {
@@ -192,8 +193,7 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
               </div>
               <div className="form-field">
                 <label>Boater Email</label>
-                <input type="email" value={form.boaterEmail} placeholder="angler@example.com"
-                       onChange={e => set('boaterEmail', e.target.value)} />
+                <EmailInput value={form.boaterEmail} onChange={v => set('boaterEmail', v)} />
               </div>
             </div>
 
@@ -243,8 +243,7 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
               </div>
               <div className="form-field">
                 <label>Co-Angler Email</label>
-                <input type="email" value={form.coAnglerEmail} placeholder="angler@example.com"
-                       onChange={e => set('coAnglerEmail', e.target.value)} />
+                <EmailInput value={form.coAnglerEmail} onChange={v => set('coAnglerEmail', v)} />
               </div>
             </div>
 
