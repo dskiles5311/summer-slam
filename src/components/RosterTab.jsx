@@ -99,6 +99,7 @@ export default function RosterTab({
   const [penaltyPopup, setPenaltyPopup] = useState(null);
   const [confirmAction, setConfirmAction] = useState(null);
   const [actionsOpen, setActionsOpen] = useState(false);
+  const [actionsPos, setActionsPos]   = useState({ top: 0, right: 0 });
   const fileInputRef      = useRef(null);
   const tableContainerRef = useRef(null);
   const actionsRef        = useRef(null);
@@ -111,6 +112,14 @@ export default function RosterTab({
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, [actionsOpen]);
+
+  function openActions() {
+    if (actionsRef.current) {
+      const rect = actionsRef.current.getBoundingClientRect();
+      setActionsPos({ top: rect.bottom + 6, right: window.innerWidth - rect.right });
+    }
+    setActionsOpen(o => !o);
+  }
 
   useEffect(() => {
     if (sorting[0]) {
@@ -487,11 +496,11 @@ export default function RosterTab({
                }} />
 
         <div ref={actionsRef} style={{ position: 'relative' }}>
-          <button className="btn btn-outline" onClick={() => setActionsOpen(o => !o)}>
+          <button className="btn btn-outline" onClick={openActions}>
             ⚙️ Actions {actionsOpen ? '▲' : '▼'}
           </button>
           {actionsOpen && (
-            <div className="actions-dropdown">
+            <div className="actions-dropdown" style={{ position: 'fixed', top: actionsPos.top, right: actionsPos.right }}>
               <button className="actions-item" onClick={() => { setActionsOpen(false); confirmed('import CSV', () => fileInputRef.current?.click()); }}>
                 📂 Import CSV
               </button>

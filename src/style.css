@@ -168,9 +168,6 @@ main { flex: 1; min-height: 0; padding: 0 20px 16px; overflow-y: auto; overflow-
 
 /* ── ACTIONS DROPDOWN ── */
 .actions-dropdown {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
   min-width: 180px;
   background: var(--navy);
   border: 1px solid rgba(139,180,225,0.25);
