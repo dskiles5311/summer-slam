@@ -53,8 +53,6 @@ header {
   padding: 12px 20px;
 }
 
-.logo { display: flex; align-items: center; gap: 12px; }
-.logo-icon { width: 80px; height: 80px; object-fit: contain; flex-shrink: 0; background: #fff; border-radius: 6px; padding: 3px; }
 
 .logo-text h1 {
   font-size: 22px;
@@ -707,8 +705,6 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
   .contacts-table .col-email { display: none; }
   .contacts-table .col-last-seen { display: none; }
 
-  .logo-icon { width: 56px; height: 56px; }
-
   /* Nav tabs: scroll horizontally, never wrap */
   .nav-tabs-wrap::after { display: block; }
   .nav-tabs {
@@ -742,7 +738,6 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
   /* Header: compact */
   .header-top { padding: 8px 12px; gap: 8px; }
   header, body.light header { background-position: center top !important; }
-  .logo-icon { width: 44px; height: 44px; }
   .logo-text h1 { font-size: 17px; letter-spacing: 1px; }
   .logo-text p { display: none; }
   .theme-toggle { font-size: 11px; padding: 5px 8px; }
@@ -830,7 +825,6 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
 @media (max-height: 500px) {
   .stats-bar { display: none; }
   .header-top { padding: 4px 12px; }
-  .logo-icon { width: 32px; height: 32px; }
   .logo-text h1 { font-size: 14px; letter-spacing: 1px; }
   .nav-tab { padding: 6px 14px; min-height: 36px; }
   .table-wrapper { max-height: max(160px, calc(100dvh - 120px)); }
