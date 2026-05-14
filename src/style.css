@@ -37,7 +37,7 @@ body {
 header {
   background:
     linear-gradient(rgba(26,51,32,0.78), rgba(26,51,32,0.78)),
-    url('/Summer_Slam_2.jpg') center/contain no-repeat #1a3320;
+    url('/Summer_Slam_2.jpg') left center/contain no-repeat #1a3320;
   padding: 0;
   border-bottom: 3px solid var(--gold);
   box-shadow: 0 2px 8px rgba(0,0,0,0.4);
@@ -860,7 +860,7 @@ body.light {
   --settings-panel-bg: #ffffff;
 }
 
-body.light header    { background: linear-gradient(rgba(26,51,32,0.78), rgba(26,51,32,0.78)), url('/Summer_Slam_2.jpg') center/contain no-repeat #1a3320; }
+body.light header    { background: linear-gradient(rgba(26,51,32,0.78), rgba(26,51,32,0.78)), url('/Summer_Slam_2.jpg') left center/contain no-repeat #1a3320; }
 body.light .nav-tabs { background: rgba(0,0,0,0.2); }
 body.light main      { background: #f2f5ee; }
 
@@ -922,9 +922,12 @@ body.light .form-field select:focus { border-color: #2d6e38; background: #ffffff
 body.light .edit-panel-close   { background: rgba(0,0,0,0.05); border-color: #b8ccb4; color: #3d5c40; }
 body.light .edit-panel-header h3 { color: #6b5018; }
 
-/* Leaderboard watermark — page bg is #0f1f0f so black image bg is barely visible */
+/* Leaderboard watermark
+   dark:          plain opacity — #0f1f0f bg makes black image bg nearly invisible
+   light/outdoor: invert flips black bg → white; multiply blend makes white transparent */
 .lb-watermark { opacity: 0.18; }
-body.light .lb-watermark { opacity: 0 !important; }
+body.light .lb-watermark   { opacity: 0.25 !important; filter: invert(1); mix-blend-mode: multiply; }
+
 
 body.light .nav-tab.active     { color: #e0c48a; border-bottom-color: #e0c48a; }
 body.light .logo-text h1       { color: #f0ede6; }
@@ -955,7 +958,7 @@ body.outdoor {
   --settings-panel-bg: #ffffff;
 }
 
-body.outdoor header    { background: linear-gradient(rgba(22,61,32,0.78), rgba(22,61,32,0.78)), url('/Summer_Slam_2.jpg') center/contain no-repeat #163d20; }
+body.outdoor header    { background: linear-gradient(rgba(22,61,32,0.78), rgba(22,61,32,0.78)), url('/Summer_Slam_2.jpg') left center/contain no-repeat #163d20; }
 body.outdoor .nav-tabs { background: #0d2914; }
 body.outdoor main      { background: #f0f5f0; }
 
@@ -1068,4 +1071,4 @@ body.outdoor .edit-panel-close       { background: #e6f2e6; border-color: #3a6e3
 body.outdoor .edit-section-label     { color: #1a5c28; border-bottom-color: #3a6e3a; font-size: 11px; }
 
 /* Watermark */
-body.outdoor .lb-watermark { opacity: 0 !important; }
+body.outdoor .lb-watermark { opacity: 0.25 !important; filter: invert(1); mix-blend-mode: multiply; }
