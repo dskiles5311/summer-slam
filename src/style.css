@@ -103,6 +103,7 @@ header {
 
 .stat-chip .lbl {
   font-size: 12px;
+  font-weight: 700;
   color: rgba(255,255,255,0.65);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -952,7 +953,7 @@ body.light .top-n-control input   {
 /* Stat chips in header (stays on dark green header) */
 body.light .stat-chip        { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.4); }
 body.light .stat-chip .val   { color: #ffffff; }
-body.light .stat-chip .lbl   { color: rgba(255,255,255,0.9); font-weight: 700; }
+body.light .stat-chip .lbl   { color: rgba(255,255,255,0.9); }
 
 /* Nav tabs (on dark header) */
 body.light .nav-tab          { color: rgba(255,255,255,0.85); }
