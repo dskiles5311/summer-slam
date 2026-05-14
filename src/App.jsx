@@ -462,7 +462,7 @@ export default function App() {
 
       {activeTab === 'leaderboard' && (
         <img
-          src="/Summer_Slam_no_bg.png"
+          src="/watermark.png"
           alt=""
           aria-hidden="true"
           className="lb-watermark"
