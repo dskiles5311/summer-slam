@@ -111,7 +111,6 @@ header {
 /* ── NAV TABS ── */
 .nav-tabs-wrap {
   position: relative;
-  background: #1a3320;
 }
 .nav-tabs-wrap::after {
   content: '';
@@ -957,7 +956,6 @@ body.outdoor {
 
 body.outdoor header         { background: linear-gradient(rgba(22,61,32,0.78), rgba(22,61,32,0.78)), url('/Summer_Slam_2.jpg') left top/contain no-repeat #163d20; }
 
-body.outdoor .nav-tabs-wrap { background: #163d20; }
 body.outdoor .nav-tabs { background: #0d2914; }
 body.outdoor main      { background: #f0f5f0; }
 
