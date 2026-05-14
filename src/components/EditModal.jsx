@@ -167,13 +167,19 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
               </div>
               <div className="form-field">
                 <label>Boater Last{isNew ? ' *' : ''}</label>
-                <ContactSuggest
-                  value={form.boaterLast}
-                  placeholder="Last"
-                  onChange={v => set('boaterLast', v)}
-                  onSelect={c => setForm(prev => ({ ...prev, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || prev.boaterEmail }))}
-                  inputProps={{ style: errBorder('boaterLast') }}
-                />
+                {isNew ? (
+                  <ContactSuggest
+                    value={form.boaterLast}
+                    placeholder="Last"
+                    onChange={v => set('boaterLast', v)}
+                    onSelect={c => setForm(prev => ({ ...prev, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || prev.boaterEmail }))}
+                    inputProps={{ style: errBorder('boaterLast') }}
+                  />
+                ) : (
+                  <input type="text" value={form.boaterLast} placeholder="Last"
+                         onChange={e => set('boaterLast', e.target.value)}
+                         style={errBorder('boaterLast')} />
+                )}
                 {err('boaterLast')}
               </div>
               <div className="form-field">
@@ -215,12 +221,17 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
               </div>
               <div className="form-field">
                 <label>Co-Angler Last</label>
-                <ContactSuggest
-                  value={form.coAnglerLast}
-                  placeholder="Last"
-                  onChange={v => set('coAnglerLast', v)}
-                  onSelect={c => setForm(prev => ({ ...prev, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || prev.coAnglerEmail }))}
-                />
+                {isNew ? (
+                  <ContactSuggest
+                    value={form.coAnglerLast}
+                    placeholder="Last"
+                    onChange={v => set('coAnglerLast', v)}
+                    onSelect={c => setForm(prev => ({ ...prev, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || prev.coAnglerEmail }))}
+                  />
+                ) : (
+                  <input type="text" value={form.coAnglerLast} placeholder="Last"
+                         onChange={e => set('coAnglerLast', e.target.value)} />
+                )}
               </div>
               <div className="form-field">
                 <label>Co-Angler Phone{isNew && (form.coAnglerFirst || form.coAnglerLast) ? ' *' : ''}</label>
