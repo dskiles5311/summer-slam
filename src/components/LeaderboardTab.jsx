@@ -43,7 +43,7 @@ export default function LeaderboardTab({ entries, settings }) {
   return (
     <div className="tab-panel active" style={{ position: 'relative' }}>
       <img
-        src="/SFT%20logo%20color%20no%20background.png"
+        src="/Summer_Slam.png"
         alt=""
         aria-hidden="true"
         className="lb-watermark"

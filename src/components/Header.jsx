@@ -18,7 +18,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
     <header>
       <div className="header-top">
         <div className="logo">
-          <img src="/SFT%20logo%20color.jpg" alt="SFT" className="logo-icon" />
+          <img src="/Summer_Slam_2.jpg" alt="Summer Slam" className="logo-icon" />
           <div className="logo-text">
             <h1>{new Date().getFullYear()} Summer Slam!</h1>
             <p>Susquehanna Fishing Tackle</p>
