@@ -56,8 +56,10 @@ export default function ArchiveTab({ isUnlocked, rosterCount, onLoadArchive }) {
 
         {years.length > 0 && (
           <>
-            <label style={{ color: 'var(--header-bg)', fontSize: 14 }}>Year:</label>
+            <label htmlFor="archive-year" style={{ color: 'var(--header-bg)', fontSize: 14 }}>Year:</label>
             <select
+              id="archive-year"
+              name="year"
               value={activeYear ?? ''}
               onChange={e => setActiveYear(e.target.value)}
               style={{
