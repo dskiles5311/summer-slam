@@ -166,6 +166,37 @@ main { flex: 1; min-height: 0; padding: 0 20px 16px; overflow-y: auto; overflow-
   border-bottom: 1px solid rgba(168,200,160,0.13);
 }
 
+/* ── ACTIONS DROPDOWN ── */
+.actions-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 180px;
+  background: var(--navy);
+  border: 1px solid rgba(139,180,225,0.25);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  z-index: 100;
+  overflow: hidden;
+  padding: 4px 0;
+}
+.actions-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 11px 16px;
+  color: var(--white);
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.actions-item:hover { background: rgba(255,255,255,0.07); }
+.actions-item--danger { color: #ff9090; }
+.actions-item--danger:hover { background: rgba(255,107,107,0.1); }
+.actions-divider { height: 1px; background: rgba(139,180,225,0.15); margin: 4px 0; }
+
 .btn {
   padding: 7px 14px;
   border-radius: 6px;
@@ -795,6 +826,10 @@ body.light .btn-primary:hover  { background: #254d30; }
 
 body.light .add-row-btn        { background: rgba(0,0,0,0.02); border-color: #b8ccb4; color: #3d5c40; }
 body.light .add-row-btn:hover  { background: rgba(0,0,0,0.05); color: #1a2e1a; }
+body.light .actions-dropdown   { background: #f0ede6; border-color: #b8ccb4; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+body.light .actions-item       { color: #1a2e1a; }
+body.light .actions-item:hover { background: rgba(0,0,0,0.05); }
+body.light .actions-divider    { background: rgba(0,0,0,0.1); }
 
 body.light .summary-chip  { background: #ffffff; border-color: #b8ccb4; }
 body.light .summary-chip .sc-lbl    { color: #1a2e1a; }
@@ -902,6 +937,10 @@ body.outdoor .btn-primary:hover { background: #0d3d1a; }
 /* Add-row button */
 body.outdoor .add-row-btn       { background: #f0f8f0; border-color: #3a6e3a; color: #1a5c28; }
 body.outdoor .add-row-btn:hover { background: #ddf0dd; color: #0d3d1a; }
+body.outdoor .actions-dropdown   { background: #f0f8f0; border-color: #3a6e3a; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+body.outdoor .actions-item       { color: #0a120a; }
+body.outdoor .actions-item:hover { background: rgba(0,0,0,0.05); }
+body.outdoor .actions-divider    { background: rgba(0,0,0,0.1); }
 
 /* Summary chips / cards */
 body.outdoor .summary-chip { background: #ffffff; border: 1.5px solid #3a6e3a; }

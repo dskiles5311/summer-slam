@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import {
   useReactTable,
   getCoreRowModel,
@@ -98,8 +98,19 @@ export default function RosterTab({
   const [editValues, setEditValues]     = useState({});
   const [penaltyPopup, setPenaltyPopup] = useState(null);
   const [confirmAction, setConfirmAction] = useState(null);
-  const fileInputRef     = useRef(null);
+  const [actionsOpen, setActionsOpen] = useState(false);
+  const fileInputRef      = useRef(null);
   const tableContainerRef = useRef(null);
+  const actionsRef        = useRef(null);
+
+  useEffect(() => {
+    if (!actionsOpen) return;
+    function handleClick(e) {
+      if (actionsRef.current && !actionsRef.current.contains(e.target)) setActionsOpen(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [actionsOpen]);
 
   useEffect(() => {
     if (sorting[0]) {
@@ -468,19 +479,6 @@ export default function RosterTab({
           }}
         />
 
-        {onBackfillInfo && (
-          <button className="btn btn-outline" title="Fill in missing phones and emails from saved contacts (matched by name)"
-                  onClick={() => confirmed('backfill phones and emails from contacts', onBackfillInfo)}>
-            📋 Backfill info
-          </button>
-        )}
-        {onNormalizePhones && (
-          <button className="btn btn-outline" title="Reformat all phone numbers to xxx-xxx-xxxx"
-                  onClick={() => confirmed('normalize all phone numbers to xxx-xxx-xxxx', onNormalizePhones)}>
-            📞 Format phone #'s
-          </button>
-        )}
-
         <input ref={fileInputRef} type="file" accept=".csv" style={{ display: 'none' }}
                onChange={e => {
                  const f = e.target.files[0];
@@ -488,21 +486,41 @@ export default function RosterTab({
                  e.target.value = '';
                }} />
 
-        <button className="btn btn-outline" onClick={() => confirmed('import CSV', () => fileInputRef.current?.click())}>
-          📂 Import CSV
-        </button>
-        <button className="btn btn-primary" onClick={() => confirmed('export CSV', () => exportCSV(entries, settings.payoutSettings))}>
-          💾 Export CSV
-        </button>
-        <button className="btn btn-outline" onClick={() => confirmed('export HTML', () => exportHTML(rows.map(r => r.original), 'Summer Slam Roster'))}>
-          📄 Export HTML
-        </button>
-        <button className="btn btn-outline" onClick={() => confirmed('archive year', onArchive)}>
-          🗂️ Archive Year
-        </button>
-        <button className="btn btn-danger" onClick={() => confirmed('clear all entries', onClearAll)}>
-          🗑️ Clear All
-        </button>
+        <div ref={actionsRef} style={{ position: 'relative' }}>
+          <button className="btn btn-outline" onClick={() => setActionsOpen(o => !o)}>
+            ⚙️ Actions {actionsOpen ? '▲' : '▼'}
+          </button>
+          {actionsOpen && (
+            <div className="actions-dropdown">
+              <button className="actions-item" onClick={() => { setActionsOpen(false); confirmed('import CSV', () => fileInputRef.current?.click()); }}>
+                📂 Import CSV
+              </button>
+              <button className="actions-item" onClick={() => { setActionsOpen(false); confirmed('export CSV', () => exportCSV(entries, settings.payoutSettings)); }}>
+                💾 Export CSV
+              </button>
+              <button className="actions-item" onClick={() => { setActionsOpen(false); confirmed('export HTML', () => exportHTML(rows.map(r => r.original), 'Summer Slam Roster')); }}>
+                📄 Export HTML
+              </button>
+              <button className="actions-item" onClick={() => { setActionsOpen(false); confirmed('archive year', onArchive); }}>
+                🗂️ Archive Year
+              </button>
+              {onNormalizePhones && (
+                <button className="actions-item" onClick={() => { setActionsOpen(false); confirmed('normalize all phone numbers to xxx-xxx-xxxx', onNormalizePhones); }}>
+                  📞 Format phone #'s
+                </button>
+              )}
+              {onBackfillInfo && (
+                <button className="actions-item" onClick={() => { setActionsOpen(false); confirmed('backfill phones and emails from contacts', onBackfillInfo); }}>
+                  📋 Backfill info
+                </button>
+              )}
+              <div className="actions-divider" />
+              <button className="actions-item actions-item--danger" onClick={() => { setActionsOpen(false); confirmed('clear all entries', onClearAll); }}>
+                🗑️ Clear All
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Table */}
