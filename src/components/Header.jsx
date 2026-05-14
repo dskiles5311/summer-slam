@@ -17,7 +17,9 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
   return (
     <header>
       <div className="header-top">
-        <div style={{ flex: 1 }} />
+        <div style={{ flex: 1 }}>
+          <img src="/Summer_Slam_2.jpg" alt="Summer Slam" className="logo-icon" />
+        </div>
         <div className="logo-text" style={{ textAlign: 'center' }}>
           <h1>{new Date().getFullYear()} Summer Slam!</h1>
           <p>Susquehanna Fishing Tackle</p>
