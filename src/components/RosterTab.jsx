@@ -99,7 +99,7 @@ export default function RosterTab({
   const [penaltyPopup, setPenaltyPopup] = useState(null);
   const [confirmAction, setConfirmAction] = useState(null);
   const [actionsOpen, setActionsOpen] = useState(false);
-  const [actionsPos, setActionsPos]   = useState({ top: 0, right: 0 });
+  const [actionsPos, setActionsPos]   = useState({ top: 0, right: 0, bottom: 'auto' });
   const fileInputRef      = useRef(null);
   const tableContainerRef = useRef(null);
   const actionsRef        = useRef(null);
@@ -116,7 +116,14 @@ export default function RosterTab({
   function openActions() {
     if (actionsRef.current) {
       const rect = actionsRef.current.getBoundingClientRect();
-      setActionsPos({ top: rect.bottom + 6, right: window.innerWidth - rect.right });
+      const right = window.innerWidth - rect.right;
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      if (spaceBelow >= 220 || spaceBelow >= spaceAbove) {
+        setActionsPos({ top: rect.bottom + 6, bottom: 'auto', right });
+      } else {
+        setActionsPos({ top: 'auto', bottom: window.innerHeight - rect.top + 6, right });
+      }
     }
     setActionsOpen(o => !o);
   }
@@ -500,7 +507,7 @@ export default function RosterTab({
             ⚙️ Actions {actionsOpen ? '▲' : '▼'}
           </button>
           {actionsOpen && (
-            <div className="actions-dropdown" style={{ position: 'fixed', top: actionsPos.top, right: actionsPos.right }}>
+            <div className="actions-dropdown" style={{ position: 'fixed', top: actionsPos.top, bottom: actionsPos.bottom, right: actionsPos.right }}>
               <button className="actions-item" onClick={() => { setActionsOpen(false); confirmed('import CSV', () => fileInputRef.current?.click()); }}>
                 📂 Import CSV
               </button>
