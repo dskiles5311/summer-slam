@@ -160,37 +160,37 @@ export default function SignUpTab({ onAddEntry, settings }) {
           <div style={SECTION}>Boater</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
             <div>
-              <label style={LABEL}>First Name *</label>
-              <input ref={boaterFirstRef} type="text" value={form.boaterFirst} placeholder="First"
+              <label htmlFor="su-boater-first" style={LABEL}>First Name *</label>
+              <input ref={boaterFirstRef} id="su-boater-first" name="boaterFirst" type="text" value={form.boaterFirst} placeholder="First"
                      onChange={e => set('boaterFirst', e.target.value)}
                      style={fieldBorder('boaterFirst')} />
               {err('boaterFirst')}
             </div>
             <div>
-              <label style={LABEL}>Last Name *</label>
+              <label htmlFor="su-boater-last" style={LABEL}>Last Name *</label>
               <ContactSuggest
                 value={form.boaterLast}
                 placeholder="Last"
                 onChange={v => set('boaterLast', v)}
                 onSelect={c => setForm(p => ({ ...p, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || p.boaterEmail }))}
-                inputProps={{ style: fieldBorder('boaterLast') }}
+                inputProps={{ id: 'su-boater-last', name: 'boaterLast', style: fieldBorder('boaterLast') }}
               />
               {err('boaterLast')}
             </div>
           </div>
           <div>
-            <label style={LABEL}>Email</label>
-            <EmailInput value={form.boaterEmail} onChange={v => set('boaterEmail', v)} style={FIELD} />
+            <label htmlFor="su-boater-email" style={LABEL}>Email</label>
+            <EmailInput id="su-boater-email" name="boaterEmail" value={form.boaterEmail} onChange={v => set('boaterEmail', v)} style={FIELD} />
           </div>
           <div>
-            <label style={LABEL}>Phone *</label>
+            <label htmlFor="su-boater-phone" style={LABEL}>Phone *</label>
             <ContactSuggest
               value={form.boaterPhone}
               placeholder="555-123-4567"
               onChange={v => set('boaterPhone', v)}
               onSelect={c => setForm(p => ({ ...p, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || p.boaterEmail }))}
               onBlur={e => set('boaterPhone', formatPhone(e.target.value))}
-              inputProps={{ style: fieldBorder('boaterPhone'), type: 'tel' }}
+              inputProps={{ id: 'su-boater-phone', name: 'boaterPhone', style: fieldBorder('boaterPhone'), type: 'tel' }}
             />
             {err('boaterPhone')}
           </div>
@@ -204,30 +204,30 @@ export default function SignUpTab({ onAddEntry, settings }) {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
             <div>
-              <label style={LABEL}>First Name</label>
-              <input type="text" value={form.coAnglerFirst} placeholder="First"
+              <label htmlFor="su-co-first" style={LABEL}>First Name</label>
+              <input id="su-co-first" name="coAnglerFirst" type="text" value={form.coAnglerFirst} placeholder="First"
                      onChange={e => set('coAnglerFirst', e.target.value)}
                      style={fieldBorder('coAnglerFirst')} />
               {err('coAnglerFirst')}
             </div>
             <div>
-              <label style={LABEL}>Last Name</label>
+              <label htmlFor="su-co-last" style={LABEL}>Last Name</label>
               <ContactSuggest
                 value={form.coAnglerLast}
                 placeholder="Last"
                 onChange={v => set('coAnglerLast', v)}
                 onSelect={c => setForm(p => ({ ...p, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || p.coAnglerEmail }))}
-                inputProps={{ style: fieldBorder('coAnglerLast') }}
+                inputProps={{ id: 'su-co-last', name: 'coAnglerLast', style: fieldBorder('coAnglerLast') }}
               />
               {err('coAnglerLast')}
             </div>
           </div>
           <div>
-            <label style={LABEL}>Email</label>
-            <EmailInput value={form.coAnglerEmail} onChange={v => set('coAnglerEmail', v)} style={FIELD} />
+            <label htmlFor="su-co-email" style={LABEL}>Email</label>
+            <EmailInput id="su-co-email" name="coAnglerEmail" value={form.coAnglerEmail} onChange={v => set('coAnglerEmail', v)} style={FIELD} />
           </div>
           <div>
-            <label style={LABEL}>
+            <label htmlFor="su-co-phone" style={LABEL}>
               Phone{(form.coAnglerFirst || form.coAnglerLast) ? ' *' : ''}
             </label>
             <ContactSuggest
@@ -236,7 +236,7 @@ export default function SignUpTab({ onAddEntry, settings }) {
               onChange={v => set('coAnglerPhone', v)}
               onSelect={c => setForm(p => ({ ...p, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || p.coAnglerEmail }))}
               onBlur={e => set('coAnglerPhone', formatPhone(e.target.value))}
-              inputProps={{ style: fieldBorder('coAnglerPhone'), type: 'tel' }}
+              inputProps={{ id: 'su-co-phone', name: 'coAnglerPhone', style: fieldBorder('coAnglerPhone'), type: 'tel' }}
             />
             {err('coAnglerPhone')}
           </div>
@@ -259,8 +259,8 @@ export default function SignUpTab({ onAddEntry, settings }) {
             ))}
           </div>
           <div>
-            <label style={LABEL}>Amount ($)</label>
-            <input type="text" inputMode="decimal" value={form.buyIn} placeholder="0.00"
+            <label htmlFor="su-buy-in" style={LABEL}>Amount ($)</label>
+            <input id="su-buy-in" name="buyIn" type="text" inputMode="decimal" value={form.buyIn} placeholder="0.00"
                    onChange={e => set('buyIn', e.target.value)}
                    onBlur={e => {
                      const result = evalMath(e.target.value);

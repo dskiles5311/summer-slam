@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 
 const DOMAINS = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'icloud.com'];
 
-export default function EmailInput({ value, onChange, onBlur, style, placeholder = 'angler@example.com' }) {
+export default function EmailInput({ value, onChange, onBlur, style, placeholder = 'angler@example.com', id, name }) {
   const [suggestions, setSuggestions] = useState([]);
   const [activeIdx, setActiveIdx]     = useState(-1);
   const containerRef = useRef(null);
@@ -68,6 +68,8 @@ export default function EmailInput({ value, onChange, onBlur, style, placeholder
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
+        id={id}
+        name={name}
         style={{ ...style, width: '100%', boxSizing: 'border-box' }}
         autoComplete="off"
         inputMode="email"

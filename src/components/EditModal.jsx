@@ -155,40 +155,40 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
             <div className="edit-section-label">Boater</div>
             <div className="edit-grid-2">
               <div className="form-field">
-                <label>Boater First{isNew ? ' *' : ''}</label>
-                <input ref={firstInputRef} type="text" value={form.boaterFirst} placeholder="First"
+                <label htmlFor="em-boater-first">Boater First{isNew ? ' *' : ''}</label>
+                <input ref={firstInputRef} id="em-boater-first" name="boaterFirst" type="text" value={form.boaterFirst} placeholder="First"
                        onChange={e => set('boaterFirst', e.target.value)}
                        style={errBorder('boaterFirst')} />
                 {err('boaterFirst')}
               </div>
               <div className="form-field">
-                <label>Boater Last{isNew ? ' *' : ''}</label>
+                <label htmlFor="em-boater-last">Boater Last{isNew ? ' *' : ''}</label>
                 {isNew ? (
                   <ContactSuggest
                     value={form.boaterLast}
                     placeholder="Last"
                     onChange={v => set('boaterLast', v)}
                     onSelect={c => setForm(prev => ({ ...prev, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || prev.boaterEmail }))}
-                    inputProps={{ style: errBorder('boaterLast') }}
+                    inputProps={{ id: 'em-boater-last', name: 'boaterLast', style: errBorder('boaterLast') }}
                   />
                 ) : (
-                  <input type="text" value={form.boaterLast} placeholder="Last"
+                  <input id="em-boater-last" name="boaterLast" type="text" value={form.boaterLast} placeholder="Last"
                          onChange={e => set('boaterLast', e.target.value)}
                          style={errBorder('boaterLast')} />
                 )}
                 {err('boaterLast')}
               </div>
               <div className="form-field">
-                <label>Boater Phone{isNew ? ' *' : ''}</label>
-                <input type="tel" value={form.boaterPhone} placeholder="555-123-4567"
+                <label htmlFor="em-boater-phone">Boater Phone{isNew ? ' *' : ''}</label>
+                <input id="em-boater-phone" name="boaterPhone" type="tel" value={form.boaterPhone} placeholder="555-123-4567"
                        onChange={e => set('boaterPhone', e.target.value)}
                        onBlur={e => set('boaterPhone', formatPhone(e.target.value))}
                        style={errBorder('boaterPhone')} />
                 {err('boaterPhone')}
               </div>
               <div className="form-field">
-                <label>Boater Email</label>
-                <EmailInput value={form.boaterEmail} onChange={v => set('boaterEmail', v)} />
+                <label htmlFor="em-boater-email">Boater Email</label>
+                <EmailInput id="em-boater-email" name="boaterEmail" value={form.boaterEmail} onChange={v => set('boaterEmail', v)} />
               </div>
             </div>
 
@@ -210,63 +210,64 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
             <div className="edit-section-label">Co-Angler</div>
             <div className="edit-grid-2">
               <div className="form-field">
-                <label>Co-Angler First</label>
-                <input type="text" value={form.coAnglerFirst} placeholder="First"
+                <label htmlFor="em-co-first">Co-Angler First</label>
+                <input id="em-co-first" name="coAnglerFirst" type="text" value={form.coAnglerFirst} placeholder="First"
                        onChange={e => set('coAnglerFirst', e.target.value)} />
               </div>
               <div className="form-field">
-                <label>Co-Angler Last</label>
+                <label htmlFor="em-co-last">Co-Angler Last</label>
                 {isNew ? (
                   <ContactSuggest
                     value={form.coAnglerLast}
                     placeholder="Last"
                     onChange={v => set('coAnglerLast', v)}
                     onSelect={c => setForm(prev => ({ ...prev, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || prev.coAnglerEmail }))}
+                    inputProps={{ id: 'em-co-last', name: 'coAnglerLast' }}
                   />
                 ) : (
-                  <input type="text" value={form.coAnglerLast} placeholder="Last"
+                  <input id="em-co-last" name="coAnglerLast" type="text" value={form.coAnglerLast} placeholder="Last"
                          onChange={e => set('coAnglerLast', e.target.value)} />
                 )}
               </div>
               <div className="form-field">
-                <label>Co-Angler Phone{isNew && (form.coAnglerFirst || form.coAnglerLast) ? ' *' : ''}</label>
-                <input type="tel" value={form.coAnglerPhone} placeholder="555-123-4567"
+                <label htmlFor="em-co-phone">Co-Angler Phone{isNew && (form.coAnglerFirst || form.coAnglerLast) ? ' *' : ''}</label>
+                <input id="em-co-phone" name="coAnglerPhone" type="tel" value={form.coAnglerPhone} placeholder="555-123-4567"
                        onChange={e => set('coAnglerPhone', e.target.value)}
                        onBlur={e => set('coAnglerPhone', formatPhone(e.target.value))}
                        style={errBorder('coAnglerPhone')} />
                 {err('coAnglerPhone')}
               </div>
               <div className="form-field">
-                <label>Co-Angler Email</label>
-                <EmailInput value={form.coAnglerEmail} onChange={v => set('coAnglerEmail', v)} />
+                <label htmlFor="em-co-email">Co-Angler Email</label>
+                <EmailInput id="em-co-email" name="coAnglerEmail" value={form.coAnglerEmail} onChange={v => set('coAnglerEmail', v)} />
               </div>
             </div>
 
             <div className="edit-section-label">Catch Details</div>
             <div className="edit-grid-3">
               <div className="form-field">
-                <label>Boat #</label>
-                <input type="text" value={form.boatNo} placeholder="42" inputMode="numeric"
+                <label htmlFor="em-boat-no">Boat #</label>
+                <input id="em-boat-no" name="boatNo" type="text" value={form.boatNo} placeholder="42" inputMode="numeric"
                        onChange={e => set('boatNo', e.target.value)} />
               </div>
               <div className="form-field">
-                <label># Fish</label>
-                <input type="number" value={form.numFish} placeholder="0" min="0" max="10" inputMode="numeric"
+                <label htmlFor="em-num-fish"># Fish</label>
+                <input id="em-num-fish" name="numFish" type="number" value={form.numFish} placeholder="0" min="0" max="10" inputMode="numeric"
                        onChange={e => set('numFish', e.target.value)} />
               </div>
               <div className="form-field">
-                <label>Lunker Wt (lbs)</label>
-                <input type="number" value={form.lunkerWeight} placeholder="0.00" step="0.01" min="0" inputMode="decimal"
+                <label htmlFor="em-lunker-wt">Lunker Wt (lbs)</label>
+                <input id="em-lunker-wt" name="lunkerWeight" type="number" value={form.lunkerWeight} placeholder="0.00" step="0.01" min="0" inputMode="decimal"
                        onChange={e => set('lunkerWeight', e.target.value)} />
               </div>
               <div className="form-field">
-                <label>Total Wt (lbs)</label>
-                <input type="number" value={form.totalWeight} placeholder="0.00" step="0.01" min="0" inputMode="decimal"
+                <label htmlFor="em-total-wt">Total Wt (lbs)</label>
+                <input id="em-total-wt" name="totalWeight" type="number" value={form.totalWeight} placeholder="0.00" step="0.01" min="0" inputMode="decimal"
                        onChange={e => set('totalWeight', e.target.value)} />
               </div>
               <div className="form-field">
-                <label>Buy-In ($)</label>
-                <input type="number" value={form.buyIn} placeholder="0.00" step="0.01" min="0" inputMode="decimal"
+                <label htmlFor="em-buy-in">Buy-In ($)</label>
+                <input id="em-buy-in" name="buyIn" type="number" value={form.buyIn} placeholder="0.00" step="0.01" min="0" inputMode="decimal"
                        onChange={e => set('buyIn', e.target.value)} />
               </div>
             </div>
