@@ -24,7 +24,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
         </div>
         <div style={{ flex: 1, display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'flex-end' }}>
           <button className="theme-toggle" onClick={onThemeToggle}>
-            {settings.theme === 'dark' ? '☀️ Light' : settings.theme === 'light' ? '🏕️ Outdoor' : '🌙 Dark'}
+            {settings.theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
           </button>
           <button
             className="theme-toggle"

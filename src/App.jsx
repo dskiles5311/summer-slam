@@ -47,7 +47,10 @@ function mergeSettings(raw) {
 }
 
 export default function App() {
-  const [theme, setTheme]               = useState(() => localStorage.getItem('ss_theme') || 'outdoor');
+  const [theme, setTheme]               = useState(() => {
+    const stored = localStorage.getItem('ss_theme');
+    return stored === 'outdoor' ? 'light' : (stored || 'light');
+  });
   const [activeTab, setActiveTab]       = useState('leaderboard');
   const [toasts, setToasts]             = useState([]);
   const [editingEntry, setEditingEntry] = useState(null);
@@ -100,8 +103,8 @@ export default function App() {
   useEffect(() => { if (isUnlocked) setEverUnlocked(true); }, [isUnlocked]);
 
   useEffect(() => {
-    document.body.classList.remove('light', 'outdoor');
-    if (theme === 'light' || theme === 'outdoor') document.body.classList.add(theme);
+    document.body.classList.remove('light');
+    if (theme === 'light') document.body.classList.add(theme);
   }, [theme]);
 
   async function handleUnlock(password) {
@@ -450,7 +453,7 @@ export default function App() {
         activeTab={isUnlocked || activeTab === 'rules' || activeTab === 'archive' || activeTab === 'roster' || activeTab === 'flights' ? activeTab : 'leaderboard'}
         onTabChange={tab => { if (isUnlocked || tab === 'rules' || tab === 'leaderboard' || tab === 'archive' || tab === 'roster' || tab === 'flights') setActiveTab(tab); }}
         onThemeToggle={() => {
-          const next = theme === 'dark' ? 'light' : theme === 'light' ? 'outdoor' : 'dark';
+          const next = theme === 'dark' ? 'light' : 'dark';
           setTheme(next);
           localStorage.setItem('ss_theme', next);
         }}
