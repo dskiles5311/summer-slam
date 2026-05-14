@@ -253,7 +253,7 @@ export default function SignUpTab({ onAddEntry, settings }) {
               { key: 'appSigned', label: 'App Signed' },
             ].map(({ key, label }) => (
               <div key={key}>
-                <label style={LABEL}>{label}</label>
+                <span style={LABEL}>{label}</span>
                 <ToggleButton value={form[key]} onChange={v => set(key, v)} />
               </div>
             ))}

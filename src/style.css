@@ -572,7 +572,7 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
 .edit-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr);   gap: 10px; }
 
 .form-field { display: flex; flex-direction: column; gap: 4px; }
-.form-field label { font-size: 12px; color: var(--header-bg); text-transform: uppercase; letter-spacing: 0.5px; }
+.form-field label, .form-field .field-label { font-size: 12px; color: var(--header-bg); text-transform: uppercase; letter-spacing: 0.5px; }
 
 .form-field input,
 .form-field select {
@@ -1039,7 +1039,7 @@ body.outdoor .logo-text h1     { color: #ffe08a; }
 
 /* Edit modal */
 body.outdoor .edit-panel             { background: #ffffff; border: 2px solid #1a5c28; }
-body.outdoor .form-field label       { color: #1a5c28; font-weight: 700; }
+body.outdoor .form-field label, body.outdoor .form-field .field-label { color: #1a5c28; font-weight: 700; }
 body.outdoor .form-field input,
 body.outdoor .form-field select      {
   background: #f5faf5;

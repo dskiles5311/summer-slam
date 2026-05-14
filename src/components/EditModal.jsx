@@ -298,7 +298,7 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
                 { key: 'appSigned', label: 'App Signed'  },
               ].map(({ key, label }) => (
                 <div key={key} className="form-field">
-                  <label>{label}</label>
+                  <span className="field-label">{label}</span>
                   <ToggleButton value={form[key]} onChange={v => set(key, v)} />
                 </div>
               ))}
