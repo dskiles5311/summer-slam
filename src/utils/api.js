@@ -41,8 +41,11 @@ function parseEntry(raw) {
     deadFish:       raw.dead_fish       ?? raw.deadFish       ?? 0,
     shortFish:      raw.short_fish      ?? raw.shortFish      ?? 0,
     needsAttention: Boolean(raw.needs_attention ?? raw.needsAttention ?? false),
-    weighedAt:      raw.weighed_at ?? raw.weighedAt ?? null,
-    updatedAt:      raw.updated_at ?? raw.updatedAt ?? null,
+    weighedAt:      raw.weighed_at    ?? raw.weighedAt    ?? null,
+    updatedAt:      raw.updated_at    ?? raw.updatedAt    ?? null,
+    signedUpAt:     raw.signed_up_at  ?? raw.signedUpAt  ?? null,
+    checkedInAt:    raw.checked_in_at ?? raw.checkedInAt ?? null,
+    offWaterAt:     raw.off_water_at  ?? raw.offWaterAt  ?? null,
   };
 }
 
