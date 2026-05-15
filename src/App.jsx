@@ -14,6 +14,7 @@ import ArchiveTab from './components/ArchiveTab';
 import FlightsTab from './components/FlightsTab';
 import EditModal from './components/EditModal';
 import UnlockModal from './components/UnlockModal';
+import ConfirmActionModal from './components/ConfirmActionModal';
 import Toast from './components/Toast';
 import { verifyPassword, storePassword, clearPassword, isPasswordStored, revalidatePassword, archiveEntries } from './utils/api';
 import { calcRanks } from './utils/calculations';
@@ -56,6 +57,7 @@ export default function App() {
   const [everUnlocked, setEverUnlocked] = useState(false);
   const [showUnlock, setShowUnlock]     = useState(false);
   const [buyInBlurred, setBuyInBlurred] = useState(() => localStorage.getItem('ss_buyin_blur') !== 'false');
+  const [confirmAction, setConfirmAction] = useState(null);
 
   const showToast = useCallback((message, type = 'success') => {
     setToasts(prev => [...prev, { message, type, id: Date.now() + Math.random() }]);
@@ -321,47 +323,67 @@ export default function App() {
     await handleUpdateSettings({ boatCheck: {}, offWater: {} });
   }
 
-  async function handleClearWeighLog() {
-    if (!confirm('Clear the weigh-in log for ALL entries? This will erase all weights, dead fish, and short fish counts and cannot be undone.')) return;
-    showToast('Weigh-in log cleared', 'info');
-    clearWeighLogMut.mutate(undefined, {
-      onError: () => showToast('Failed to clear weigh-in log', 'error'),
+  function handleClearWeighLog() {
+    setConfirmAction({
+      label: 'clear the weigh-in log (erases all weights, dead fish, and short fish counts)',
+      action: () => {
+        showToast('Weigh-in log cleared', 'info');
+        clearWeighLogMut.mutate(undefined, {
+          onError: () => showToast('Failed to clear weigh-in log', 'error'),
+        });
+      },
     });
   }
 
-  async function handleClearSignUpLog() {
-    if (!confirm('Clear the sign-up timestamp for ALL entries? This cannot be undone.')) return;
-    showToast('Sign-up log cleared', 'info');
-    clearSignUpLogMut.mutate(undefined, {
-      onError: () => showToast('Failed to clear sign-up log', 'error'),
+  function handleClearSignUpLog() {
+    setConfirmAction({
+      label: 'clear the sign-up timestamp for ALL entries',
+      action: () => {
+        showToast('Sign-up log cleared', 'info');
+        clearSignUpLogMut.mutate(undefined, {
+          onError: () => showToast('Failed to clear sign-up log', 'error'),
+        });
+      },
     });
   }
 
-  async function handleClearCheckInLog() {
-    if (!confirm('Clear the check-in timestamp for ALL entries? This cannot be undone.')) return;
-    showToast('Check-in log cleared', 'info');
-    clearCheckInLogMut.mutate(undefined, {
-      onError: () => showToast('Failed to clear check-in log', 'error'),
+  function handleClearCheckInLog() {
+    setConfirmAction({
+      label: 'clear the check-in timestamp for ALL entries',
+      action: () => {
+        showToast('Check-in log cleared', 'info');
+        clearCheckInLogMut.mutate(undefined, {
+          onError: () => showToast('Failed to clear check-in log', 'error'),
+        });
+      },
     });
   }
 
-  async function handleClearCheckOutLog() {
-    if (!confirm('Clear the off-water timestamp for ALL entries? This cannot be undone.')) return;
-    showToast('Check-out log cleared', 'info');
-    clearCheckOutLogMut.mutate(undefined, {
-      onError: () => showToast('Failed to clear check-out log', 'error'),
+  function handleClearCheckOutLog() {
+    setConfirmAction({
+      label: 'clear the off-water timestamp for ALL entries',
+      action: () => {
+        showToast('Check-out log cleared', 'info');
+        clearCheckOutLogMut.mutate(undefined, {
+          onError: () => showToast('Failed to clear check-out log', 'error'),
+        });
+      },
     });
   }
 
-  async function handleClearAll() {
-    if (!confirm('Clear ALL data? This cannot be undone!')) return;
-    try {
-      await clearAllMut.mutateAsync();
-      await handleUpdateSettings({ boatCheck: {}, offWater: {} });
-      showToast('All data cleared', 'info');
-    } catch {
-      showToast('Failed to clear data', 'error');
-    }
+  function handleClearAll() {
+    setConfirmAction({
+      label: 'clear ALL roster data — this cannot be undone',
+      action: async () => {
+        try {
+          await clearAllMut.mutateAsync();
+          await handleUpdateSettings({ boatCheck: {}, offWater: {} });
+          showToast('All data cleared', 'info');
+        } catch {
+          showToast('Failed to clear data', 'error');
+        }
+      },
+    });
   }
 
   async function handleArchive() {
@@ -628,6 +650,14 @@ export default function App() {
         <UnlockModal
           onUnlock={handleUnlock}
           onCancel={() => setShowUnlock(false)}
+        />
+      )}
+
+      {confirmAction && (
+        <ConfirmActionModal
+          label={confirmAction.label}
+          onConfirm={() => { confirmAction.action(); setConfirmAction(null); }}
+          onCancel={() => setConfirmAction(null)}
         />
       )}
 
