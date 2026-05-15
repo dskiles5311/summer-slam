@@ -32,6 +32,9 @@ function toJS(row, hidePI = false) {
     buyIn:          hidePI ? 0 : (row.buy_in ?? 0),
     needsAttention: Boolean(row.needs_attention),
     weighedAt:      row.weighed_at      ?? null,
+    signedUpAt:     row.signed_up_at    ?? null,
+    checkedInAt:    row.checked_in_at   ?? null,
+    offWaterAt:     row.off_water_at    ?? null,
   };
 }
 

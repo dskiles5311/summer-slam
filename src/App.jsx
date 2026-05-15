@@ -413,6 +413,10 @@ export default function App() {
         paid:          e.paid,          appSigned:     e.appSigned,
         buyIn:         e.buyIn,
         needsAttention: e.needsAttention,
+        weighedAt:     e.weighedAt     ?? null,
+        signedUpAt:    e.signedUpAt    ?? null,
+        checkedInAt:   e.checkedInAt   ?? null,
+        offWaterAt:    e.offWaterAt    ?? null,
       }));
       await bulkCreateMut.mutateAsync(payload);
       showToast(`Loaded ${payload.length} entries from archive — switch to Roster to edit`, 'success');

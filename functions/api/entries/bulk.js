@@ -24,8 +24,9 @@ export async function onRequestPost({ request, env }) {
                co_angler_first, co_angler_last, co_angler_phone, co_angler_email,
                boat_no, num_fish, lunker_weight, total_weight,
                lunker, option_field, paid, app_signed, buy_in,
-               raw_weight, dead_fish, short_fish, needs_attention)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+               raw_weight, dead_fish, short_fish, needs_attention,
+               weighed_at, signed_up_at, checked_in_at, off_water_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
         t(body.boaterFirst),   t(body.boaterLast),    t(body.boaterPhone),   t(body.boaterEmail),
         t(body.coAnglerFirst), t(body.coAnglerLast),  t(body.coAnglerPhone), t(body.coAnglerEmail),
@@ -42,6 +43,10 @@ export async function onRequestPost({ request, env }) {
         Number(body.deadFish)  || 0,
         Number(body.shortFish) || 0,
         body.needsAttention ? 1 : 0,
+        body.weighedAt   ?? null,
+        body.signedUpAt  ?? null,
+        body.checkedInAt ?? null,
+        body.offWaterAt  ?? null,
       ],
     }));
 
