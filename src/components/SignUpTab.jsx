@@ -170,7 +170,7 @@ export default function SignUpTab({ onAddEntry, settings }) {
             <div>
               <label htmlFor="su-boater-first" style={LABEL}>First Name *</label>
               <input ref={boaterFirstRef} id="su-boater-first" name="boaterFirst" type="text" value={form.boaterFirst} placeholder="First"
-                     onChange={e => set('boaterFirst', e.target.value)}
+                     onChange={e => { boaterContactIdRef.current = null; set('boaterFirst', e.target.value); }}
                      style={fieldBorder('boaterFirst')} />
               {err('boaterFirst')}
             </div>
@@ -179,7 +179,7 @@ export default function SignUpTab({ onAddEntry, settings }) {
               <ContactSuggest
                 value={form.boaterLast}
                 placeholder="Last"
-                onChange={v => set('boaterLast', v)}
+                onChange={v => { boaterContactIdRef.current = null; set('boaterLast', v); }}
                 onSelect={c => { boaterContactIdRef.current = c.id; setForm(p => ({ ...p, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || p.boaterEmail })); }}
                 inputProps={{ id: 'su-boater-last', name: 'boaterLast', style: fieldBorder('boaterLast') }}
               />
@@ -214,7 +214,7 @@ export default function SignUpTab({ onAddEntry, settings }) {
             <div>
               <label htmlFor="su-co-first" style={LABEL}>First Name</label>
               <input id="su-co-first" name="coAnglerFirst" type="text" value={form.coAnglerFirst} placeholder="First"
-                     onChange={e => set('coAnglerFirst', e.target.value)}
+                     onChange={e => { coAnglerContactIdRef.current = null; set('coAnglerFirst', e.target.value); }}
                      style={fieldBorder('coAnglerFirst')} />
               {err('coAnglerFirst')}
             </div>
@@ -223,7 +223,7 @@ export default function SignUpTab({ onAddEntry, settings }) {
               <ContactSuggest
                 value={form.coAnglerLast}
                 placeholder="Last"
-                onChange={v => set('coAnglerLast', v)}
+                onChange={v => { coAnglerContactIdRef.current = null; set('coAnglerLast', v); }}
                 onSelect={c => { coAnglerContactIdRef.current = c.id; setForm(p => ({ ...p, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || p.coAnglerEmail })); }}
                 inputProps={{ id: 'su-co-last', name: 'coAnglerLast', style: fieldBorder('coAnglerLast') }}
               />
