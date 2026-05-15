@@ -94,6 +94,8 @@ export default function RosterTab({
     const dir = localStorage.getItem('ss_roster_sort_dir') || 'asc';
     return [{ id: key, desc: dir === 'desc' }];
   });
+  const [lockedSortBy,   setLockedSortBy]   = useState('boaterFirst');
+  const [lockedSortDesc, setLockedSortDesc] = useState(false);
   const [globalFilter, setGlobalFilter] = useState({ text: '', regFilter: 'all' });
   const [editingId, setEditingId]       = useState(null);
   const [editValues, setEditValues]     = useState({});
@@ -424,12 +426,35 @@ export default function RosterTab({
 
   // --- Locked view ---
   if (!isUnlocked) {
+    function toggleLockedSort(col) {
+      if (lockedSortBy === col) setLockedSortDesc(d => !d);
+      else { setLockedSortBy(col); setLockedSortDesc(false); }
+    }
+    function LockedSortTh({ col, label, style }) {
+      const active = lockedSortBy === col;
+      return (
+        <th onClick={() => toggleLockedSort(col)}
+            style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', textAlign: 'left', ...style }}>
+          {label}
+          <span style={{ marginLeft: 4, opacity: active ? 1 : 0.3, fontSize: 11 }}>
+            {active && lockedSortDesc ? '▼' : '▲'}
+          </span>
+        </th>
+      );
+    }
     const lockedSorted = [...entries]
       .filter(e => (e.paid === 1 || e.paid === '1') && (e.appSigned === 1 || e.appSigned === '1'))
       .sort((a, b) => {
-        const fa = (a.boaterFirst || '').toLowerCase();
-        const fb = (b.boaterFirst || '').toLowerCase();
-        return fa < fb ? -1 : fa > fb ? 1 : 0;
+        let va, vb;
+        if (lockedSortBy === 'signedUpAt') {
+          va = a.signedUpAt ? new Date(a.signedUpAt.includes('T') ? a.signedUpAt : a.signedUpAt.replace(' ', 'T')).getTime() : 0;
+          vb = b.signedUpAt ? new Date(b.signedUpAt.includes('T') ? b.signedUpAt : b.signedUpAt.replace(' ', 'T')).getTime() : 0;
+        } else {
+          va = (a[lockedSortBy] || '').toLowerCase();
+          vb = (b[lockedSortBy] || '').toLowerCase();
+        }
+        const cmp = va < vb ? -1 : va > vb ? 1 : 0;
+        return lockedSortDesc ? -cmp : cmp;
       });
 
     function fmtSignedUp(ts) {
@@ -464,9 +489,11 @@ export default function RosterTab({
             </colgroup>
             <thead>
               <tr>
-                <th>Boater First</th><th>Boater Last</th>
-                <th>Co-Angler First</th><th>Co-Angler Last</th>
-                <th style={{ textAlign: 'center' }}>Signed Up</th>
+                <LockedSortTh col="boaterFirst"    label="Boater First" />
+                <LockedSortTh col="boaterLast"     label="Boater Last" />
+                <LockedSortTh col="coAnglerFirst"  label="Co-Angler First" />
+                <LockedSortTh col="coAnglerLast"   label="Co-Angler Last" />
+                <LockedSortTh col="signedUpAt"     label="Signed Up" style={{ textAlign: 'center' }} />
               </tr>
             </thead>
             <tbody>
