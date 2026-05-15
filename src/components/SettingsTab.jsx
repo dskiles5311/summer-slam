@@ -4,7 +4,7 @@ import { exportCSV, importCSV } from '../utils/csv';
 import { evalMath } from '../utils/evalMath';
 
 const PANEL = { background: 'var(--settings-panel-bg)', border: '1px solid rgba(139,180,225,0.2)', borderRadius: 10, padding: 20, marginBottom: 16 };
-const H3 = { color: 'var(--header-bg)', fontSize: 14, marginBottom: 14, textTransform: 'uppercase', letterSpacing: 1 };
+const H3 = { color: 'var(--header-bg)', fontSize: 14, marginBottom: 14, textTransform: 'uppercase', letterSpacing: 1, textAlign: 'center' };
 
 export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSettings, onClearAll, onImport, onClearWeighLog, onClearSignUpLog, onClearCheckInLog, onClearCheckOutLog }) {
   const { fees, payoutSettings, penalties } = settings;
