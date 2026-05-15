@@ -94,24 +94,37 @@ export async function onRequestPost({ request, env }) {
       }
     }
 
-    const existing = await db.execute({
-      sql:  `SELECT id, phone, email FROM contacts WHERE first_name = ? AND last_name = ? COLLATE NOCASE ORDER BY last_seen DESC LIMIT 1`,
-      args: [firstName, lastName],
-    });
-
-    if (existing.rows.length > 0) {
-      const row      = existing.rows[0];
-      const newPhone = phone !== '' ? phone : (row.phone || '');
-      const newEmail = email !== '' ? email : (row.email || '');
+    if (phone) {
+      // Atomic upsert keyed on (first_name, last_name, phone) — the table's unique constraint.
+      // Eliminates the SELECT-then-INSERT race: two concurrent requests for the same person
+      // will serialize at the DB level; one inserts, one updates. Both succeed cleanly.
       await db.execute({
-        sql:  `UPDATE OR IGNORE contacts SET phone=?, email=?, last_seen=CURRENT_TIMESTAMP WHERE id=?`,
-        args: [newPhone, newEmail, Number(row.id)],
-      });
-    } else {
-      await db.execute({
-        sql:  `INSERT OR IGNORE INTO contacts (first_name, last_name, phone, email, last_seen) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+        sql: `INSERT INTO contacts (first_name, last_name, phone, email, last_seen)
+              VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+              ON CONFLICT(first_name, last_name, phone) DO UPDATE SET
+                email     = CASE WHEN excluded.email != '' THEN excluded.email ELSE contacts.email END,
+                last_seen = CURRENT_TIMESTAMP`,
         args: [firstName, lastName, phone, email],
       });
+    } else {
+      // No phone — fall back to name lookup so we don't insert a blank-phone duplicate.
+      const existing = await db.execute({
+        sql:  `SELECT id, email FROM contacts WHERE first_name = ? AND last_name = ? COLLATE NOCASE ORDER BY last_seen DESC LIMIT 1`,
+        args: [firstName, lastName],
+      });
+      if (existing.rows.length > 0) {
+        const row      = existing.rows[0];
+        const newEmail = email !== '' ? email : (row.email || '');
+        await db.execute({
+          sql:  `UPDATE contacts SET email=?, last_seen=CURRENT_TIMESTAMP WHERE id=?`,
+          args: [newEmail, Number(row.id)],
+        });
+      } else {
+        await db.execute({
+          sql:  `INSERT OR IGNORE INTO contacts (first_name, last_name, phone, email, last_seen) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+          args: [firstName, lastName, '', email],
+        });
+      }
     }
 
     return Response.json({ success: true }, { status: 201 });

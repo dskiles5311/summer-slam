@@ -27,6 +27,11 @@ export async function onRequestPost({ request, env }) {
       return Response.json({ error: 'year and entries are required' }, { status: 400 });
     }
 
+    // Concurrency note: two simultaneous archive requests for the same year will be
+    // serialized by SQLite's write lock — the second batch runs after the first commits.
+    // Both admins see the same entries (within the polling window), so both produce
+    // equivalent snapshots. Last writer wins, which is acceptable for a once-per-season
+    // operation that already requires explicit confirmation.
     const stmts = [
       { sql: 'DELETE FROM archives WHERE year = ?', args: [String(year)] },
       ...entries.map(e => ({

@@ -41,8 +41,14 @@ export function useUpdateEntry() {
       );
       return { prev };
     },
-    onError: (_err, _vars, ctx) => {
-      if (ctx?.prev) qc.setQueryData(ENTRIES_KEY, ctx.prev);
+    onError: (err, _vars, ctx) => {
+      if (err?.isConflict) {
+        // On conflict, refetch from the server so the admin sees what the other
+        // device saved rather than their own stale pre-edit snapshot.
+        qc.invalidateQueries({ queryKey: ENTRIES_KEY });
+      } else {
+        if (ctx?.prev) qc.setQueryData(ENTRIES_KEY, ctx.prev);
+      }
     },
     onSuccess: (updated) => {
       qc.setQueryData(ENTRIES_KEY, old =>
