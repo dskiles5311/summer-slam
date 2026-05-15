@@ -398,6 +398,12 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
                      onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
             </div>
             <div className="form-field">
+              <label htmlFor="st-min-fish-length">Minimum Fish Length (inches)</label>
+              <input id="st-min-fish-length" name="minFishLength" type="number" value={localPenalties?.minFishLength ?? 15} min="1" step="1" disabled={locked}
+                     onChange={e => setLocalPenalties(prev => ({ ...prev, minFishLength: parseInt(e.target.value) || 1 }))}
+                     onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
+            </div>
+            <div className="form-field">
               <label htmlFor="st-late-pen-per-min">Late Penalty (lbs per minute)</label>
               <input id="st-late-pen-per-min" name="latePenaltyPerMin" type="number" value={localPenalties?.latePenaltyPerMin ?? 1.0} min="0" step="0.01" disabled={locked}
                      onChange={e => setLocalPenalties(prev => ({ ...prev, latePenaltyPerMin: parseFloat(e.target.value) || 0 }))}

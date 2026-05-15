@@ -5,7 +5,9 @@ import offLimitsRaw from '../content/offlimits.md?raw';
 marked.setOptions({ breaks: true });
 
 export default function OffLimitsTab({ settings }) {
-  const year = new Date().getFullYear();
+  const year      = new Date().getFullYear();
+  const maxFish   = parseInt(settings?.penalties?.maxFish)       || 5;
+  const minLength = parseInt(settings?.penalties?.minFishLength) || 15;
 
   const flightTimesMd = useMemo(() => {
     const flights = (settings?.flights || [])
@@ -23,9 +25,11 @@ export default function OffLimitsTab({ settings }) {
   const html = useMemo(() => {
     const md = offLimitsRaw
       .replace(/\{\{YEAR\}\}/g,         String(year))
+      .replace(/\{\{MAX_FISH\}\}/g,     String(maxFish))
+      .replace(/\{\{MIN_LENGTH\}\}/g,   String(minLength))
       .replace(/\{\{FLIGHT_TIMES\}\}/g, flightTimesMd);
     return marked(md);
-  }, [year, flightTimesMd]);
+  }, [year, maxFish, minLength, flightTimesMd]);
 
   return (
     <div className="tab-panel active" style={{ overflowY: 'auto', padding: '20px 24px', maxWidth: 760, margin: '0 auto' }}>
