@@ -442,19 +442,17 @@ export default function RosterTab({
 
     return (
       <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-        <div style={{ padding: '10px 16px 6px', flexShrink: 0, background: 'rgba(255,180,80,0.07)', borderBottom: '1px solid rgba(255,180,80,0.2)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-            <p style={{ fontSize: 12, color: 'var(--gold-light)', lineHeight: 1.6, margin: 0, flex: 1 }}>
-              <strong>Only names shown are anglers who have signed their application and have paid the entry fee.</strong>
-              {' '}If your name is misspelled or is not showing, please contact{' '}
-              <a href="mailto:info@sfttackle.com" style={{ color: 'var(--gold-light)' }}>info@sfttackle.com</a>
-              {' '}with a signed application and proof of purchase, or a legible name change.
-            </p>
-            <div style={{ flexShrink: 0, textAlign: 'center', background: 'rgba(255,180,80,0.15)', border: '1px solid rgba(255,180,80,0.35)', borderRadius: 8, padding: '4px 14px' }}>
-              <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--gold-light)', lineHeight: 1.2 }}>{lockedSorted.length}</div>
-              <div style={{ fontSize: 10, color: 'var(--gold-light)', opacity: 0.8, textTransform: 'uppercase', letterSpacing: 1 }}>Teams</div>
-            </div>
+        <div style={{ padding: '16px 20px 12px', flexShrink: 0, background: 'rgba(255,180,80,0.1)', borderBottom: '2px solid rgba(255,180,80,0.35)', textAlign: 'center' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,180,80,0.2)', border: '1px solid rgba(255,180,80,0.5)', borderRadius: 10, padding: '6px 20px', marginBottom: 10 }}>
+            <span style={{ fontSize: 28, fontWeight: 800, color: 'var(--gold-light)', lineHeight: 1 }}>{lockedSorted.length}</span>
+            <span style={{ fontSize: 13, color: 'var(--gold-light)', opacity: 0.85, textTransform: 'uppercase', letterSpacing: 2, marginLeft: 8 }}>Teams Registered</span>
           </div>
+          <p style={{ fontSize: 15, color: 'var(--gold-light)', lineHeight: 1.65, margin: 0, maxWidth: 700, marginLeft: 'auto', marginRight: 'auto' }}>
+            <strong>Only names shown are anglers who have signed their application and have paid the entry fee.</strong>
+            {' '}If your name is misspelled or is not showing, please contact{' '}
+            <a href="mailto:info@sfttackle.com" style={{ color: 'var(--gold-light)' }}>info@sfttackle.com</a>
+            {' '}with a signed application and proof of purchase, or a legible name change.
+          </p>
         </div>
         <div className="table-wrapper" style={{ flex: 1, minHeight: 0, maxHeight: 'none' }}>
           <table style={{ tableLayout: 'fixed', minWidth: 600 }}>
