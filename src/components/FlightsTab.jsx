@@ -56,38 +56,20 @@ export default function FlightsTab({ entries, settings }) {
       </div>
 
       <div style={{ maxWidth: 700, margin: '0 auto', paddingTop: 8 }}>
-        {groups.map(({ flight, entries: flightEntries }, gIdx) =>
-          flightEntries.length === 0 ? null : (
-            <div key={gIdx} style={{ marginBottom: 24 }}>
-              <FlightDivider flight={flight} flightNum={gIdx + 1} count={flightEntries.length} />
+        {groups.map(({ flight, entries: flightEntries }, gIdx) => (
+          <div key={gIdx} style={{ marginBottom: 24 }}>
+            <FlightDivider flight={flight} flightNum={gIdx + 1} count={flightEntries.length} />
+            {flightEntries.length === 0 ? (
+              <p style={{ color: 'var(--header-bg)', fontSize: 13, padding: '10px 4px', fontStyle: 'italic' }}>
+                No boats in this flight range yet.
+              </p>
+            ) : (
               <div>
                 {flightEntries.map(entry => <BoatRow key={entry.id} entry={entry} />)}
               </div>
-            </div>
-          )
-        )}
-
-        {unassigned.length > 0 && (
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'var(--header-bg)', opacity: 0.6, marginBottom: 6 }}>
-              ❓ Unassigned ({unassigned.length})
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {unassigned.map(entry => {
-                const name = [entry.boaterFirst, entry.boaterLast].filter(Boolean).join(' ') || '—';
-                return (
-                  <span key={entry.id} style={{
-                    fontSize: 12, padding: '3px 10px', borderRadius: 20,
-                    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(139,180,225,0.2)',
-                    color: 'var(--header-bg)',
-                  }}>
-                    {entry.boatNo ? `#${entry.boatNo} ` : ''}{name}
-                  </span>
-                );
-              })}
-            </div>
+            )}
           </div>
-        )}
+        ))}
       </div>
     </div>
   );
