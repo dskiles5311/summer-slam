@@ -153,8 +153,10 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   }
 
   function handleFlightSave() {
-    const start = parseInt(flightDraft.boatStart) || 0;
-    const end   = parseInt(flightDraft.boatEnd)   || 0;
+    const startRaw = evalMath(String(flightDraft.boatStart ?? ''));
+    const endRaw   = evalMath(String(flightDraft.boatEnd   ?? ''));
+    const start = isNaN(startRaw) ? 0 : Math.round(startRaw);
+    const end   = isNaN(endRaw)   ? 0 : Math.round(endRaw);
 
     if (!start || !end) {
       setFlightError('Boat # Start and End are required.');
@@ -856,6 +858,19 @@ function formatTime(raw) {
 }
 
 function FlightForm({ draft, onChange, onSave, onCancel, error }) {
+  function evalBoat(val) {
+    const result = evalMath(String(val ?? ''));
+    return isNaN(result) || result < 1 ? (parseInt(val) || '') : Math.round(result);
+  }
+
+  function handleBoatKeyDown(e, field) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      onChange(prev => ({ ...prev, [field]: evalBoat(prev[field]) }));
+      onSave();
+    }
+  }
+
   return (
     <div style={{ width: '100%' }}>
       <div className="edit-grid-2" style={{ marginBottom: 8 }}>
@@ -863,23 +878,29 @@ function FlightForm({ draft, onChange, onSave, onCancel, error }) {
           <label htmlFor="ff-launch-time">Launch Time</label>
           <input id="ff-launch-time" name="launchTime" type="text" value={draft.launchTime} placeholder="e.g. 715 AM"
                  onChange={e => onChange(prev => ({ ...prev, launchTime: e.target.value }))}
-                 onBlur={e => onChange(prev => ({ ...prev, launchTime: formatTime(e.target.value) }))} />
+                 onBlur={e => onChange(prev => ({ ...prev, launchTime: formatTime(e.target.value) }))}
+                 onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onChange(prev => ({ ...prev, launchTime: formatTime(prev.launchTime) })); onSave(); } }} />
         </div>
         <div className="form-field">
           <label htmlFor="ff-boat-start">Boat # Start</label>
-          <input id="ff-boat-start" name="boatStart" type="number" value={draft.boatStart} min="1" inputMode="numeric"
-                 onChange={e => onChange(prev => ({ ...prev, boatStart: e.target.value }))} />
+          <input id="ff-boat-start" name="boatStart" type="text" inputMode="numeric" value={draft.boatStart} placeholder="e.g. 31+1"
+                 onChange={e => onChange(prev => ({ ...prev, boatStart: e.target.value }))}
+                 onBlur={e => onChange(prev => ({ ...prev, boatStart: evalBoat(e.target.value) }))}
+                 onKeyDown={e => handleBoatKeyDown(e, 'boatStart')} />
         </div>
         <div className="form-field">
           <label htmlFor="ff-boat-end">Boat # End</label>
-          <input id="ff-boat-end" name="boatEnd" type="number" value={draft.boatEnd} min="1" inputMode="numeric"
-                 onChange={e => onChange(prev => ({ ...prev, boatEnd: e.target.value }))} />
+          <input id="ff-boat-end" name="boatEnd" type="text" inputMode="numeric" value={draft.boatEnd} placeholder="e.g. 30+30"
+                 onChange={e => onChange(prev => ({ ...prev, boatEnd: e.target.value }))}
+                 onBlur={e => onChange(prev => ({ ...prev, boatEnd: evalBoat(e.target.value) }))}
+                 onKeyDown={e => handleBoatKeyDown(e, 'boatEnd')} />
         </div>
         <div className="form-field">
           <label htmlFor="ff-check-in-time">Check-In Time</label>
           <input id="ff-check-in-time" name="checkInTime" type="text" value={draft.checkInTime} placeholder="e.g. 315 PM"
                  onChange={e => onChange(prev => ({ ...prev, checkInTime: e.target.value }))}
-                 onBlur={e => onChange(prev => ({ ...prev, checkInTime: formatTime(e.target.value) }))} />
+                 onBlur={e => onChange(prev => ({ ...prev, checkInTime: formatTime(e.target.value) }))}
+                 onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onChange(prev => ({ ...prev, checkInTime: formatTime(prev.checkInTime) })); onSave(); } }} />
         </div>
       </div>
       {error && (
