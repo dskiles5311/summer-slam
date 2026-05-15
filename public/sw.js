@@ -1,4 +1,4 @@
-const CACHE_NAME = 'summer-slam-v5';
+const CACHE_NAME = 'summer-slam-v6';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
