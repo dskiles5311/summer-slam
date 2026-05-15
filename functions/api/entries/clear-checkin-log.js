@@ -9,7 +9,7 @@ export async function onRequestDelete({ request, env }) {
   if (!checkAuth(request, env)) return Response.json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const db = getDb(env);
-    await db.execute('UPDATE entries SET checked_in_at = NULL');
+    await db.execute('UPDATE entries SET checked_in_at = NULL WHERE checked_in_at IS NOT NULL');
     return Response.json({ success: true });
   } catch (e) {
     return Response.json({ error: e.message }, { status: 500 });

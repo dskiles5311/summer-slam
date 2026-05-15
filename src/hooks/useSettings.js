@@ -23,6 +23,11 @@ export function useSaveSettings() {
       qc.setQueryData(SETTINGS_KEY, newSettings);
       return { prev };
     },
+    onSuccess: (serverData) => {
+      if (serverData?._version) {
+        qc.setQueryData(SETTINGS_KEY, prev => ({ ...prev, _version: serverData._version }));
+      }
+    },
     onError: (_err, _vars, ctx) => {
       if (ctx?.prev) qc.setQueryData(SETTINGS_KEY, ctx.prev);
     },

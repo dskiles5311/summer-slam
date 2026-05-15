@@ -136,7 +136,12 @@ export default function App() {
       payoutSettings: updates.payoutSettings ? { ...settings.payoutSettings, ...updates.payoutSettings } : settings.payoutSettings,
     };
     saveSettingsMut.mutate(newSettings, {
-      onError: () => showToast('Failed to save settings', 'error'),
+      onError: (err) => showToast(
+        err.isConflict
+          ? 'Settings were changed by another device — refresh to get the latest, then re-apply your changes.'
+          : 'Failed to save settings',
+        'error'
+      ),
     });
   }
 
@@ -317,6 +322,7 @@ export default function App() {
   }
 
   async function handleClearWeighLog() {
+    if (!confirm('Clear the weigh-in log for ALL entries? This will erase all weights, dead fish, and short fish counts and cannot be undone.')) return;
     showToast('Weigh-in log cleared', 'info');
     clearWeighLogMut.mutate(undefined, {
       onError: () => showToast('Failed to clear weigh-in log', 'error'),
@@ -324,6 +330,7 @@ export default function App() {
   }
 
   async function handleClearSignUpLog() {
+    if (!confirm('Clear the sign-up timestamp for ALL entries? This cannot be undone.')) return;
     showToast('Sign-up log cleared', 'info');
     clearSignUpLogMut.mutate(undefined, {
       onError: () => showToast('Failed to clear sign-up log', 'error'),
@@ -331,6 +338,7 @@ export default function App() {
   }
 
   async function handleClearCheckInLog() {
+    if (!confirm('Clear the check-in timestamp for ALL entries? This cannot be undone.')) return;
     showToast('Check-in log cleared', 'info');
     clearCheckInLogMut.mutate(undefined, {
       onError: () => showToast('Failed to clear check-in log', 'error'),
@@ -338,6 +346,7 @@ export default function App() {
   }
 
   async function handleClearCheckOutLog() {
+    if (!confirm('Clear the off-water timestamp for ALL entries? This cannot be undone.')) return;
     showToast('Check-out log cleared', 'info');
     clearCheckOutLogMut.mutate(undefined, {
       onError: () => showToast('Failed to clear check-out log', 'error'),

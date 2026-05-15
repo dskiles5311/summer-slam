@@ -154,7 +154,13 @@ export async function saveSettings(updates) {
     headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify(updates),
   });
+  if (res.status === 409) {
+    const err = new Error('Settings conflict');
+    err.isConflict = true;
+    throw err;
+  }
   if (!res.ok) throw new Error('Failed to save settings');
+  return res.json(); // { success, _version }
 }
 
 export async function fetchContacts() {
