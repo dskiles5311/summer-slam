@@ -109,7 +109,7 @@ export default function LeaderboardTab({ entries, settings }) {
       </div>
 
       {recentEntries.length > 0 && (
-        <div style={{ maxWidth: 900, marginLeft: 'auto', marginRight: 'auto', marginBottom: 12 }}>
+        <div className="no-print" style={{ maxWidth: 900, marginLeft: 'auto', marginRight: 'auto', marginBottom: 12 }}>
           <div className="rw-label">⚖️ Recently Weighed</div>
           <div className="rw-cards">
             {recentEntries.map((row, i) => {
@@ -159,7 +159,7 @@ export default function LeaderboardTab({ entries, settings }) {
         </div>
       )}
 
-      <div className="top-n-control" style={{ maxWidth: 900, marginLeft: 'auto', marginRight: 'auto' }}>
+      <div className="top-n-control no-print" style={{ maxWidth: 900, marginLeft: 'auto', marginRight: 'auto' }}>
         <span style={{ color: 'var(--header-bg)', fontSize: 14 }}>
           Showing top <strong style={{ color: 'var(--gold-light)' }}>{topN}</strong> positions — set in Settings
         </span>
