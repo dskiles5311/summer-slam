@@ -45,6 +45,7 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry })
   const [lunkerWeight, setLunkerWeight] = useState('');
   const [totalWeight, setTotalWeight] = useState('');
   const [status, setStatus]           = useState(null);
+  const [overwriteConfirmed, setOverwriteConfirmed] = useState(false);
   const [history, setHistory]         = useState([]);
   const [submitting, setSubmitting]   = useState(false);
 
@@ -152,7 +153,7 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry })
 
   function reset() {
     setBoatNo(''); setNumFish(''); setDeadFish(''); setShortFish('');
-    setLunkerWeight(''); setTotalWeight(''); setStatus(null);
+    setLunkerWeight(''); setTotalWeight(''); setStatus(null); setOverwriteConfirmed(false);
     boatRef.current?.focus();
   }
 
@@ -175,7 +176,7 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry })
             id="wi-boat-no" name="boatNo"
             type="number" inputMode="numeric"
             value={boatNo}
-            onChange={e => { setBoatNo(e.target.value); setStatus(null); }}
+            onChange={e => { setBoatNo(e.target.value); setStatus(null); setOverwriteConfirmed(false); }}
             onBlur={() => lookupBoat(boatNo)}
             onKeyDown={handleBoatKeyDown}
             placeholder="Enter boat #"
@@ -205,6 +206,21 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry })
               >
                 ➕ Add to roster & flag for attention
               </button>
+            )}
+            {status.type === 'warning' && !overwriteConfirmed && (
+              <button
+                type="button"
+                className="btn btn-outline btn-sm"
+                onClick={() => setOverwriteConfirmed(true)}
+                style={{ marginTop: 8, borderColor: '#ffb450', color: '#ffb450' }}
+              >
+                ✔ Yes, overwrite existing weight
+              </button>
+            )}
+            {status.type === 'warning' && overwriteConfirmed && (
+              <div style={{ marginTop: 6, fontSize: 12, color: '#4CAF50', fontWeight: 700 }}>
+                ✔ Overwrite confirmed — fill in data and save
+              </div>
             )}
           </div>
         )}
@@ -293,7 +309,8 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry })
 
         {/* Actions */}
         <div style={{ display: 'flex', gap: 10 }}>
-          <button type="submit" className="btn btn-primary" disabled={submitting || !boatNo.trim()}
+          <button type="submit" className="btn btn-primary"
+            disabled={submitting || !boatNo.trim() || (status?.type === 'warning' && !overwriteConfirmed)}
             style={{ flex: 1, fontSize: 16, padding: '12px 0' }}>
             {submitting ? 'Saving…' : '✔ Save & Next'}
           </button>
