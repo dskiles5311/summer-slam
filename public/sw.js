@@ -1,4 +1,4 @@
-const CACHE_NAME = 'summer-slam-v6';
+const CACHE_NAME = 'summer-slam-v7';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -15,18 +15,12 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.url.includes('/api/')) return;
 
-  // Always fetch HTML from network so code changes show immediately
-  if (e.request.mode === 'navigate') {
-    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-    return;
-  }
-
-  // Cache-first for static assets
+  // Network-first: always try network, fall back to cache for offline support
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).then(res => {
+    fetch(e.request).then(res => {
       const clone = res.clone();
       caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
       return res;
-    }))
+    }).catch(() => caches.match(e.request))
   );
 });
