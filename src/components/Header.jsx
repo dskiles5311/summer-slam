@@ -130,6 +130,12 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
         >
           📋 Rules
         </button>
+        <button
+          className={`nav-tab ${activeTab === 'offlimits' ? 'active' : ''}`}
+          onClick={() => onTabChange('offlimits')}
+        >
+          🚫 Off Limits
+        </button>
         {isUnlocked && (
           <button
             className={`nav-tab ${activeTab === 'contacts' ? 'active' : ''}`}

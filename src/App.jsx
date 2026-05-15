@@ -5,6 +5,7 @@ import BoatCheckTab from './components/BoatCheckTab';
 import WeighInTab from './components/WeighInTab';
 import LeaderboardTab from './components/LeaderboardTab';
 import RulesTab from './components/RulesTab';
+import OffLimitsTab from './components/OffLimitsTab';
 import SettingsTab from './components/SettingsTab';
 import SignUpTab from './components/SignUpTab';
 import CheckInTab from './components/CheckInTab';
@@ -479,8 +480,8 @@ export default function App() {
       <Header
         entries={rankedEntries}
         settings={settingsWithTheme}
-        activeTab={isUnlocked || activeTab === 'rules' || activeTab === 'archive' || activeTab === 'roster' || activeTab === 'flights' ? activeTab : 'leaderboard'}
-        onTabChange={tab => { if (isUnlocked || tab === 'rules' || tab === 'leaderboard' || tab === 'archive' || tab === 'roster' || tab === 'flights') setActiveTab(tab); }}
+        activeTab={isUnlocked || activeTab === 'rules' || activeTab === 'offlimits' || activeTab === 'archive' || activeTab === 'roster' || activeTab === 'flights' ? activeTab : 'leaderboard'}
+        onTabChange={tab => { if (isUnlocked || tab === 'rules' || tab === 'offlimits' || tab === 'leaderboard' || tab === 'archive' || tab === 'roster' || tab === 'flights') setActiveTab(tab); }}
         onThemeToggle={() => {
           const next = theme === 'dark' ? 'light' : 'dark';
           setTheme(next);
@@ -538,6 +539,9 @@ export default function App() {
         </div>
         <div style={{ display: activeTab === 'rules' ? '' : 'none' }}>
           <RulesTab settings={settings} />
+        </div>
+        <div style={{ display: activeTab === 'offlimits' ? '' : 'none' }}>
+          <OffLimitsTab settings={settings} />
         </div>
         <div style={{ display: activeTab === 'archive' ? '' : 'none' }}>
           <ArchiveTab
