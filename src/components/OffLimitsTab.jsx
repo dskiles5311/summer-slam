@@ -44,6 +44,8 @@ export default function OffLimitsTab({ settings }) {
                          padding: 6px 12px; border-bottom: 1px solid rgba(139,180,225,0.25); text-align: left; }
         .rules-body td { font-size: 14px; color: var(--white); padding: 6px 12px;
                          border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .rules-body img { max-width: 100%; height: auto; border-radius: 8px; margin: 10px 0 16px;
+                          border: 1px solid rgba(139,180,225,0.2); display: block; }
       `}</style>
       <div className="rules-body" dangerouslySetInnerHTML={{ __html: html }} />
     </div>
