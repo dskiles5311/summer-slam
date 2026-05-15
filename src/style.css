@@ -679,6 +679,32 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
   .sc-lbl, .sc-val, .sc-boat, .sc-name, .sc-co { color: black !important; }
   .summary-grid-top { grid-template-columns: repeat(3, 1fr); }
   .lb-print-only { display: grid; }
+
+  /* ── Rules / Off Limits — letter paper layout ── */
+  .rules-body-panel {
+    overflow: visible !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    height: auto !important;
+  }
+  .rules-body h1 { font-size: 15px !important; font-weight: 800 !important; color: black !important; margin: 0 0 8px !important; }
+  .rules-body h2 { font-size: 9.5px !important; font-weight: 700 !important; color: black !important;
+                   text-transform: uppercase !important; letter-spacing: 0.4px !important;
+                   margin: 8px 0 2px !important; padding-bottom: 1px !important;
+                   border-bottom: 0.5px solid #999 !important; page-break-after: avoid; }
+  .rules-body p  { font-size: 10px !important; line-height: 1.35 !important; color: black !important; margin: 0 0 3px !important; }
+  .rules-body ol, .rules-body ul { padding-left: 14px !important; margin: 0 0 3px !important; }
+  .rules-body li { font-size: 10px !important; line-height: 1.35 !important; color: black !important; margin-bottom: 1px !important; }
+  .rules-body strong { color: black !important; font-weight: bold !important; }
+  .rules-body hr { border: none !important; border-top: 0.5px solid #bbb !important; margin: 5px 0 !important; }
+  .rules-body table { width: 100% !important; border-collapse: collapse !important; margin: 0 0 5px !important; }
+  .rules-body th { font-size: 9px !important; padding: 2px 6px !important; color: black !important;
+                   border-bottom: 0.5px solid #999 !important; text-align: left !important; }
+  .rules-body td { font-size: 10px !important; padding: 2px 6px !important; color: black !important;
+                   border-bottom: 0.5px solid #ddd !important; }
+  .rules-body img[alt^="QR"] { width: 90px !important; height: 90px !important; margin: 6px 0 !important; }
+  .rules-body img:not([alt^="QR"]) { max-width: 260px !important; max-height: 150px !important; border: 0.5px solid #ccc !important; margin: 6px 0 10px !important; }
 }
 
 /* ── RESPONSIVE ── */
