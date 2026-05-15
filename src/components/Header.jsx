@@ -52,11 +52,11 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
           </div>
           <div className="stat-chip" style={{ borderColor: 'rgba(255,180,80,0.4)' }}>
             <span className="val" style={{ color: '#ffb450' }}>${stats.lunkerPot}</span>
-            <span className="lbl">🎯 Lunker Pot <span style={{ color: 'rgba(255,180,80,0.7)', fontWeight: 400, textTransform: 'none' }}>{stats.lunkerPaidCount} paid</span></span>
+            <span className="lbl">🎯 Lunker Pot <span style={{ color: 'rgba(255,180,80,0.7)', fontWeight: 700, textTransform: 'uppercase' }}>{stats.lunkerPaidCount} PAID</span></span>
           </div>
           <div className="stat-chip" style={{ borderColor: 'rgba(120,200,255,0.4)' }}>
             <span className="val" style={{ color: '#78c8ff' }}>${stats.optionPot}</span>
-            <span className="lbl">⚡ Option Pot <span style={{ color: 'rgba(120,200,255,0.7)', fontWeight: 400, textTransform: 'none' }}>{stats.optionPaidCount} paid</span></span>
+            <span className="lbl">⚡ Option Pot <span style={{ color: 'rgba(120,200,255,0.7)', fontWeight: 700, textTransform: 'uppercase' }}>{stats.optionPaidCount} PAID</span></span>
           </div>
           {isUnlocked && (
             <div className="stat-chip" onClick={onToggleBuyInBlur}
