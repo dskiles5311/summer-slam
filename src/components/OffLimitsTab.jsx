@@ -1,11 +1,18 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { marked } from 'marked';
+import QRCode from 'qrcode';
 import offLimitsRaw from '../content/offlimits.md?raw';
 
 marked.setOptions({ breaks: true });
 
+const SITE_URL = 'https://sft-summer-slam.pages.dev';
+
 export default function OffLimitsTab({ settings }) {
   const year      = new Date().getFullYear();
+  const [qrDataUrl, setQrDataUrl] = useState('');
+  useEffect(() => {
+    QRCode.toDataURL(SITE_URL, { width: 160, margin: 1 }).then(setQrDataUrl).catch(() => {});
+  }, []);
   const maxFish   = parseInt(settings?.penalties?.maxFish)       || 5;
   const minLength = parseInt(settings?.penalties?.minFishLength) || 15;
 
@@ -22,14 +29,19 @@ export default function OffLimitsTab({ settings }) {
     return `| Boats | Weigh-In Time |\n|-------|---------------|\n${rows.join('\n')}`;
   }, [settings?.flights]);
 
+  const qrImg = qrDataUrl
+    ? `<img src="${qrDataUrl}" alt="QR Code — ${SITE_URL}" style="width:160px;height:160px;display:block;margin:12px 0;">`
+    : '';
+
   const html = useMemo(() => {
     const md = offLimitsRaw
       .replace(/\{\{YEAR\}\}/g,         String(year))
       .replace(/\{\{MAX_FISH\}\}/g,     String(maxFish))
       .replace(/\{\{MIN_LENGTH\}\}/g,   String(minLength))
-      .replace(/\{\{FLIGHT_TIMES\}\}/g, flightTimesMd);
+      .replace(/\{\{FLIGHT_TIMES\}\}/g, flightTimesMd)
+      .replace(/\{\{QR_CODE\}\}/g,      qrImg);
     return marked(md);
-  }, [year, maxFish, minLength, flightTimesMd]);
+  }, [year, maxFish, minLength, flightTimesMd, qrImg]);
 
   function handleCreatePdf() {
     const base = `${window.location.protocol}//${window.location.host}`;

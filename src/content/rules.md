@@ -100,3 +100,11 @@ In the case of a tie, the heaviest bass will break the tie. If each team's heavi
 ## #23 — Lunker
 
 A dead bass cannot be weighed for lunker, but can be included in overall catch.
+
+---
+
+## Register & Results
+
+Scan the QR code to view live results and sign-up information online.
+
+{{QR_CODE}}

@@ -32,3 +32,11 @@ Please be careful and know your limitations.
 ---
 
 Thank you everyone for fishing Summer Slam {{YEAR}}!
+
+---
+
+## Register & Results
+
+Scan the QR code to view live results and sign-up information online.
+
+{{QR_CODE}}

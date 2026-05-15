@@ -1,11 +1,18 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { marked } from 'marked';
+import QRCode from 'qrcode';
 import rulesRaw from '../content/rules.md?raw';
 
 marked.setOptions({ breaks: true });
 
+const SITE_URL = 'https://sft-summer-slam.pages.dev';
+
 export default function RulesTab({ settings }) {
   const year          = new Date().getFullYear();
+  const [qrDataUrl, setQrDataUrl] = useState('');
+  useEffect(() => {
+    QRCode.toDataURL(SITE_URL, { width: 160, margin: 1 }).then(setQrDataUrl).catch(() => {});
+  }, []);
   const entryFee      = parseFloat(settings?.fees?.entryFee             || 250).toFixed(2);
   const opt1          = parseInt(settings?.fees?.option1Pct             || 70);
   const opt2          = 100 - opt1;
@@ -15,6 +22,10 @@ export default function RulesTab({ settings }) {
   const maxFish       = parseInt(settings?.penalties?.maxFish              || 5);
   const latePenPerMin = parseFloat(settings?.penalties?.latePenaltyPerMin  || 1.0).toFixed(2);
   const lateDQMin     = parseInt(settings?.penalties?.latePenaltyDQMin     || 15);
+
+  const qrImg = qrDataUrl
+    ? `<img src="${qrDataUrl}" alt="QR Code — ${SITE_URL}" style="width:160px;height:160px;display:block;margin:12px 0;">`
+    : '';
 
   const html = useMemo(() => {
     const md = rulesRaw
@@ -27,9 +38,10 @@ export default function RulesTab({ settings }) {
       .replace(/\{\{OVER_LIMIT_PEN\}\}/g,  overLimitPen)
       .replace(/\{\{MAX_FISH\}\}/g,        String(maxFish))
       .replace(/\{\{LATE_PEN_PER_MIN\}\}/g, latePenPerMin)
-      .replace(/\{\{LATE_DQ_MIN\}\}/g,     String(lateDQMin));
+      .replace(/\{\{LATE_DQ_MIN\}\}/g,     String(lateDQMin))
+      .replace(/\{\{QR_CODE\}\}/g,         qrImg);
     return marked(md);
-  }, [year, entryFee, opt1, opt2, deadFishPen, shortFishPen, overLimitPen, maxFish, latePenPerMin, lateDQMin]);
+  }, [year, entryFee, opt1, opt2, deadFishPen, shortFishPen, overLimitPen, maxFish, latePenPerMin, lateDQMin, qrImg]);
 
   function handleCreatePdf() {
     const base = `${window.location.protocol}//${window.location.host}`;
