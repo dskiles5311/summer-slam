@@ -381,12 +381,13 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
             ].map(({ id, label, field, step, parse, min = 0, max }) => (
               <div key={id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
                 <label htmlFor={id} style={{ fontSize: 13, color: 'var(--header-bg)', flex: 1 }}>{label}</label>
-                <input id={id} name={field} type="number" step={step} min={min} max={max}
-                       value={localPenalties?.[field] ?? (step < 1 ? 0 : 1)}
-                       style={{ width: 90, flexShrink: 0 }}
-                       disabled={locked}
-                       onChange={e => setLocalPenalties(prev => ({ ...prev, [field]: parse(e.target.value) || 0 }))}
-                       onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
+                <div className="form-field" style={{ width: 100, flexShrink: 0 }}>
+                  <input id={id} name={field} type="number" step={step} min={min} max={max}
+                         value={localPenalties?.[field] ?? (step < 1 ? 0 : 1)}
+                         disabled={locked}
+                         onChange={e => setLocalPenalties(prev => ({ ...prev, [field]: parse(e.target.value) || 0 }))}
+                         onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
+                </div>
               </div>
             ))}
           </div>
