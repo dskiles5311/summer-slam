@@ -424,23 +424,48 @@ export default function RosterTab({
 
   // --- Locked view ---
   if (!isUnlocked) {
-    const lockedSorted = [...entries].sort((a, b) => {
-      const fa = (a.boaterFirst || '').toLowerCase();
-      const fb = (b.boaterFirst || '').toLowerCase();
-      return fa < fb ? -1 : fa > fb ? 1 : 0;
-    });
+    const lockedSorted = [...entries]
+      .filter(e => (e.paid === 1 || e.paid === '1') && (e.appSigned === 1 || e.appSigned === '1'))
+      .sort((a, b) => {
+        const fa = (a.boaterFirst || '').toLowerCase();
+        const fb = (b.boaterFirst || '').toLowerCase();
+        return fa < fb ? -1 : fa > fb ? 1 : 0;
+      });
+
+    function fmtSignedUp(ts) {
+      if (!ts) return '—';
+      const d = new Date(ts + (ts.includes('Z') || ts.includes('+') ? '' : 'Z'));
+      return `${d.toLocaleDateString([], { month: '2-digit', day: '2-digit', year: '2-digit' })} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    }
+
     return (
       <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+        <div style={{ padding: '10px 16px 6px', flexShrink: 0, background: 'rgba(255,180,80,0.07)', borderBottom: '1px solid rgba(255,180,80,0.2)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+            <p style={{ fontSize: 12, color: 'var(--gold-light)', lineHeight: 1.6, margin: 0, flex: 1 }}>
+              <strong>Only names shown are anglers who have signed their application and have paid the entry fee.</strong>
+              {' '}If your name is misspelled or is not showing, please contact{' '}
+              <a href="mailto:info@sfttackle.com" style={{ color: 'var(--gold-light)' }}>info@sfttackle.com</a>
+              {' '}with a signed application and proof of purchase, or a legible name change.
+            </p>
+            <div style={{ flexShrink: 0, textAlign: 'center', background: 'rgba(255,180,80,0.15)', border: '1px solid rgba(255,180,80,0.35)', borderRadius: 8, padding: '4px 14px' }}>
+              <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--gold-light)', lineHeight: 1.2 }}>{lockedSorted.length}</div>
+              <div style={{ fontSize: 10, color: 'var(--gold-light)', opacity: 0.8, textTransform: 'uppercase', letterSpacing: 1 }}>Teams</div>
+            </div>
+          </div>
+        </div>
         <div className="table-wrapper" style={{ flex: 1, minHeight: 0, maxHeight: 'none' }}>
-          <table style={{ tableLayout: 'fixed', minWidth: 480 }}>
+          <table style={{ tableLayout: 'fixed', minWidth: 600 }}>
             <colgroup>
-              <col style={{ width: '25%' }} /><col style={{ width: '25%' }} />
-              <col style={{ width: '25%' }} /><col style={{ width: '25%' }} />
+              <col style={{ width: '22%' }} /><col style={{ width: '22%' }} />
+              <col style={{ width: '22%' }} /><col style={{ width: '22%' }} />
+              <col style={{ width: '12%' }} />
             </colgroup>
             <thead>
               <tr>
                 <th>Boater First</th><th>Boater Last</th>
                 <th>Co-Angler First</th><th>Co-Angler Last</th>
+                <th style={{ textAlign: 'center' }}>Signed Up</th>
               </tr>
             </thead>
             <tbody>
@@ -450,10 +475,11 @@ export default function RosterTab({
                   <td className="td-name">{row.boaterLast}</td>
                   <td className="td-name">{row.coAnglerFirst}</td>
                   <td className="td-name">{row.coAnglerLast}</td>
+                  <td style={{ textAlign: 'center', fontSize: 11, color: 'var(--header-bg)', whiteSpace: 'nowrap' }}>{fmtSignedUp(row.signedUpAt)}</td>
                 </tr>
               ))}
-              {entries.length === 0 && (
-                <tr><td colSpan={4} style={{ textAlign: 'center', color: 'var(--header-bg)', padding: 40 }}>No entries yet.</td></tr>
+              {lockedSorted.length === 0 && (
+                <tr><td colSpan={5} style={{ textAlign: 'center', color: 'var(--header-bg)', padding: 40 }}>No registered entries yet.</td></tr>
               )}
             </tbody>
           </table>
