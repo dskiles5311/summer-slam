@@ -118,6 +118,30 @@ export async function clearWeighLog() {
   if (!res.ok) throw new Error('Failed to clear weigh-in log');
 }
 
+export async function clearSignUpLog() {
+  const res = await fetchWithTimeout(`${BASE}/entries/clear-signup-log`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new Error('Failed to clear sign-up log');
+}
+
+export async function clearCheckInLog() {
+  const res = await fetchWithTimeout(`${BASE}/entries/clear-checkin-log`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new Error('Failed to clear check-in log');
+}
+
+export async function clearCheckOutLog() {
+  const res = await fetchWithTimeout(`${BASE}/entries/clear-checkout-log`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new Error('Failed to clear check-out log');
+}
+
 export async function fetchSettings() {
   const res = await fetchWithTimeout(`${BASE}/settings`);
   if (!res.ok) throw new Error('Failed to fetch settings');

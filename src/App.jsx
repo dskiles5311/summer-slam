@@ -16,7 +16,7 @@ import UnlockModal from './components/UnlockModal';
 import Toast from './components/Toast';
 import { verifyPassword, storePassword, clearPassword, isPasswordStored, revalidatePassword, archiveEntries } from './utils/api';
 import { calcRanks } from './utils/calculations';
-import { useEntries, useCreateEntry, useUpdateEntry, useDeleteEntry, useClearWeighLog, useClearAllEntries, useCreateEntriesBulk, useBackfillPhones, useNormalizePhones } from './hooks/useEntries';
+import { useEntries, useCreateEntry, useUpdateEntry, useDeleteEntry, useClearWeighLog, useClearSignUpLog, useClearCheckInLog, useClearCheckOutLog, useClearAllEntries, useCreateEntriesBulk, useBackfillPhones, useNormalizePhones } from './hooks/useEntries';
 import { useSettings, useSaveSettings } from './hooks/useSettings';
 import { useContacts, useUpdateContact, useDeleteContact, useUpsertContacts } from './hooks/useContacts';
 
@@ -80,7 +80,10 @@ export default function App() {
   const createEntryMut    = useCreateEntry();
   const updateEntryMut    = useUpdateEntry();
   const deleteEntryMut    = useDeleteEntry();
-  const clearWeighLogMut  = useClearWeighLog();
+  const clearWeighLogMut    = useClearWeighLog();
+  const clearSignUpLogMut   = useClearSignUpLog();
+  const clearCheckInLogMut  = useClearCheckInLog();
+  const clearCheckOutLogMut = useClearCheckOutLog();
   const clearAllMut       = useClearAllEntries();
   const bulkCreateMut     = useCreateEntriesBulk();
   const backfillMut       = useBackfillPhones();
@@ -316,6 +319,27 @@ export default function App() {
     showToast('Weigh-in log cleared', 'info');
     clearWeighLogMut.mutate(undefined, {
       onError: () => showToast('Failed to clear weigh-in log', 'error'),
+    });
+  }
+
+  async function handleClearSignUpLog() {
+    showToast('Sign-up log cleared', 'info');
+    clearSignUpLogMut.mutate(undefined, {
+      onError: () => showToast('Failed to clear sign-up log', 'error'),
+    });
+  }
+
+  async function handleClearCheckInLog() {
+    showToast('Check-in log cleared', 'info');
+    clearCheckInLogMut.mutate(undefined, {
+      onError: () => showToast('Failed to clear check-in log', 'error'),
+    });
+  }
+
+  async function handleClearCheckOutLog() {
+    showToast('Check-out log cleared', 'info');
+    clearCheckOutLogMut.mutate(undefined, {
+      onError: () => showToast('Failed to clear check-out log', 'error'),
     });
   }
 
@@ -565,6 +589,9 @@ export default function App() {
                 onClearAll={handleClearAll}
                 onImport={handleImport}
                 onClearWeighLog={handleClearWeighLog}
+                onClearSignUpLog={handleClearSignUpLog}
+                onClearCheckInLog={handleClearCheckInLog}
+                onClearCheckOutLog={handleClearCheckOutLog}
               />
             </div>
           </>

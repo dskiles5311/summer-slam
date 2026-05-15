@@ -6,7 +6,7 @@ import { evalMath } from '../utils/evalMath';
 const PANEL = { background: 'var(--settings-panel-bg)', border: '1px solid rgba(139,180,225,0.2)', borderRadius: 10, padding: 20, marginBottom: 16 };
 const H3 = { color: 'var(--header-bg)', fontSize: 14, marginBottom: 14, textTransform: 'uppercase', letterSpacing: 1 };
 
-export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSettings, onClearAll, onImport, onClearWeighLog }) {
+export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSettings, onClearAll, onImport, onClearWeighLog, onClearSignUpLog, onClearCheckInLog, onClearCheckOutLog }) {
   const { fees, payoutSettings, penalties } = settings;
 
   const [totalPayout, setTotalPayout]       = useState(payoutSettings.totalPayout || 0);
@@ -531,9 +531,9 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
       </div>
 
       {showLog        && <WeighInLogModal   entries={entries} penalties={penalties} onClose={() => setShowLog(false)}        onClearLog={onClearWeighLog} />}
-      {showSignUpLog  && <EventLogModal title="Sign-Up Log"   icon="📝" tsKey="signedUpAt"  entries={entries} onClose={() => setShowSignUpLog(false)} />}
-      {showCheckInLog && <EventLogModal title="Check In Log"  icon="⚓" tsKey="checkedInAt" entries={entries} onClose={() => setShowCheckInLog(false)} />}
-      {showOffWaterLog && <EventLogModal title="Check Out Log" icon="🏁" tsKey="offWaterAt"  entries={entries} onClose={() => setShowOffWaterLog(false)} />}
+      {showSignUpLog  && <EventLogModal title="Sign-Up Log"  icon="📝" tsKey="signedUpAt"  entries={entries} onClose={() => setShowSignUpLog(false)}  onClearLog={onClearSignUpLog} />}
+      {showCheckInLog && <EventLogModal title="Check In Log" icon="⚓" tsKey="checkedInAt" entries={entries} onClose={() => setShowCheckInLog(false)} onClearLog={onClearCheckInLog} />}
+      {showOffWaterLog && <EventLogModal title="Check Out Log" icon="🏁" tsKey="offWaterAt" entries={entries} onClose={() => setShowOffWaterLog(false)} onClearLog={onClearCheckOutLog} />}
     </div>
   );
 }
@@ -740,7 +740,7 @@ function WeighInLogModal({ entries, penalties, onClose, onClearLog }) {
   );
 }
 
-function EventLogModal({ title, icon, tsKey, entries, onClose }) {
+function EventLogModal({ title, icon, tsKey, entries, onClose, onClearLog }) {
   function parseSqliteTs(ts) {
     if (!ts) return null;
     const iso = ts.includes('T') ? ts : ts.replace(' ', 'T');
@@ -815,6 +815,7 @@ function EventLogModal({ title, icon, tsKey, entries, onClose }) {
           )}
           <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
             <button className="btn btn-outline btn-lg" onClick={handleExport} disabled={logged.length === 0}>💾 Export CSV</button>
+            {onClearLog && <button className="btn btn-danger btn-lg" onClick={() => { if (!confirm(`Clear the ${title}? This cannot be undone.`)) return; onClearLog(); onClose(); }}>🗑️ Clear Log</button>}
             <button className="btn btn-outline btn-lg" onClick={onClose}>Close</button>
           </div>
         </div>

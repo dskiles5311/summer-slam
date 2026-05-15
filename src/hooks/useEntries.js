@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   fetchEntries, createEntry, updateEntry, deleteEntry,
-  clearWeighLog, backfillPhones, normalizePhones,
+  clearWeighLog, clearSignUpLog, clearCheckInLog, clearCheckOutLog,
+  backfillPhones, normalizePhones,
   clearAllEntries, createEntriesBulk,
 } from '../utils/api';
 import { CONTACTS_KEY } from './useContacts';
@@ -82,6 +83,51 @@ export function useClearWeighLog() {
     onError: (_err, _vars, ctx) => {
       if (ctx?.prev) qc.setQueryData(ENTRIES_KEY, ctx.prev);
     },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ENTRIES_KEY }),
+  });
+}
+
+export function useClearSignUpLog() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: clearSignUpLog,
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: ENTRIES_KEY });
+      const prev = qc.getQueryData(ENTRIES_KEY);
+      qc.setQueryData(ENTRIES_KEY, old => (old || []).map(e => ({ ...e, signedUpAt: null })));
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => { if (ctx?.prev) qc.setQueryData(ENTRIES_KEY, ctx.prev); },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ENTRIES_KEY }),
+  });
+}
+
+export function useClearCheckInLog() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: clearCheckInLog,
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: ENTRIES_KEY });
+      const prev = qc.getQueryData(ENTRIES_KEY);
+      qc.setQueryData(ENTRIES_KEY, old => (old || []).map(e => ({ ...e, checkedInAt: null })));
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => { if (ctx?.prev) qc.setQueryData(ENTRIES_KEY, ctx.prev); },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ENTRIES_KEY }),
+  });
+}
+
+export function useClearCheckOutLog() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: clearCheckOutLog,
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: ENTRIES_KEY });
+      const prev = qc.getQueryData(ENTRIES_KEY);
+      qc.setQueryData(ENTRIES_KEY, old => (old || []).map(e => ({ ...e, offWaterAt: null })));
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => { if (ctx?.prev) qc.setQueryData(ENTRIES_KEY, ctx.prev); },
     onSuccess: () => qc.invalidateQueries({ queryKey: ENTRIES_KEY }),
   });
 }
