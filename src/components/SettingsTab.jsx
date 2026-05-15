@@ -487,7 +487,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <button className="btn btn-primary" onClick={() => exportCSV(entries, payoutSettings)}>💾 Export CSV</button>
             <button className="btn btn-outline" onClick={() => setShowSignUpLog(true)}>📝 Sign-Up Log</button>
-            <button className="btn btn-outline" onClick={() => setShowCheckInLog(true)}>⚓ Check-In Log</button>
+            <button className="btn btn-outline" onClick={() => setShowCheckInLog(true)}>⚓ Check Out Log</button>
             <button className="btn btn-outline" onClick={() => setShowOffWaterLog(true)}>🏁 Off-Water Log</button>
             <button className="btn btn-outline" onClick={() => setShowLog(true)}>📋 Weigh-In Log</button>
             {isUnlocked && (
@@ -532,7 +532,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
 
       {showLog        && <WeighInLogModal   entries={entries} penalties={penalties} onClose={() => setShowLog(false)}        onClearLog={onClearWeighLog} />}
       {showSignUpLog  && <EventLogModal title="Sign-Up Log"   icon="📝" tsKey="signedUpAt"  entries={entries} onClose={() => setShowSignUpLog(false)} />}
-      {showCheckInLog && <EventLogModal title="Check-In Log"  icon="⚓" tsKey="checkedInAt" entries={entries} onClose={() => setShowCheckInLog(false)} />}
+      {showCheckInLog && <EventLogModal title="Check Out Log" icon="⚓" tsKey="checkedInAt" entries={entries} onClose={() => setShowCheckInLog(false)} />}
       {showOffWaterLog && <EventLogModal title="Off-Water Log" icon="🏁" tsKey="offWaterAt"  entries={entries} onClose={() => setShowOffWaterLog(false)} />}
     </div>
   );
