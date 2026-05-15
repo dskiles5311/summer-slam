@@ -31,6 +31,37 @@ export default function OffLimitsTab({ settings }) {
     return marked(md);
   }, [year, maxFish, minLength, flightTimesMd]);
 
+  function handleCreatePdf() {
+    const base = `${window.location.protocol}//${window.location.host}`;
+    const win = window.open('', '_blank');
+    win.document.write(`<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<base href="${base}">
+<title>Summer Slam ${year} — Off Limits</title>
+<style>
+  body { font-family: Georgia, serif; max-width: 760px; margin: 40px auto; padding: 0 24px; color: #000; }
+  h1 { font-size: 22px; font-weight: 800; margin: 0 0 24px; }
+  h2 { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;
+       margin: 22px 0 6px; padding-bottom: 4px; border-bottom: 1px solid #ccc; }
+  p  { font-size: 14px; line-height: 1.65; margin: 0 0 10px; }
+  ol, ul { padding-left: 22px; margin: 0 0 10px; }
+  li { font-size: 14px; line-height: 1.65; margin-bottom: 6px; }
+  strong { font-weight: bold; }
+  hr { border: none; border-top: 1px solid #ccc; margin: 18px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 0 0 14px; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px;
+       padding: 6px 12px; border-bottom: 1px solid #ccc; text-align: left; }
+  td { font-size: 14px; padding: 6px 12px; border-bottom: 1px solid #eee; }
+  img { max-width: 100%; height: auto; border-radius: 8px; margin: 10px 0 16px;
+        border: 1px solid #ccc; display: block; }
+</style>
+</head><body>${html}</body></html>`);
+    win.document.close();
+    win.focus();
+    setTimeout(() => { win.print(); win.close(); }, 300);
+  }
+
   return (
     <div className="tab-panel active" style={{ overflowY: 'auto', padding: '20px 24px', maxWidth: 760, margin: '0 auto' }}>
       <style>{`
@@ -51,6 +82,11 @@ export default function OffLimitsTab({ settings }) {
         .rules-body img { max-width: 100%; height: auto; border-radius: 8px; margin: 10px 0 16px;
                           border: 1px solid rgba(139,180,225,0.2); display: block; }
       `}</style>
+      <div className="no-print" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+        <button className="btn btn-outline" onClick={handleCreatePdf} style={{ fontSize: 13, padding: '7px 16px' }}>
+          📄 Create PDF
+        </button>
+      </div>
       <div className="rules-body" dangerouslySetInnerHTML={{ __html: html }} />
     </div>
   );
