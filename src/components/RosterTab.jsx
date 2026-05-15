@@ -451,7 +451,7 @@ export default function RosterTab({
             <strong>Only names shown are anglers who have signed their application and have paid the entry fee.</strong>
             {' '}If your name is misspelled or is not showing, please contact{' '}
             <a href="mailto:info@sfttackle.com" style={{ color: 'var(--gold-light)' }}>info@sfttackle.com</a>
-            {' '}with a signed application and proof of purchase, or a legible name change.
+            {' '}with a signed application and proof of purchase!
           </p>
         </div>
         <div className="table-wrapper" style={{ flex: 1, minHeight: 0, maxHeight: 'none' }}>
