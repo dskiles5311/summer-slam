@@ -434,7 +434,9 @@ export default function RosterTab({
 
     function fmtSignedUp(ts) {
       if (!ts) return '—';
-      const d = new Date(ts + (ts.includes('Z') || ts.includes('+') ? '' : 'Z'));
+      const iso = ts.includes('T') ? ts : ts.replace(' ', 'T');
+      const d = new Date(iso.endsWith('Z') || iso.includes('+') ? iso : iso + 'Z');
+      if (isNaN(d)) return '—';
       return `${d.toLocaleDateString([], { month: '2-digit', day: '2-digit', year: '2-digit' })} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     }
 

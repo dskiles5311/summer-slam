@@ -739,13 +739,20 @@ function WeighInLogModal({ entries, penalties, onClose, onClearLog }) {
 }
 
 function EventLogModal({ title, icon, tsKey, entries, onClose }) {
+  function parseSqliteTs(ts) {
+    if (!ts) return null;
+    const iso = ts.includes('T') ? ts : ts.replace(' ', 'T');
+    const d = new Date(iso.endsWith('Z') || iso.includes('+') ? iso : iso + 'Z');
+    return isNaN(d) ? null : d;
+  }
+
   const logged = [...entries]
     .filter(e => e[tsKey])
-    .sort((a, b) => new Date(a[tsKey]) - new Date(b[tsKey]));
+    .sort((a, b) => (parseSqliteTs(a[tsKey]) || 0) - (parseSqliteTs(b[tsKey]) || 0));
 
   function fmtTime(ts) {
-    if (!ts) return '—';
-    const d = new Date(ts + (ts.includes('Z') || ts.includes('+') ? '' : 'Z'));
+    const d = parseSqliteTs(ts);
+    if (!d) return '—';
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   }
 
