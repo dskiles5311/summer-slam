@@ -56,7 +56,12 @@ export default function RulesTab({ settings }) {
         .rules-body strong { color: var(--gold-light); }
       `}</style>
       <div className="no-print" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
-        <button className="btn btn-outline" onClick={() => window.print()} style={{ fontSize: 13, padding: '7px 16px' }}>
+        <button className="btn btn-outline" onClick={() => {
+          const prev = document.title;
+          document.title = 'Rules';
+          window.print();
+          window.addEventListener('afterprint', () => { document.title = prev; }, { once: true });
+        }} style={{ fontSize: 13, padding: '7px 16px' }}>
           🖨️ Print / PDF
         </button>
       </div>
