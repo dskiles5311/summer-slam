@@ -368,55 +368,27 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
         {/* Penalties & Limits */}
         <div style={PANEL}>
           <h3 style={H3}>Penalties &amp; Limits</h3>
-          <div className="edit-grid-2" style={{ marginBottom: 12 }}>
-            <div className="form-field">
-              <label htmlFor="st-dead-fish-pen">Dead Fish (lbs per fish)</label>
-              <input id="st-dead-fish-pen" name="deadFishPenalty" type="number" value={localPenalties?.deadFishPenalty ?? 0.5} min="0" step="0.01" disabled={locked}
-                     onChange={e => setLocalPenalties(prev => ({ ...prev, deadFishPenalty: parseFloat(e.target.value) || 0 }))}
-                     onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
-            </div>
-            <div className="form-field">
-              <label htmlFor="st-short-fish-pen">Short Fish — weight deduction (lbs per fish)</label>
-              <input id="st-short-fish-pen" name="shortFishPenalty" type="number" value={localPenalties?.shortFishPenalty ?? 1.0} min="0" step="0.01" disabled={locked}
-                     onChange={e => setLocalPenalties(prev => ({ ...prev, shortFishPenalty: parseFloat(e.target.value) || 0 }))}
-                     onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
-            </div>
-            <div className="form-field">
-              <label htmlFor="st-short-fish-count-pen">Short Fish — fish count deduction (per fish)</label>
-              <input id="st-short-fish-count-pen" name="shortFishCountPenalty" type="number" value={localPenalties?.shortFishCountPenalty ?? 1} min="0" max="1" step="1" disabled={locked}
-                     onChange={e => setLocalPenalties(prev => ({ ...prev, shortFishCountPenalty: parseInt(e.target.value) || 0 }))}
-                     onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
-            </div>
-            <div className="form-field">
-              <label htmlFor="st-over-limit-pen">Over Limit (lbs per fish over max)</label>
-              <input id="st-over-limit-pen" name="overLimitPenalty" type="number" value={localPenalties?.overLimitPenalty ?? 3.0} min="0" step="0.01" disabled={locked}
-                     onChange={e => setLocalPenalties(prev => ({ ...prev, overLimitPenalty: parseFloat(e.target.value) || 0 }))}
-                     onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
-            </div>
-            <div className="form-field">
-              <label htmlFor="st-max-fish">Max Fish Limit</label>
-              <input id="st-max-fish" name="maxFish" type="number" value={localPenalties?.maxFish ?? 5} min="1" step="1" disabled={locked}
-                     onChange={e => setLocalPenalties(prev => ({ ...prev, maxFish: parseInt(e.target.value) || 1 }))}
-                     onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
-            </div>
-            <div className="form-field">
-              <label htmlFor="st-min-fish-length">Minimum Fish Length (inches)</label>
-              <input id="st-min-fish-length" name="minFishLength" type="number" value={localPenalties?.minFishLength ?? 15} min="1" step="1" disabled={locked}
-                     onChange={e => setLocalPenalties(prev => ({ ...prev, minFishLength: parseInt(e.target.value) || 1 }))}
-                     onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
-            </div>
-            <div className="form-field">
-              <label htmlFor="st-late-pen-per-min">Late Penalty (lbs per minute)</label>
-              <input id="st-late-pen-per-min" name="latePenaltyPerMin" type="number" value={localPenalties?.latePenaltyPerMin ?? 1.0} min="0" step="0.01" disabled={locked}
-                     onChange={e => setLocalPenalties(prev => ({ ...prev, latePenaltyPerMin: parseFloat(e.target.value) || 0 }))}
-                     onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
-            </div>
-            <div className="form-field">
-              <label htmlFor="st-late-dq-min">Late DQ (minutes past check-in)</label>
-              <input id="st-late-dq-min" name="latePenaltyDQMin" type="number" value={localPenalties?.latePenaltyDQMin ?? 15} min="1" step="1" disabled={locked}
-                     onChange={e => setLocalPenalties(prev => ({ ...prev, latePenaltyDQMin: parseInt(e.target.value) || 15 }))}
-                     onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
-            </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 12 }}>
+            {[
+              { id: 'st-dead-fish-pen',      label: 'Dead Fish (lbs per fish)',                    field: 'deadFishPenalty',       step: 0.01, parse: parseFloat },
+              { id: 'st-short-fish-pen',     label: 'Short Fish — weight deduction (lbs per fish)', field: 'shortFishPenalty',      step: 0.01, parse: parseFloat },
+              { id: 'st-short-fish-count',   label: 'Short Fish — fish count deduction (per fish)', field: 'shortFishCountPenalty', step: 1,    parse: parseInt,  max: 1 },
+              { id: 'st-over-limit-pen',     label: 'Over Limit (lbs per fish over max)',           field: 'overLimitPenalty',      step: 0.01, parse: parseFloat },
+              { id: 'st-max-fish',           label: 'Max Fish Limit',                               field: 'maxFish',               step: 1,    parse: parseInt,  min: 1 },
+              { id: 'st-min-fish-length',    label: 'Minimum Fish Length (inches)',                 field: 'minFishLength',         step: 1,    parse: parseInt,  min: 1 },
+              { id: 'st-late-pen-per-min',   label: 'Late Penalty (lbs per minute)',                field: 'latePenaltyPerMin',     step: 0.01, parse: parseFloat },
+              { id: 'st-late-dq-min',        label: 'Late DQ (minutes past check-in)',              field: 'latePenaltyDQMin',      step: 1,    parse: parseInt,  min: 1 },
+            ].map(({ id, label, field, step, parse, min = 0, max }) => (
+              <div key={id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                <label htmlFor={id} style={{ fontSize: 13, color: 'var(--header-bg)', flex: 1 }}>{label}</label>
+                <input id={id} name={field} type="number" step={step} min={min} max={max}
+                       value={localPenalties?.[field] ?? (step < 1 ? 0 : 1)}
+                       style={{ width: 90, flexShrink: 0 }}
+                       disabled={locked}
+                       onChange={e => setLocalPenalties(prev => ({ ...prev, [field]: parse(e.target.value) || 0 }))}
+                       onBlur={() => onUpdateSettings({ penalties: localPenalties })} />
+              </div>
+            ))}
           </div>
           <p style={{ color: 'var(--header-bg)', fontSize: 11, marginTop: 8 }}>
             Dead fish: deduct X lbs per dead fish from total weight.<br />
