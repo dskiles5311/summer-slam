@@ -77,7 +77,7 @@ const COL_WIDTHS = {
   _rank: 52, boaterFirst: 100, boaterLast: 100, coAnglerFirst: 100, coAnglerLast: 100,
   boatNo: 68, numFish: 58, lunkerWeight: 90, totalWeight: 110,
   lunker: 68, option: 68, paid: 58, appSigned: 90, offWater: 82, buyIn: 82, actions: 108,
-  signedUpAt: 110,
+  signedUpAt: 130,
 };
 
 export default function RosterTab({
@@ -368,7 +368,7 @@ export default function RosterTab({
           const d = new Date(r.signedUpAt + (r.signedUpAt.includes('Z') || r.signedUpAt.includes('+') ? '' : 'Z'));
           return (
             <span style={{ whiteSpace: 'nowrap' }}>
-              {d.toLocaleDateString([], { month: 'numeric', day: 'numeric' })}
+              {d.toLocaleDateString([], { month: '2-digit', day: '2-digit', year: '2-digit' })}
               {' '}
               {d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
