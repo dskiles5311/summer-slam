@@ -101,7 +101,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
             className={`nav-tab ${activeTab === 'boatcheck' ? 'active' : ''}`}
             onClick={() => onTabChange('boatcheck')}
           >
-            ⚓ Boat Check / Off Water
+            ⚓ Off Water
           </button>
         )}
         {isUnlocked && (
