@@ -486,10 +486,10 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           <h3 style={H3}>Data Management</h3>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <button className="btn btn-primary" onClick={() => exportCSV(entries, payoutSettings)}>💾 Export CSV</button>
-            <button className="btn btn-outline" onClick={() => setShowLog(true)}>📋 Weigh-In Log</button>
             <button className="btn btn-outline" onClick={() => setShowSignUpLog(true)}>📝 Sign-Up Log</button>
             <button className="btn btn-outline" onClick={() => setShowCheckInLog(true)}>⚓ Check-In Log</button>
             <button className="btn btn-outline" onClick={() => setShowOffWaterLog(true)}>🏁 Off-Water Log</button>
+            <button className="btn btn-outline" onClick={() => setShowLog(true)}>📋 Weigh-In Log</button>
             {isUnlocked && (
               <label className="btn btn-outline" style={{ cursor: 'pointer' }}>
                 📂 Import CSV
