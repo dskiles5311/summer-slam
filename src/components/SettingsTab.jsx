@@ -567,8 +567,10 @@ function WeighInLogModal({ entries, penalties, onClose, onClearLog }) {
 
   function fmtTime(ts) {
     if (!ts) return '—';
-    const d = new Date(ts + (ts.includes('Z') || ts.includes('+') ? '' : 'Z'));
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const iso = ts.includes('T') ? ts : ts.replace(' ', 'T');
+    const d = new Date(iso.endsWith('Z') || iso.includes('+') ? iso : iso + 'Z');
+    if (isNaN(d)) return '—';
+    return `${d.toLocaleDateString([], { month: '2-digit', day: '2-digit', year: '2-digit' })} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
   }
 
   function penaltyLines(e) {
@@ -753,7 +755,7 @@ function EventLogModal({ title, icon, tsKey, entries, onClose }) {
   function fmtTime(ts) {
     const d = parseSqliteTs(ts);
     if (!d) return '—';
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    return `${d.toLocaleDateString([], { month: '2-digit', day: '2-digit', year: '2-digit' })} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
   }
 
   function handleExport() {
