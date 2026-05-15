@@ -363,9 +363,9 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           </p>
         </div>
 
-        {/* Penalties */}
+        {/* Penalties & Limits */}
         <div style={PANEL}>
-          <h3 style={H3}>Penalties</h3>
+          <h3 style={H3}>Penalties &amp; Limits</h3>
           <div className="edit-grid-2" style={{ marginBottom: 12 }}>
             <div className="form-field">
               <label htmlFor="st-dead-fish-pen">Dead Fish (lbs per fish)</label>
