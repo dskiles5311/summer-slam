@@ -34,6 +34,9 @@ function toJS(row) {
     needsAttention: Boolean(row.needs_attention),
     weighedAt:      row.weighed_at      ?? null,
     updatedAt:      row.updated_at      ?? null,
+    signedUpAt:     row.signed_up_at    ?? null,
+    checkedInAt:    row.checked_in_at   ?? null,
+    offWaterAt:     row.off_water_at    ?? null,
   };
 }
 
@@ -57,8 +60,10 @@ export async function onRequestPut({ params, request, env }) {
               boat_no=?, num_fish=?, lunker_weight=?, total_weight=?,
               lunker=?, option_field=?, paid=?, app_signed=?, buy_in=?,
               raw_weight=?, dead_fish=?, short_fish=?, needs_attention=?,
-              weighed_at  = CASE WHEN ? > 0 AND ? = 0 THEN COALESCE(?, CURRENT_TIMESTAMP) ELSE weighed_at END,
-              updated_at  = CURRENT_TIMESTAMP
+              weighed_at   = CASE WHEN ? > 0 AND ? = 0 THEN COALESCE(?, CURRENT_TIMESTAMP) ELSE weighed_at END,
+              checked_in_at = CASE WHEN ? != '' AND checked_in_at IS NULL THEN CURRENT_TIMESTAMP ELSE checked_in_at END,
+              off_water_at  = CASE WHEN ? = 1 THEN COALESCE(off_water_at, CURRENT_TIMESTAMP) WHEN ? = 0 THEN NULL ELSE off_water_at END,
+              updated_at   = CURRENT_TIMESTAMP
             WHERE id=? AND (? IS NULL OR updated_at = ?)`,
       args: [
         t(body.boaterFirst),   t(body.boaterLast),    t(body.boaterPhone),   t(body.boaterEmail),
@@ -77,6 +82,9 @@ export async function onRequestPut({ params, request, env }) {
         Number(body.shortFish) || 0,
         body.needsAttention ? 1 : 0,
         newTotalWeight, preserveWeighTime, clientWeighedAt,
+        t(body.boatNo),
+        body.offWater === true ? 1 : body.offWater === false ? 0 : -1,
+        body.offWater === true ? 1 : body.offWater === false ? 0 : -1,
         params.id, clientUpdatedAt, clientUpdatedAt,
       ],
     });

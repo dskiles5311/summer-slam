@@ -34,8 +34,9 @@ export async function onRequestPost({ request, env }) {
                 (year, place, boater_first, boater_last, co_angler_first, co_angler_last,
                  boat_no, num_fish, lunker_weight, total_weight, raw_weight, dead_fish, short_fish,
                  boater_phone, boater_email, co_angler_phone, co_angler_email,
-                 lunker, option_field, paid, app_signed, buy_in, needs_attention, weighed_at)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                 lunker, option_field, paid, app_signed, buy_in, needs_attention,
+                 weighed_at, signed_up_at, checked_in_at, off_water_at)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         args: [
           String(year),
           e.place != null ? Number(e.place) : null,
@@ -60,7 +61,10 @@ export async function onRequestPost({ request, env }) {
           e.appSigned != null ? Number(e.appSigned) : null,
           Number(e.buyIn) || 0,
           e.needsAttention ? 1 : 0,
-          e.weighedAt ?? null,
+          e.weighedAt    ?? null,
+          e.signedUpAt   ?? null,
+          e.checkedInAt  ?? null,
+          e.offWaterAt   ?? null,
         ],
       })),
     ];

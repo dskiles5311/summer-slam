@@ -17,6 +17,9 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   const [localFees, setLocalFees]           = useState(fees);
   const [localPenalties, setLocalPenalties] = useState(penalties);
   const [showLog, setShowLog]               = useState(false);
+  const [showSignUpLog, setShowSignUpLog]   = useState(false);
+  const [showCheckInLog, setShowCheckInLog] = useState(false);
+  const [showOffWaterLog, setShowOffWaterLog] = useState(false);
   const [localFlights, setLocalFlights]     = useState(() => (settings.flights || []).map((f, i) => ({ ...f, _key: i })));
   const [editingFlightIdx, setEditingFlightIdx] = useState(null);
   const [flightDraft, setFlightDraft]       = useState(null);
@@ -484,6 +487,9 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <button className="btn btn-primary" onClick={() => exportCSV(entries, payoutSettings)}>💾 Export CSV</button>
             <button className="btn btn-outline" onClick={() => setShowLog(true)}>📋 Weigh-In Log</button>
+            <button className="btn btn-outline" onClick={() => setShowSignUpLog(true)}>📝 Sign-Up Log</button>
+            <button className="btn btn-outline" onClick={() => setShowCheckInLog(true)}>⚓ Check-In Log</button>
+            <button className="btn btn-outline" onClick={() => setShowOffWaterLog(true)}>🏁 Off-Water Log</button>
             {isUnlocked && (
               <label className="btn btn-outline" style={{ cursor: 'pointer' }}>
                 📂 Import CSV
@@ -524,7 +530,10 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
         </div>
       </div>
 
-      {showLog && <WeighInLogModal entries={entries} penalties={penalties} onClose={() => setShowLog(false)} onClearLog={onClearWeighLog} />}
+      {showLog        && <WeighInLogModal   entries={entries} penalties={penalties} onClose={() => setShowLog(false)}        onClearLog={onClearWeighLog} />}
+      {showSignUpLog  && <EventLogModal title="Sign-Up Log"   icon="📝" tsKey="signedUpAt"  entries={entries} onClose={() => setShowSignUpLog(false)} />}
+      {showCheckInLog && <EventLogModal title="Check-In Log"  icon="⚓" tsKey="checkedInAt" entries={entries} onClose={() => setShowCheckInLog(false)} />}
+      {showOffWaterLog && <EventLogModal title="Off-Water Log" icon="🏁" tsKey="offWaterAt"  entries={entries} onClose={() => setShowOffWaterLog(false)} />}
     </div>
   );
 }
@@ -721,6 +730,82 @@ function WeighInLogModal({ entries, penalties, onClose, onClearLog }) {
             <button className="btn btn-danger btn-lg" onClick={handleClear} style={{ marginRight: 'auto' }}>🗑️ Clear Log</button>
             <button className="btn btn-outline btn-lg" onClick={handleExport} disabled={logged.length === 0}>💾 Export CSV</button>
             <button className="btn btn-outline btn-lg" onClick={handlePrint} disabled={logged.length === 0}>🖨️ Print</button>
+            <button className="btn btn-outline btn-lg" onClick={onClose}>Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EventLogModal({ title, icon, tsKey, entries, onClose }) {
+  const logged = [...entries]
+    .filter(e => e[tsKey])
+    .sort((a, b) => new Date(a[tsKey]) - new Date(b[tsKey]));
+
+  function fmtTime(ts) {
+    if (!ts) return '—';
+    const d = new Date(ts + (ts.includes('Z') || ts.includes('+') ? '' : 'Z'));
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+
+  function handleExport() {
+    const rows = [['#', 'Time', 'Boat', 'Boater', 'Co-Angler']];
+    logged.forEach((e, i) => {
+      rows.push([
+        i + 1,
+        fmtTime(e[tsKey]),
+        e.boatNo || '—',
+        [e.boaterFirst, e.boaterLast].filter(Boolean).join(' ') || '—',
+        [e.coAnglerFirst, e.coAnglerLast].filter(Boolean).join(' ') || '—',
+      ]);
+    });
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    a.download = `${title.toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+  }
+
+  return (
+    <div className="edit-overlay" onPointerDown={e => e.stopPropagation()} onPointerUp={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="edit-panel" style={{ maxWidth: 700, width: '95vw' }}>
+        <div className="edit-panel-inner">
+          <div className="edit-panel-header">
+            <h3>{icon} {title}</h3>
+            <button className="edit-panel-close" onClick={onClose}>✕</button>
+          </div>
+          <p style={{ color: 'var(--header-bg)', fontSize: 12, marginBottom: 14 }}>
+            {logged.length} record{logged.length !== 1 ? 's' : ''} · read-only · ordered by time
+          </p>
+          {logged.length === 0 ? (
+            <p style={{ color: 'var(--header-bg)', textAlign: 'center', padding: '32px 0' }}>No records yet.</p>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                <thead>
+                  <tr>
+                    {['#', 'Time', 'Boat', 'Boater', 'Co-Angler'].map(h => (
+                      <th key={h} style={{ textAlign: h === '#' ? 'right' : 'left', padding: '6px 10px', color: 'var(--header-bg)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, borderBottom: '1px solid rgba(139,180,225,0.2)', whiteSpace: 'nowrap' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {logged.map((e, i) => (
+                    <tr key={e.id} style={{ borderBottom: '1px solid rgba(139,180,225,0.08)' }}>
+                      <td style={{ padding: '7px 10px', color: 'var(--header-bg)', textAlign: 'right', fontWeight: 600 }}>{i + 1}</td>
+                      <td style={{ padding: '7px 10px', color: 'var(--gold-light)', fontWeight: 600, whiteSpace: 'nowrap' }}>{fmtTime(e[tsKey])}</td>
+                      <td style={{ padding: '7px 10px', fontWeight: 700 }}>#{e.boatNo || '—'}</td>
+                      <td style={{ padding: '7px 10px' }}>{[e.boaterFirst, e.boaterLast].filter(Boolean).join(' ') || '—'}</td>
+                      <td style={{ padding: '7px 10px', color: 'var(--header-bg)' }}>{[e.coAnglerFirst, e.coAnglerLast].filter(Boolean).join(' ') || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+            <button className="btn btn-outline btn-lg" onClick={handleExport} disabled={logged.length === 0}>💾 Export CSV</button>
             <button className="btn btn-outline btn-lg" onClick={onClose}>Close</button>
           </div>
         </div>

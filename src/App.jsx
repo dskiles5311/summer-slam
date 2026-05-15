@@ -300,7 +300,12 @@ export default function App() {
 
   async function handleToggleOffWater(id) {
     const current = settings.offWater || {};
-    await handleUpdateSettings({ offWater: { ...current, [id]: !current[id] } });
+    const nowOffWater = !current[id];
+    await handleUpdateSettings({ offWater: { ...current, [id]: nowOffWater } });
+    const entry = rawEntries.find(e => e.id === id);
+    if (entry) {
+      updateEntryMut.mutate({ id, data: { ...entry, offWater: nowOffWater } });
+    }
   }
 
   async function handleResetBoatCheck() {
@@ -349,7 +354,10 @@ export default function App() {
         paid:          e.paid,          appSigned:     e.appSigned,
         buyIn:         e.buyIn,
         needsAttention: e.needsAttention,
-        weighedAt:     e.weighedAt,
+        weighedAt:    e.weighedAt,
+        signedUpAt:   e.signedUpAt,
+        checkedInAt:  e.checkedInAt,
+        offWaterAt:   e.offWaterAt,
       }));
       await archiveEntries(label, payload);
       showToast(`${rankedEntries.length} entries archived as ${label}`, 'success');

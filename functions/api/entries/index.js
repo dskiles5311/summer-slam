@@ -34,6 +34,9 @@ function toJS(row, hidePI = false) {
     needsAttention: Boolean(row.needs_attention),
     weighedAt:      row.weighed_at      ?? null,
     updatedAt:      row.updated_at      ?? null,
+    signedUpAt:     row.signed_up_at    ?? null,
+    checkedInAt:    row.checked_in_at   ?? null,
+    offWaterAt:     row.off_water_at    ?? null,
   };
 }
 
@@ -72,8 +75,8 @@ export async function onRequestPost({ request, env }) {
                co_angler_first, co_angler_last, co_angler_phone, co_angler_email,
                boat_no, num_fish, lunker_weight, total_weight,
                lunker, option_field, paid, app_signed, buy_in,
-               raw_weight, dead_fish, short_fish, needs_attention, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+               raw_weight, dead_fish, short_fish, needs_attention, signed_up_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
       args: [
         t(body.boaterFirst),   t(body.boaterLast),    t(body.boaterPhone),   t(body.boaterEmail),
         t(body.coAnglerFirst), t(body.coAnglerLast),  t(body.coAnglerPhone), t(body.coAnglerEmail),

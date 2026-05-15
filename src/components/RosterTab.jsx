@@ -77,6 +77,7 @@ const COL_WIDTHS = {
   _rank: 52, boaterFirst: 100, boaterLast: 100, coAnglerFirst: 100, coAnglerLast: 100,
   boatNo: 68, numFish: 58, lunkerWeight: 90, totalWeight: 110,
   lunker: 68, option: 68, paid: 58, appSigned: 90, offWater: 82, buyIn: 82, actions: 108,
+  signedUpAt: 90,
 };
 
 export default function RosterTab({
@@ -353,6 +354,21 @@ export default function RosterTab({
           return <span className={`buyin-val ${cls}`}>${buyIn.toFixed(2)}</span>;
         },
       },
+      ...(!isUnlocked ? [{
+        id: 'signedUpAt', accessorKey: 'signedUpAt', header: 'Signed Up', size: COL_WIDTHS.signedUpAt,
+        enableSorting: true,
+        sortingFn: withAttentionFirst((a, b) => {
+          const va = a.original.signedUpAt ? new Date(a.original.signedUpAt).getTime() : 0;
+          const vb = b.original.signedUpAt ? new Date(b.original.signedUpAt).getTime() : 0;
+          return va - vb;
+        }),
+        meta: { tdStyle: { textAlign: 'center', fontSize: 11, color: 'var(--header-bg)' } },
+        cell: ({ row: { original: r } }) => {
+          if (!r.signedUpAt) return '—';
+          const d = new Date(r.signedUpAt + (r.signedUpAt.includes('Z') || r.signedUpAt.includes('+') ? '' : 'Z'));
+          return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        },
+      }] : []),
       ...(isUnlocked ? [{
         id: 'actions', header: 'Actions', size: COL_WIDTHS.actions,
         enableSorting: false,
