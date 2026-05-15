@@ -23,7 +23,7 @@
 
 Fish care is our concern — release fish at end of dock.
 
-Limit is **5 fish, 15" per boat**.
+Limit is **5 fish per boat, 15" minimum length per fish**.
 
 Please move your boat after you weigh in so other people can access the dock.
 
