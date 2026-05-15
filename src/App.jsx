@@ -267,8 +267,8 @@ export default function App() {
       await createEntryMut.mutateAsync(entryData);
       showToast(`${entryData.boaterFirst} ${entryData.boaterLast} signed up!`, 'success');
       upsertContactsMut.mutate([
-        { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone,   email: entryData.boaterEmail   },
-        { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone, email: entryData.coAnglerEmail },
+        { firstName: entryData.boaterFirst,   lastName: entryData.boaterLast,   phone: entryData.boaterPhone,   email: entryData.boaterEmail,   contactId: entryData.boaterContactId   ?? null },
+        { firstName: entryData.coAnglerFirst, lastName: entryData.coAnglerLast, phone: entryData.coAnglerPhone, email: entryData.coAnglerEmail, contactId: entryData.coAnglerContactId ?? null },
       ]);
       return true;
     } catch {

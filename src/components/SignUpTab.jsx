@@ -68,7 +68,9 @@ export default function SignUpTab({ onAddEntry, settings }) {
   const [errors, setErrors]     = useState({});
   const [recent, setRecent]     = useState([]);
   const [submitting, setSubmitting] = useState(false);
-  const boaterFirstRef = useRef(null);
+  const boaterFirstRef      = useRef(null);
+  const boaterContactIdRef  = useRef(null);
+  const coAnglerContactIdRef = useRef(null);
 
   function set(field, val) {
     setForm(prev => {
@@ -119,6 +121,8 @@ export default function SignUpTab({ onAddEntry, settings }) {
       appSigned: form.appSigned === '' ? '' : parseInt(form.appSigned),
       buyIn:     parseFloat((evalMath(form.buyIn) || 0).toFixed(2)),
       boatNo: '', numFish: 0, lunkerWeight: 0, totalWeight: 0,
+      boaterContactId:   boaterContactIdRef.current  ?? null,
+      coAnglerContactId: coAnglerContactIdRef.current ?? null,
     };
 
     setSubmitting(true);
@@ -129,6 +133,8 @@ export default function SignUpTab({ onAddEntry, settings }) {
       setRecent(prev => [entry, ...prev].slice(0, 10));
       setForm({ ...EMPTY });
       setErrors({});
+      boaterContactIdRef.current  = null;
+      coAnglerContactIdRef.current = null;
       setTimeout(() => boaterFirstRef.current?.focus(), 0);
     }
   }
@@ -136,6 +142,8 @@ export default function SignUpTab({ onAddEntry, settings }) {
   function handleClear() {
     setForm({ ...EMPTY });
     setErrors({});
+    boaterContactIdRef.current  = null;
+    coAnglerContactIdRef.current = null;
     setTimeout(() => boaterFirstRef.current?.focus(), 0);
   }
 
@@ -172,7 +180,7 @@ export default function SignUpTab({ onAddEntry, settings }) {
                 value={form.boaterLast}
                 placeholder="Last"
                 onChange={v => set('boaterLast', v)}
-                onSelect={c => setForm(p => ({ ...p, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || p.boaterEmail }))}
+                onSelect={c => { boaterContactIdRef.current = c.id; setForm(p => ({ ...p, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || p.boaterEmail })); }}
                 inputProps={{ id: 'su-boater-last', name: 'boaterLast', style: fieldBorder('boaterLast') }}
               />
               {err('boaterLast')}
@@ -188,7 +196,7 @@ export default function SignUpTab({ onAddEntry, settings }) {
               value={form.boaterPhone}
               placeholder="555-123-4567"
               onChange={v => set('boaterPhone', v)}
-              onSelect={c => setForm(p => ({ ...p, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || p.boaterEmail }))}
+              onSelect={c => { boaterContactIdRef.current = c.id; setForm(p => ({ ...p, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || p.boaterEmail })); }}
               onBlur={e => set('boaterPhone', formatPhone(e.target.value))}
               inputProps={{ id: 'su-boater-phone', name: 'boaterPhone', style: fieldBorder('boaterPhone'), type: 'tel' }}
             />
@@ -216,7 +224,7 @@ export default function SignUpTab({ onAddEntry, settings }) {
                 value={form.coAnglerLast}
                 placeholder="Last"
                 onChange={v => set('coAnglerLast', v)}
-                onSelect={c => setForm(p => ({ ...p, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || p.coAnglerEmail }))}
+                onSelect={c => { coAnglerContactIdRef.current = c.id; setForm(p => ({ ...p, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || p.coAnglerEmail })); }}
                 inputProps={{ id: 'su-co-last', name: 'coAnglerLast', style: fieldBorder('coAnglerLast') }}
               />
               {err('coAnglerLast')}
@@ -234,7 +242,7 @@ export default function SignUpTab({ onAddEntry, settings }) {
               value={form.coAnglerPhone}
               placeholder="555-123-4567"
               onChange={v => set('coAnglerPhone', v)}
-              onSelect={c => setForm(p => ({ ...p, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || p.coAnglerEmail }))}
+              onSelect={c => { coAnglerContactIdRef.current = c.id; setForm(p => ({ ...p, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || p.coAnglerEmail })); }}
               onBlur={e => set('coAnglerPhone', formatPhone(e.target.value))}
               inputProps={{ id: 'su-co-phone', name: 'coAnglerPhone', style: fieldBorder('coAnglerPhone'), type: 'tel' }}
             />

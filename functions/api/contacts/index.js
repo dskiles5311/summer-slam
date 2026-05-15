@@ -58,7 +58,23 @@ export async function onRequestPost({ request, env }) {
     const email        = (body.email ?? '').trim();
     const oldFirstName = (body.oldFirstName ?? '').trim();
     const oldLastName  = (body.oldLastName  ?? '').trim();
+    const contactId    = body.contactId ? Number(body.contactId) : null;
     if (!firstName || !lastName) return Response.json({ error: 'firstName and lastName required' }, { status: 400 });
+
+    // If the caller knows exactly which contact to update (selected from autofill), update by ID
+    if (contactId) {
+      const row = await db.execute({ sql: `SELECT id, phone, email FROM contacts WHERE id = ?`, args: [contactId] });
+      if (row.rows.length > 0) {
+        const existing = row.rows[0];
+        const newPhone = phone !== '' ? phone : (existing.phone || '');
+        const newEmail = email !== '' ? email : (existing.email || '');
+        await db.execute({
+          sql:  `UPDATE contacts SET first_name=?, last_name=?, phone=?, email=?, last_seen=CURRENT_TIMESTAMP WHERE id=?`,
+          args: [firstName, lastName, newPhone, newEmail, contactId],
+        });
+        return Response.json({ success: true }, { status: 201 });
+      }
+    }
 
     // If old names differ from new names, rename the existing contact instead of creating an orphan
     if (oldFirstName && oldLastName && (oldFirstName !== firstName || oldLastName !== lastName)) {
