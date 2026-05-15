@@ -449,7 +449,8 @@ export default function RosterTab({
           </div>
           <p style={{ fontSize: 15, color: 'var(--gold-light)', lineHeight: 1.65, margin: 0, maxWidth: 700, marginLeft: 'auto', marginRight: 'auto' }}>
             <strong>Only names shown are anglers who have signed their application and have paid the entry fee.</strong>
-            {' '}If your name is misspelled or is not showing, please contact{' '}
+            <br />
+            If your name is misspelled or is not showing, please contact{' '}
             <a href="mailto:info@sfttackle.com" style={{ color: 'var(--gold-light)' }}>info@sfttackle.com</a>
             {' '}with a signed application and proof of purchase!
           </p>
