@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import ContactSuggest from './ContactSuggest';
 import EmailInput from './EmailInput';
 import { formatPhone } from '../utils/phone';
+import { evalMath } from '../utils/evalMath';
 
 const EMPTY = {
   boaterFirst: '', boaterLast: '', boaterPhone: '', boaterEmail: '',
@@ -92,7 +93,7 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
     setForm(prev => {
       const next = { ...prev, [field]: val };
       if (field === 'buyIn') {
-        const amount = parseFloat(val);
+        const amount = parseFloat(evalMath(String(val)));
         if (!isNaN(amount) && amount > 0) {
           next.paid = amount >= entryFee ? 1 : 0;
         }
@@ -117,7 +118,7 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
-    const numFields = ['numFish', 'lunkerWeight', 'totalWeight', 'buyIn'];
+    const numFields = ['numFish', 'lunkerWeight', 'totalWeight'];
     const statusFields = ['lunker', 'option', 'paid', 'appSigned'];
     const passthroughFields = ['rawWeight', 'deadFish', 'shortFish', 'needsAttention'];
     const data = {};
@@ -128,6 +129,8 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
         data[k] = v === '' ? '' : parseInt(v);
       } else if (numFields.includes(k)) {
         data[k] = v === '' ? '' : parseFloat(v);
+      } else if (k === 'buyIn') {
+        data[k] = v === '' ? '' : parseFloat((evalMath(String(v)) || 0).toFixed(2));
       } else {
         data[k] = typeof v === 'string' ? v.trim() : v;
       }
@@ -267,8 +270,12 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
               </div>
               <div className="form-field">
                 <label htmlFor="em-buy-in">Buy-In ($)</label>
-                <input id="em-buy-in" name="buyIn" type="number" value={form.buyIn} placeholder="0.00" step="0.01" min="0" inputMode="decimal"
-                       onChange={e => set('buyIn', e.target.value)} />
+                <input id="em-buy-in" name="buyIn" type="text" value={form.buyIn} placeholder="0.00" inputMode="decimal"
+                       onChange={e => set('buyIn', e.target.value)}
+                       onBlur={e => {
+                         const result = evalMath(e.target.value);
+                         if (!isNaN(result)) set('buyIn', parseFloat(result.toFixed(2)));
+                       }} />
               </div>
             </div>
 
