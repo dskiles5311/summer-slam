@@ -11,12 +11,33 @@ export async function onRequestPut({ params, request, env }) {
   try {
     const db = getDb(env);
     const { firstName, lastName, phone, email } = await request.json();
+
+    // Read old name before updating so we can cascade to entries
+    const before = await db.execute({ sql: 'SELECT first_name, last_name FROM contacts WHERE id=?', args: [params.id] });
+    if (!before.rows[0]) return Response.json({ error: 'Not found' }, { status: 404 });
+    const oldFirst = before.rows[0].first_name;
+    const oldLast  = before.rows[0].last_name;
+    const newFirst = firstName ?? '';
+    const newLast  = lastName  ?? '';
+
     await db.execute({
-      sql: `UPDATE contacts SET first_name=?, last_name=?, phone=?, email=? WHERE id=?`,
-      args: [firstName ?? '', lastName ?? '', phone ?? '', email ?? '', params.id],
+      sql:  `UPDATE contacts SET first_name=?, last_name=?, phone=?, email=? WHERE id=?`,
+      args: [newFirst, newLast, phone ?? '', email ?? '', params.id],
     });
+
+    // Cascade name change to entries if the name actually changed
+    if (oldFirst !== newFirst || oldLast !== newLast) {
+      await db.execute({
+        sql:  `UPDATE entries SET boater_first=?, boater_last=? WHERE boater_first=? AND boater_last=? COLLATE NOCASE`,
+        args: [newFirst, newLast, oldFirst, oldLast],
+      });
+      await db.execute({
+        sql:  `UPDATE entries SET co_angler_first=?, co_angler_last=? WHERE co_angler_first=? AND co_angler_last=? COLLATE NOCASE`,
+        args: [newFirst, newLast, oldFirst, oldLast],
+      });
+    }
+
     const result = await db.execute({ sql: 'SELECT * FROM contacts WHERE id=?', args: [params.id] });
-    if (!result.rows[0]) return Response.json({ error: 'Not found' }, { status: 404 });
     const r = result.rows[0];
     return Response.json({
       id:        Number(r.id),
