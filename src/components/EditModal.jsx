@@ -104,13 +104,15 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
   }
 
   function validate() {
-    if (entry?.id) return {};
     const errs = {};
-    if (!form.boaterFirst.trim()) errs.boaterFirst = 'Required';
-    if (!form.boaterLast.trim())  errs.boaterLast  = 'Required';
-    if (!form.boaterPhone.trim()) errs.boaterPhone  = 'Required';
-    const hasCoAngler = form.coAnglerFirst.trim() || form.coAnglerLast.trim();
-    if (hasCoAngler && !form.coAnglerPhone.trim()) errs.coAnglerPhone = 'Required';
+    if (!entry?.id) {
+      if (!form.boaterFirst.trim()) errs.boaterFirst = 'Required';
+      if (!form.boaterLast.trim())  errs.boaterLast  = 'Required';
+      if (!form.boaterPhone.trim()) errs.boaterPhone  = 'Required';
+      const hasCoAngler = form.coAnglerFirst.trim() || form.coAnglerLast.trim();
+      if (hasCoAngler && !form.coAnglerPhone.trim()) errs.coAnglerPhone = 'Required';
+    }
+    if (String(form.buyIn).trim() && isNaN(evalMath(String(form.buyIn)))) errs.buyIn = 'Invalid expression';
     return errs;
   }
 
@@ -275,7 +277,9 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
                        onBlur={e => {
                          const result = evalMath(e.target.value);
                          if (!isNaN(result)) set('buyIn', parseFloat(result.toFixed(2)));
-                       }} />
+                       }}
+                       style={errBorder('buyIn')} />
+                {err('buyIn')}
               </div>
             </div>
 
