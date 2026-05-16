@@ -27,6 +27,11 @@ export default function FlightsTab({ entries, settings }) {
     else groups[idx].entries.push(entry);
   }
 
+  // Overflow and unassigned boats go into the last flight
+  if (groups.length > 0 && unassigned.length > 0) {
+    groups[groups.length - 1].entries.push(...unassigned);
+  }
+
   if (flights.length === 0) {
     return (
       <div className="tab-panel active">
@@ -58,7 +63,7 @@ export default function FlightsTab({ entries, settings }) {
       <div style={{ maxWidth: 700, margin: '0 auto', paddingTop: 8 }}>
         {groups.map(({ flight, entries: flightEntries }, gIdx) => (
           <div key={gIdx} style={{ marginBottom: 24 }}>
-            <FlightDivider flight={flight} flightNum={gIdx + 1} count={flightEntries.length} />
+            <FlightDivider flight={flight} flightNum={gIdx + 1} count={flightEntries.length} isLast={gIdx === groups.length - 1} />
             {flightEntries.length === 0 ? (
               <p style={{ color: 'var(--header-bg)', fontSize: 13, padding: '10px 4px', fontStyle: 'italic' }}>
                 No boats in this flight range yet.
@@ -75,7 +80,7 @@ export default function FlightsTab({ entries, settings }) {
   );
 }
 
-function FlightDivider({ flight, flightNum, count }) {
+function FlightDivider({ flight, flightNum, count, isLast }) {
   return (
     <div style={{
       background: 'rgba(200,169,106,0.12)',
@@ -92,7 +97,7 @@ function FlightDivider({ flight, flightNum, count }) {
         <div style={{ fontWeight: 800, color: 'var(--gold-light)', fontSize: 16 }}>
           Flight {flightNum}
           <span style={{ fontWeight: 500, fontSize: 13, color: 'var(--header-bg)', marginLeft: 10 }}>
-            Boats #{flight.boatStart}–#{flight.boatEnd}
+            {isLast ? `Boats #${flight.boatStart}+ (remaining)` : `Boats #${flight.boatStart}–#${flight.boatEnd}`}
           </span>
         </div>
         <div style={{ fontSize: 12, color: 'var(--header-bg)', marginTop: 3, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
