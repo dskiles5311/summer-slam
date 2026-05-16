@@ -10,10 +10,10 @@ export async function onRequestPut({ params, request, env }) {
   if (!/^\d+$/.test(params.id)) return Response.json({ error: 'Invalid id' }, { status: 400 });
   try {
     const db = getDb(env);
-    const { phone, email } = await request.json();
+    const { firstName, lastName, phone, email } = await request.json();
     await db.execute({
-      sql: `UPDATE contacts SET phone=?, email=? WHERE id=?`,
-      args: [phone ?? '', email ?? '', params.id],
+      sql: `UPDATE contacts SET first_name=?, last_name=?, phone=?, email=? WHERE id=?`,
+      args: [firstName ?? '', lastName ?? '', phone ?? '', email ?? '', params.id],
     });
     const result = await db.execute({ sql: 'SELECT * FROM contacts WHERE id=?', args: [params.id] });
     if (!result.rows[0]) return Response.json({ error: 'Not found' }, { status: 404 });

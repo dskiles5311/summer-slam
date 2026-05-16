@@ -60,19 +60,24 @@ function parseCsv(text) {
     .filter(r => r.firstName && r.lastName);
 }
 
+const FIELD_LABEL = { fontSize: 12, fontWeight: 700, color: 'var(--header-bg)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 5, display: 'block' };
+
 function EditModal({ contact, onSave, onCancel }) {
+  const [firstName, setFirstName] = useState(contact.firstName);
+  const [lastName,  setLastName]  = useState(contact.lastName);
   const [phone, setPhone] = useState(contact.phone);
   const [email, setEmail] = useState(contact.email);
   const [saving, setSaving] = useState(false);
-  const phoneRef = useRef(null);
+  const firstRef = useRef(null);
   const overlayDownRef = useRef(false);
 
-  useEffect(() => { phoneRef.current?.focus(); }, []);
+  useEffect(() => { firstRef.current?.focus(); }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (!firstName.trim() || !lastName.trim()) return;
     setSaving(true);
-    await onSave(contact.id, { phone: phone.trim(), email: email.trim() });
+    await onSave(contact.id, { firstName: firstName.trim(), lastName: lastName.trim(), phone: phone.trim(), email: email.trim() });
     setSaving(false);
   }
 
@@ -88,19 +93,28 @@ function EditModal({ contact, onSave, onCancel }) {
             <h3>Edit Contact</h3>
             <button className="edit-panel-close" onClick={onCancel}>✕</button>
           </div>
-          <p style={{ color: 'var(--gold-light)', fontWeight: 700, fontSize: 16, marginBottom: 20 }}>
-            {contact.firstName} {contact.lastName}
-          </p>
           <form onSubmit={handleSubmit}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+              <div className="form-field">
+                <label htmlFor="ct-first" style={FIELD_LABEL}>First Name</label>
+                <input ref={firstRef} id="ct-first" name="firstName" type="text" value={firstName} placeholder="First"
+                       onChange={e => setFirstName(e.target.value)} style={FIELD_STYLE} required />
+              </div>
+              <div className="form-field">
+                <label htmlFor="ct-last" style={FIELD_LABEL}>Last Name</label>
+                <input id="ct-last" name="lastName" type="text" value={lastName} placeholder="Last"
+                       onChange={e => setLastName(e.target.value)} style={FIELD_STYLE} required />
+              </div>
+            </div>
             <div className="form-field" style={{ marginBottom: 14 }}>
-              <label htmlFor="ct-phone" style={{ fontSize: 12, fontWeight: 700, color: 'var(--header-bg)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 5, display: 'block' }}>Phone</label>
-              <input ref={phoneRef} id="ct-phone" name="phone" type="tel" value={phone} placeholder="555-123-4567"
+              <label htmlFor="ct-phone" style={FIELD_LABEL}>Phone</label>
+              <input id="ct-phone" name="phone" type="tel" value={phone} placeholder="555-123-4567"
                      onChange={e => setPhone(e.target.value)}
                      onBlur={e => setPhone(formatPhone(e.target.value))}
                      style={FIELD_STYLE} />
             </div>
             <div className="form-field" style={{ marginBottom: 20 }}>
-              <label htmlFor="ct-email" style={{ fontSize: 12, fontWeight: 700, color: 'var(--header-bg)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 5, display: 'block' }}>Email</label>
+              <label htmlFor="ct-email" style={FIELD_LABEL}>Email</label>
               <input id="ct-email" name="email" type="email" value={email} placeholder="angler@example.com"
                      onChange={e => setEmail(e.target.value)} style={FIELD_STYLE} />
             </div>

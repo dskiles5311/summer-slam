@@ -171,11 +171,11 @@ export async function fetchContacts() {
   } catch { return []; }
 }
 
-export async function updateContact(id, { phone, email }) {
+export async function updateContact(id, { firstName, lastName, phone, email }) {
   const res = await fetchWithTimeout(`${BASE}/contacts/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...authHeaders() },
-    body: JSON.stringify({ phone, email }),
+    body: JSON.stringify({ firstName, lastName, phone, email }),
   });
   if (!res.ok) throw new Error('Failed to update contact');
   return res.json();
