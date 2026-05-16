@@ -619,6 +619,11 @@ export default function RosterTab({
         </div>
       </div>
 
+      {/* Name correction tip */}
+      <div style={{ flexShrink: 0, margin: '0 0 6px', padding: '8px 14px', borderRadius: 8, background: 'rgba(139,180,225,0.07)', border: '1px solid rgba(139,180,225,0.2)', fontSize: 12, color: 'var(--header-bg)', lineHeight: 1.6 }}>
+        💡 <strong style={{ color: 'var(--white)' }}>Correcting a name?</strong> Use the <strong style={{ color: 'var(--white)' }}>Contacts tab</strong> ✏️ Edit button — it updates the contact and all matching roster entries automatically.
+      </div>
+
       {/* Table */}
       <div ref={tableContainerRef} className="table-wrapper" style={{ flex: 1, minHeight: 0, maxHeight: 'none' }}>
         <table className="roster-table" style={{ tableLayout: 'fixed', minWidth: tableMinWidth }}>
