@@ -172,11 +172,12 @@ export default function CheckInTab({ entries, onSave }) {
           {results.map(row => {
             const isOpen = expandedId === row.id;
             const appNotSigned = !isOn(row.appSigned);
+            const alreadyCheckedIn = !!row.boatNo;
             return (
               <div key={row.id} style={{
                 borderRadius: 8,
-                border: `1.5px solid ${isOpen ? 'rgba(139,180,225,0.4)' : appNotSigned ? 'rgba(255,107,107,0.3)' : 'rgba(168,200,160,0.18)'}`,
-                background: isOpen ? 'rgba(255,255,255,0.03)' : 'transparent',
+                border: `1.5px solid ${isOpen ? 'rgba(139,180,225,0.4)' : alreadyCheckedIn ? 'rgba(76,175,80,0.3)' : appNotSigned ? 'rgba(255,107,107,0.3)' : 'rgba(168,200,160,0.18)'}`,
+                background: isOpen ? 'rgba(255,255,255,0.03)' : alreadyCheckedIn ? 'rgba(76,175,80,0.04)' : 'transparent',
                 overflow: 'hidden',
               }}>
                 {/* Summary row */}
@@ -186,9 +187,9 @@ export default function CheckInTab({ entries, onSave }) {
                 }}>
                   <div style={{
                     minWidth: 36, height: 36, borderRadius: 7,
-                    background: 'rgba(139,180,225,0.1)',
+                    background: alreadyCheckedIn ? 'rgba(76,175,80,0.15)' : 'rgba(139,180,225,0.1)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontWeight: 800, fontSize: 15, color: 'var(--gold-light)', flexShrink: 0,
+                    fontWeight: 800, fontSize: 15, color: alreadyCheckedIn ? '#4CAF50' : 'var(--gold-light)', flexShrink: 0,
                   }}>
                     {row.boatNo || '—'}
                   </div>
@@ -196,8 +197,8 @@ export default function CheckInTab({ entries, onSave }) {
                     <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--white)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {row.boaterFirst} {row.boaterLast}
                     </div>
-                    <div style={{ fontSize: 12, color: 'var(--header-bg)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {row.coAnglerFirst || row.coAnglerLast
+                    <div style={{ fontSize: 12, color: alreadyCheckedIn ? '#4CAF50' : 'var(--header-bg)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {alreadyCheckedIn ? `✓ Checked in — Boat #${row.boatNo}` : row.coAnglerFirst || row.coAnglerLast
                         ? `${row.coAnglerFirst} ${row.coAnglerLast}`.trim()
                         : 'No co-angler'}
                     </div>
