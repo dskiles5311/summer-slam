@@ -25,7 +25,7 @@ export async function onRequestPut({ params, request, env }) {
       args: [newFirst, newLast, phone ?? '', email ?? '', params.id],
     });
 
-    // Cascade name change to entries if the name actually changed
+    // Cascade name change to entries and archives if the name actually changed
     if (oldFirst !== newFirst || oldLast !== newLast) {
       await db.execute({
         sql:  `UPDATE entries SET boater_first=?, boater_last=? WHERE boater_first=? COLLATE NOCASE AND boater_last=? COLLATE NOCASE`,
@@ -33,6 +33,14 @@ export async function onRequestPut({ params, request, env }) {
       });
       await db.execute({
         sql:  `UPDATE entries SET co_angler_first=?, co_angler_last=? WHERE co_angler_first=? COLLATE NOCASE AND co_angler_last=? COLLATE NOCASE`,
+        args: [newFirst, newLast, oldFirst, oldLast],
+      });
+      await db.execute({
+        sql:  `UPDATE archives SET boater_first=?, boater_last=? WHERE boater_first=? COLLATE NOCASE AND boater_last=? COLLATE NOCASE`,
+        args: [newFirst, newLast, oldFirst, oldLast],
+      });
+      await db.execute({
+        sql:  `UPDATE archives SET co_angler_first=?, co_angler_last=? WHERE co_angler_first=? COLLATE NOCASE AND co_angler_last=? COLLATE NOCASE`,
         args: [newFirst, newLast, oldFirst, oldLast],
       });
     }
