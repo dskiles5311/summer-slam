@@ -21,10 +21,11 @@ export default function OffLimitsTab({ settings }) {
       .slice()
       .sort((a, b) => (parseInt(a.boatStart) || 0) - (parseInt(b.boatStart) || 0));
     if (!flights.length) return '_No weigh-in times configured yet. Add flights in Settings._';
-    const rows = flights.map(f => {
+    const rows = flights.map((f, i) => {
       const start = String(f.boatStart).padStart(2, '0');
-      const end   = String(f.boatEnd).padStart(2, '0');
-      return `| Boats ${start}–${end} | ${f.checkInTime || '—'} |`;
+      const isLast = i === flights.length - 1;
+      const range = isLast ? `${start}+` : `${start}–${String(f.boatEnd).padStart(2, '0')}`;
+      return `| Boats ${range} | ${f.checkInTime || '—'} |`;
     });
     return `| Boats | Weigh-In Time |\n|-------|---------------|\n${rows.join('\n')}`;
   }, [settings?.flights]);
