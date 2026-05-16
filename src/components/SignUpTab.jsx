@@ -292,6 +292,10 @@ export default function SignUpTab({ onAddEntry, settings }) {
         </div>
       </form>
 
+      <div style={{ marginTop: 14, padding: '10px 14px', borderRadius: 8, background: 'rgba(139,180,225,0.07)', border: '1px solid rgba(139,180,225,0.2)', fontSize: 12, color: 'var(--header-bg)', lineHeight: 1.6 }}>
+        💡 <strong style={{ color: 'var(--white)' }}>Correcting a name?</strong> If an angler's name autofills from a saved contact and needs to be corrected, go to the <strong style={{ color: 'var(--white)' }}>Contacts tab</strong> and use the ✏️ Edit button to update the contact there.
+      </div>
+
       {/* ── Recently Signed Up ── */}
       {recent.length > 0 && (
         <div style={{ marginTop: 28 }}>
