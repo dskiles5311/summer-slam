@@ -113,7 +113,13 @@ export default function CheckInTab({ entries, onSave }) {
 
   async function handleSave(row) {
     setSaving(true);
-    try { await onSave(row.id, draft); setExpandedId(null); setDraft({}); }
+    try {
+      await onSave(row.id, draft);
+      setExpandedId(null);
+      setDraft({});
+      setQuery('');
+      setTimeout(() => searchRef.current?.focus(), 0);
+    }
     finally { setSaving(false); }
   }
 
