@@ -28,11 +28,11 @@ export async function onRequestPut({ params, request, env }) {
     // Cascade name change to entries if the name actually changed
     if (oldFirst !== newFirst || oldLast !== newLast) {
       await db.execute({
-        sql:  `UPDATE entries SET boater_first=?, boater_last=? WHERE boater_first=? AND boater_last=? COLLATE NOCASE`,
+        sql:  `UPDATE entries SET boater_first=?, boater_last=? WHERE boater_first=? COLLATE NOCASE AND boater_last=? COLLATE NOCASE`,
         args: [newFirst, newLast, oldFirst, oldLast],
       });
       await db.execute({
-        sql:  `UPDATE entries SET co_angler_first=?, co_angler_last=? WHERE co_angler_first=? AND co_angler_last=? COLLATE NOCASE`,
+        sql:  `UPDATE entries SET co_angler_first=?, co_angler_last=? WHERE co_angler_first=? COLLATE NOCASE AND co_angler_last=? COLLATE NOCASE`,
         args: [newFirst, newLast, oldFirst, oldLast],
       });
     }

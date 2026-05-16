@@ -27,9 +27,10 @@ export default function FlightsTab({ entries, settings }) {
     else groups[idx].entries.push(entry);
   }
 
-  // Overflow and unassigned boats go into the last flight
-  if (groups.length > 0 && unassigned.length > 0) {
-    groups[groups.length - 1].entries.push(...unassigned);
+  // Numeric boat numbers outside all defined ranges go into the last flight
+  if (groups.length > 0) {
+    const overflow = unassigned.filter(e => !isNaN(parseInt(e.boatNo)));
+    groups[groups.length - 1].entries.push(...overflow);
   }
 
   if (flights.length === 0) {
