@@ -83,12 +83,12 @@ export function getStats(entries, fees) {
   const named = entries.filter(r => r.boaterFirst || r.boaterLast);
   const boated = entries.filter(r => r.boatNo);
 
-  const lunkerRows = boated.filter(r => r.lunker === 1 && parseFloat(r.lunkerWeight) > 0);
+  const lunkerRows = boated.filter(r => r.lunker === 1 && parseFloat(r.lunkerWeight) > 0 && !r._isDQ);
   const topLunkerRow = lunkerRows.length
     ? lunkerRows.reduce((best, r) => parseFloat(r.lunkerWeight) > parseFloat(best.lunkerWeight) ? r : best)
     : null;
 
-  const bagRows = named.filter(r => r.paid === 1 && r.appSigned === 1 && parseFloat(r.totalWeight) > 0);
+  const bagRows = named.filter(r => r.paid === 1 && r.appSigned === 1 && parseFloat(r.totalWeight) > 0 && !r._isDQ);
   const topBagRow = bagRows.length
     ? bagRows.reduce((best, r) => parseFloat(r.totalWeight) > parseFloat(best.totalWeight) ? r : best)
     : null;
