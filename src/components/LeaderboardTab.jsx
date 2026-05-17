@@ -48,15 +48,11 @@ export default function LeaderboardTab({ entries, settings }) {
       <div className="leaderboard-header">
         <h2>🎣 Summer Slam! 🎣</h2>
         <p style={{ color: 'var(--header-bg)', fontSize: 12, letterSpacing: 2, textTransform: 'uppercase', marginTop: 4 }}>
-          Live Tournament Leaderboard
+          Live Tournament Leaderboard &nbsp;·&nbsp; {boatsWeighed} of {checkedInCount} Boats Weighed
         </p>
       </div>
 
       <div className="summary-grid-top" style={{ marginBottom: 12, maxWidth: 900, marginLeft: 'auto', marginRight: 'auto' }}>
-        <div className="summary-chip">
-          <span className="sc-lbl">Boats Weighed</span>
-          <span className="sc-val">{boatsWeighed} <span style={{ fontSize: '0.65em', opacity: 0.7 }}>of {checkedInCount}</span></span>
-        </div>
         <div className="summary-chip">
           <span className="sc-lbl">Total Weight</span>
           <span className="sc-val">{totalWeight} lbs</span>
