@@ -32,6 +32,9 @@ export default function LeaderboardTab({ entries, settings }) {
   const option1Payout = (optionPot * option1Pct).toFixed(2);
   const option2Payout = (optionPot * (1 - option1Pct)).toFixed(2);
 
+  const checkedInCount = entries.filter(e => e.boatNo).length;
+  const boatsWeighed   = entries.filter(e => e.boatNo && parseFloat(e.totalWeight) > 0).length;
+
   const recentWeighCount = parseInt(settings.recentWeighCount) || 2;
   const recentEntries = recentWeighCount > 0
     ? [...entries]
@@ -50,6 +53,10 @@ export default function LeaderboardTab({ entries, settings }) {
       </div>
 
       <div className="summary-grid-top" style={{ marginBottom: 12, maxWidth: 900, marginLeft: 'auto', marginRight: 'auto' }}>
+        <div className="summary-chip">
+          <span className="sc-lbl">Boats Weighed</span>
+          <span className="sc-val">{boatsWeighed} <span style={{ fontSize: '0.65em', opacity: 0.7 }}>of {checkedInCount}</span></span>
+        </div>
         <div className="summary-chip">
           <span className="sc-lbl">Total Weight</span>
           <span className="sc-val">{totalWeight} lbs</span>
