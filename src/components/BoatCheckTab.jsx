@@ -54,22 +54,26 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggleOf
         </div>
         <div style={{ flex: 1 }} />
         {isUnlocked && (
-          <form onSubmit={handleQuickCheckOut} style={{ display: 'flex', alignItems: 'center', gap: 8, flex: '1 1 130px', minWidth: 0 }}>
+          <form onSubmit={handleQuickCheckOut} style={{ display: 'flex', alignItems: 'center', gap: 6, flex: '1 1 160px', minWidth: 0 }}>
             <input
               ref={inputRef}
               type="text"
               inputMode="numeric"
-              placeholder="Boat # + Enter"
+              pattern="[0-9]*"
+              placeholder="Boat #…"
               value={boatInput}
               onChange={e => setBoatInput(e.target.value)}
               style={{
-                width: '100%', maxWidth: 180, padding: '6px 10px', borderRadius: 6,
+                width: '100%', maxWidth: 100, padding: '6px 10px', borderRadius: 6,
                 background: 'rgba(255,255,255,0.07)',
                 border: '1px solid rgba(139,180,225,0.28)',
                 color: 'var(--white)', fontSize: 14, outline: 'none',
                 boxSizing: 'border-box',
               }}
             />
+            <button type="submit" className="btn btn-primary btn-sm" style={{ whiteSpace: 'nowrap', minHeight: 36 }}>
+              Check Out
+            </button>
           </form>
         )}
         {isUnlocked && offWaterCount > 0 && (
