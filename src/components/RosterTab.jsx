@@ -449,6 +449,9 @@ export default function RosterTab({
         if (lockedSortBy === 'signedUpAt') {
           va = a.signedUpAt ? new Date(a.signedUpAt.includes('T') ? a.signedUpAt : a.signedUpAt.replace(' ', 'T')).getTime() : 0;
           vb = b.signedUpAt ? new Date(b.signedUpAt.includes('T') ? b.signedUpAt : b.signedUpAt.replace(' ', 'T')).getTime() : 0;
+        } else if (lockedSortBy === 'boatNo') {
+          va = a.boatNo ? (parseFloat(a.boatNo) || 0) : Infinity;
+          vb = b.boatNo ? (parseFloat(b.boatNo) || 0) : Infinity;
         } else {
           va = (a[lockedSortBy] || '').toLowerCase();
           vb = (b[lockedSortBy] || '').toLowerCase();
@@ -483,9 +486,9 @@ export default function RosterTab({
         <div className="table-wrapper" style={{ flex: 1, minHeight: 0, maxHeight: 'none' }}>
           <table style={{ tableLayout: 'fixed', minWidth: 600 }}>
             <colgroup>
-              <col style={{ width: '22%' }} /><col style={{ width: '22%' }} />
-              <col style={{ width: '22%' }} /><col style={{ width: '22%' }} />
-              <col style={{ width: '12%' }} />
+              <col style={{ width: '20%' }} /><col style={{ width: '20%' }} />
+              <col style={{ width: '20%' }} /><col style={{ width: '20%' }} />
+              <col style={{ width: '8%' }} /><col style={{ width: '12%' }} />
             </colgroup>
             <thead>
               <tr>
@@ -493,6 +496,7 @@ export default function RosterTab({
                 <LockedSortTh col="boaterLast"     label="Boater Last" />
                 <LockedSortTh col="coAnglerFirst"  label="Co-Angler First" />
                 <LockedSortTh col="coAnglerLast"   label="Co-Angler Last" />
+                <LockedSortTh col="boatNo"         label="Boat #" style={{ textAlign: 'center' }} />
                 <LockedSortTh col="signedUpAt"     label="Signed Up" style={{ textAlign: 'center' }} />
               </tr>
             </thead>
@@ -503,11 +507,12 @@ export default function RosterTab({
                   <td className="td-name">{row.boaterLast}</td>
                   <td className="td-name">{row.coAnglerFirst}</td>
                   <td className="td-name">{row.coAnglerLast}</td>
+                  <td style={{ textAlign: 'center', fontWeight: 700, color: row.boatNo ? 'var(--gold-light)' : 'var(--header-bg)' }}>{row.boatNo || '—'}</td>
                   <td style={{ textAlign: 'center', fontSize: 11, color: 'var(--header-bg)', whiteSpace: 'nowrap' }}>{fmtSignedUp(row.signedUpAt)}</td>
                 </tr>
               ))}
               {lockedSorted.length === 0 && (
-                <tr><td colSpan={5} style={{ textAlign: 'center', color: 'var(--header-bg)', padding: 40 }}>No registered entries yet.</td></tr>
+                <tr><td colSpan={6} style={{ textAlign: 'center', color: 'var(--header-bg)', padding: 40 }}>No registered entries yet.</td></tr>
               )}
             </tbody>
           </table>
