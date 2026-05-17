@@ -33,17 +33,17 @@ export function calcRanks(entries, settings) {
     const base = parseFloat(entry.totalWeight) || 0;
     const noLate = { ...entry, _latePenalty: 0, _isDQ: false, _minsLate: 0, _effectiveWeight: base };
 
-    if (!entry.weighedAt || !entry.boatNo || !flights.length) return noLate;
+    if (!entry.checkedInAt || !entry.boatNo || !flights.length) return noLate;
 
     const boatNum = parseInt(entry.boatNo);
     const flight  = flights.find(f => boatNum >= parseInt(f.boatStart) && boatNum <= parseInt(f.boatEnd));
     if (!flight?.checkInTime) return noLate;
 
-    const weighedDate = new Date(entry.weighedAt);
-    const checkIn     = parseFlightTime(flight.checkInTime, weighedDate);
+    const checkedInDate = new Date(entry.checkedInAt);
+    const checkIn       = parseFlightTime(flight.checkInTime, checkedInDate);
     if (!checkIn) return noLate;
 
-    const minsLate = Math.max(0, Math.floor((weighedDate - checkIn) / 60000));
+    const minsLate = Math.max(0, Math.floor((checkedInDate - checkIn) / 60000));
     if (minsLate === 0) return noLate;
 
     if (minsLate >= lateDQMin) {

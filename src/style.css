@@ -122,10 +122,14 @@ header {
 }
 .nav-tabs {
   display: flex;
+  flex-wrap: nowrap;
   gap: 2px;
   padding: 0 20px;
   background: transparent;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+.nav-tabs::-webkit-scrollbar { display: none; }
 
 .nav-tab {
   padding: 12px 22px;
@@ -733,13 +737,7 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
 
   /* Nav tabs: scroll horizontally, never wrap */
   .nav-tabs-wrap::after { display: block; }
-  .nav-tabs {
-    overflow-x: auto;
-    scrollbar-width: none;
-    flex-wrap: nowrap;
-    padding: 0 12px;
-  }
-  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tabs { padding: 0 12px; }
   .nav-tab { white-space: nowrap; padding: 10px 14px; }
 
   main { padding: 12px 10px; }
