@@ -300,7 +300,20 @@ export default function CheckInTab({ entries, onSave }) {
                       <ToggleField label="Option" on={isOn(draft.option)} onToggle={() => toggle('option')} />
                     </div>
 
-                    {/* App Signed */}
+                    {/* Paid / App Signed */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                    <div>
+                      <span style={LABEL_STYLE}>Paid</span>
+                      <button type="button" onClick={() => toggle('paid')} style={{
+                        width: '100%', padding: '8px 0', borderRadius: 6,
+                        fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                        border: `1.5px solid ${isOn(draft.paid) ? '#4CAF50' : '#ff6b6b'}`,
+                        background: isOn(draft.paid) ? 'rgba(76,175,80,0.18)' : 'rgba(255,107,107,0.12)',
+                        color: isOn(draft.paid) ? '#4CAF50' : '#ff9090',
+                      }}>
+                        {isOn(draft.paid) ? '✓ Paid' : '✕ Not Paid — tap to mark paid'}
+                      </button>
+                    </div>
                     <div>
                       <span style={LABEL_STYLE}>App Signed</span>
                       <button type="button" onClick={() => toggle('appSigned')} style={{
@@ -312,6 +325,7 @@ export default function CheckInTab({ entries, onSave }) {
                       }}>
                         {isOn(draft.appSigned) ? '✓ Signed' : '✕ Not Signed — tap to mark signed'}
                       </button>
+                    </div>
                     </div>
 
                     {/* Actions */}
