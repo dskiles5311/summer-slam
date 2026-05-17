@@ -443,8 +443,8 @@ export default function RosterTab({
         </th>
       );
     }
-    const lockedSorted = [...entries]
-      .filter(e => (e.paid === 1 || e.paid === '1') && (e.appSigned === 1 || e.appSigned === '1'))
+    const lockedQualified = entries.filter(e => (e.paid === 1 || e.paid === '1') && (e.appSigned === 1 || e.appSigned === '1'));
+    const lockedSorted = [...lockedQualified]
       .filter(e => !lockedBoatFilter.trim() || String(e.boatNo || '') === lockedBoatFilter.trim())
       .sort((a, b) => {
         let va, vb;
@@ -474,7 +474,7 @@ export default function RosterTab({
       <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
         <div style={{ padding: '16px 20px 12px', flexShrink: 0, background: 'rgba(255,180,80,0.1)', borderBottom: '2px solid rgba(255,180,80,0.35)', textAlign: 'center' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,180,80,0.2)', border: '1px solid rgba(255,180,80,0.5)', borderRadius: 10, padding: '6px 20px', marginBottom: 10 }}>
-            <span style={{ fontSize: 28, fontWeight: 800, color: 'var(--gold-light)', lineHeight: 1 }}>{lockedSorted.length}</span>
+            <span style={{ fontSize: 28, fontWeight: 800, color: 'var(--gold-light)', lineHeight: 1 }}>{lockedQualified.length}</span>
             <span style={{ fontSize: 13, color: 'var(--gold-light)', opacity: 0.85, textTransform: 'uppercase', letterSpacing: 2, marginLeft: 8 }}>Teams Registered</span>
           </div>
           <p style={{ fontSize: 15, color: 'var(--gold-light)', lineHeight: 1.65, margin: 0, maxWidth: 700, marginLeft: 'auto', marginRight: 'auto' }}>
