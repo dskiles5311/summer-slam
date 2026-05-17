@@ -73,9 +73,10 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
             <span className="lbl">Total Weight · {stats.totalNumFish} fish</span>
           </div>
           {isUnlocked && (
-            <div className="stat-chip" style={{ borderColor: 'rgba(255,107,107,0.4)', filter: buyInFilter, transition: 'filter 0.25s', cursor: 'pointer', userSelect: 'none' }} onClick={onToggleBuyInBlur} title={buyInBlurred ? 'Tap to reveal' : 'Tap to hide'}>
-              <span className="val" style={{ color: '#ff9090', fontSize: 13, lineHeight: 1.4 }}>
-                {stats.totalDeadFish} dead / {stats.totalShortFish} short
+            <div className="stat-chip" style={{ borderColor: 'rgba(255,107,107,0.4)', cursor: 'pointer', userSelect: 'none' }} onClick={onToggleBuyInBlur} title={buyInBlurred ? 'Tap to reveal' : 'Tap to hide'}>
+              <span className="val" style={{ color: '#ff9090', fontSize: 13, lineHeight: 1.5, filter: buyInFilter, transition: 'filter 0.25s' }}>
+                <span style={{ display: 'block' }}>{stats.totalDeadFish} dead</span>
+                <span style={{ display: 'block' }}>{stats.totalShortFish} short</span>
               </span>
               <span className="lbl" style={{ color: 'rgba(255,107,107,0.8)' }}>Deductions</span>
             </div>
