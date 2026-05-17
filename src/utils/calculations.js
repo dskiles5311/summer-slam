@@ -93,7 +93,12 @@ export function getStats(entries, fees) {
     ? bagRows.reduce((best, r) => parseFloat(r.totalWeight) > parseFloat(best.totalWeight) ? r : best)
     : null;
 
-  const totalWeight = bagRows.reduce((s, r) => s + (parseFloat(r.totalWeight) || 0), 0);
+  const totalWeight      = bagRows.reduce((s, r) => s + (parseFloat(r.totalWeight) || 0), 0);
+  const weighedEntries   = entries.filter(r => parseFloat(r.totalWeight) > 0);
+  const grandTotalWeight = weighedEntries.reduce((s, r) => s + (parseFloat(r.totalWeight) || 0), 0);
+  const totalNumFish     = weighedEntries.reduce((s, r) => s + (parseInt(r.numFish) || 0), 0);
+  const totalDeadFish    = entries.reduce((s, r) => s + (parseInt(r.deadFish)  || 0), 0);
+  const totalShortFish   = entries.reduce((s, r) => s + (parseInt(r.shortFish) || 0), 0);
   const totalBuyIn = named.reduce((s, r) => s + (parseFloat(r.buyIn) || 0), 0);
   const lunkerPaidCount = named.filter(r => r.lunker === 1).length;
   const optionPaidCount = named.filter(r => r.option === 1).length;
@@ -107,6 +112,10 @@ export function getStats(entries, fees) {
     largestBag: topBagRow ? parseFloat(topBagRow.totalWeight).toFixed(2) : '0.00',
     largestBagRow: topBagRow,
     totalWeight: totalWeight.toFixed(2),
+    grandTotalWeight: grandTotalWeight.toFixed(2),
+    totalNumFish,
+    totalDeadFish,
+    totalShortFish,
     totalBuyIn: totalBuyIn.toFixed(2),
     lunkerPot: lunkerPot.toFixed(2),
     optionPot: optionPot.toFixed(2),
