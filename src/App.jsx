@@ -319,8 +319,14 @@ export default function App() {
     }
   }
 
-  async function handleResetBoatCheck() {
-    await handleUpdateSettings({ boatCheck: {}, offWater: {} });
+  function handleResetBoatCheck() {
+    setConfirmAction({
+      label: 'reset all check-out statuses (clears every off-water flag)',
+      action: async () => {
+        await handleUpdateSettings({ boatCheck: {}, offWater: {} });
+        showToast('Check-out log reset', 'info');
+      },
+    });
   }
 
   function handleClearWeighLog() {
