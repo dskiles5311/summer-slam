@@ -1,10 +1,31 @@
-import { useMemo } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 export default function BoatCheckTab({ entries, settings, isUnlocked, onToggleOffWater, onReset }) {
   const offWater = settings.offWater || {};
   const boatedEntries = entries.filter(e => e.boatNo !== '' && e.boatNo != null);
   const offWaterCount = boatedEntries.filter(e => offWater[e.id]).length;
   const allClear = boatedEntries.length > 0 && offWaterCount === boatedEntries.length;
+
+  const [boatInput, setBoatInput] = useState('');
+  const [flashMsg, setFlashMsg]   = useState(null);
+  const inputRef = useRef(null);
+
+  function handleQuickCheckOut(e) {
+    e.preventDefault();
+    const val = boatInput.trim();
+    if (!val) return;
+    const match = entries.find(en => String(en.boatNo) === val);
+    if (!match) {
+      setFlashMsg({ type: 'error', text: `Boat #${val} not found` });
+    } else if (offWater[match.id]) {
+      setFlashMsg({ type: 'warn', text: `Boat #${val} already checked out` });
+    } else {
+      onToggleOffWater(match.id);
+      setFlashMsg({ type: 'ok', text: `Boat #${val} checked out` });
+    }
+    setBoatInput('');
+    setTimeout(() => { setFlashMsg(null); inputRef.current?.focus(); }, 1800);
+  }
 
   const sorted = useMemo(() =>
     [...entries].filter(e => e.boatNo !== '' && e.boatNo != null).sort((a, b) => {
@@ -32,10 +53,40 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggleOf
           </div>
         </div>
         <div style={{ flex: 1 }} />
+        {isUnlocked && (
+          <form onSubmit={handleQuickCheckOut} style={{ display: 'flex', alignItems: 'center', gap: 8, flex: '1 1 130px', minWidth: 0 }}>
+            <input
+              ref={inputRef}
+              type="text"
+              inputMode="numeric"
+              placeholder="Boat # + Enter"
+              value={boatInput}
+              onChange={e => setBoatInput(e.target.value)}
+              style={{
+                width: '100%', maxWidth: 180, padding: '6px 10px', borderRadius: 6,
+                background: 'rgba(255,255,255,0.07)',
+                border: '1px solid rgba(139,180,225,0.28)',
+                color: 'var(--white)', fontSize: 14, outline: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+          </form>
+        )}
         {isUnlocked && offWaterCount > 0 && (
           <button className="btn btn-outline" onClick={onReset}>↺ Reset All</button>
         )}
       </div>
+
+      {flashMsg && (
+        <div style={{
+          margin: '0 0 10px 0', padding: '7px 14px', borderRadius: 6, fontSize: 13, fontWeight: 700,
+          background: flashMsg.type === 'ok' ? 'rgba(76,175,80,0.15)' : 'rgba(255,107,107,0.15)',
+          border: `1px solid ${flashMsg.type === 'ok' ? 'rgba(76,175,80,0.4)' : 'rgba(255,107,107,0.4)'}`,
+          color: flashMsg.type === 'ok' ? '#4CAF50' : '#ff9090',
+        }}>
+          {flashMsg.type === 'ok' ? '✓' : '⚠️'} {flashMsg.text}
+        </div>
+      )}
 
       {!isUnlocked && (
         <div style={{ background: 'rgba(255,180,80,0.1)', border: '1px solid rgba(255,180,80,0.3)', borderRadius: 8, padding: '10px 16px', margin: '0 0 16px 0', fontSize: 13, color: 'rgba(255,180,80,0.9)' }}>
