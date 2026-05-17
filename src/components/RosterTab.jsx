@@ -96,6 +96,7 @@ export default function RosterTab({
   });
   const [lockedSortBy,   setLockedSortBy]   = useState('boaterFirst');
   const [lockedSortDesc, setLockedSortDesc] = useState(false);
+  const [lockedBoatFilter, setLockedBoatFilter] = useState('');
   const [globalFilter, setGlobalFilter] = useState({ text: '', regFilter: 'all' });
   const [editingId, setEditingId]       = useState(null);
   const [editValues, setEditValues]     = useState({});
@@ -444,6 +445,7 @@ export default function RosterTab({
     }
     const lockedSorted = [...entries]
       .filter(e => (e.paid === 1 || e.paid === '1') && (e.appSigned === 1 || e.appSigned === '1'))
+      .filter(e => !lockedBoatFilter.trim() || String(e.boatNo || '').includes(lockedBoatFilter.trim()))
       .sort((a, b) => {
         let va, vb;
         if (lockedSortBy === 'signedUpAt') {
@@ -482,6 +484,22 @@ export default function RosterTab({
             <a href="mailto:info@sfttackle.com" style={{ color: 'var(--gold-light)' }}>info@sfttackle.com</a>
             {' '}with a signed application and proof of purchase!
           </p>
+        </div>
+        <div style={{ padding: '8px 16px', flexShrink: 0, borderBottom: '1px solid rgba(168,200,160,0.13)' }}>
+          <input
+            type="search"
+            placeholder="Filter by boat #…"
+            value={lockedBoatFilter}
+            onChange={e => setLockedBoatFilter(e.target.value)}
+            style={{
+              width: '100%', maxWidth: 220,
+              background: 'rgba(255,255,255,0.07)',
+              border: '1px solid rgba(139,180,225,0.28)',
+              borderRadius: 6, color: 'var(--white)',
+              fontSize: 14, padding: '6px 10px', outline: 'none',
+              boxSizing: 'border-box',
+            }}
+          />
         </div>
         <div className="table-wrapper" style={{ flex: 1, minHeight: 0, maxHeight: 'none' }}>
           <table style={{ tableLayout: 'fixed', minWidth: 600 }}>
