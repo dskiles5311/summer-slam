@@ -154,6 +154,10 @@ export default function RosterTab({
     countAnglers(entries.filter(e => (e.paid === 1 || e.paid === '1') && (e.appSigned === 1 || e.appSigned === '1'))),
   [entries]);
 
+  const checkedInAnglerCount = useMemo(() =>
+    countAnglers(entries.filter(e => (e.paid === 1 || e.paid === '1') && (e.appSigned === 1 || e.appSigned === '1') && e.boatNo)),
+  [entries]);
+
   const duplicateBoatNos = useMemo(() => {
     const counts = {};
     entries.forEach(e => { if (e.boatNo) counts[e.boatNo] = (counts[e.boatNo] || 0) + 1; });
@@ -600,7 +604,7 @@ export default function RosterTab({
           }}
         >
           {regFilter === 'all'          && `All ${entries.length} entries — ${allAnglerCount} anglers`}
-          {regFilter === 'registered'   && `${registeredCount} / ${entries.length} registered — ${registeredAnglerCount} anglers`}
+          {regFilter === 'registered'   && `${registeredCount} / ${entries.length} registered — ${registeredAnglerCount} anglers (${checkedInAnglerCount} checked in)`}
           {regFilter === 'unregistered' && `${entries.length - registeredCount} / ${entries.length} not registered`}
           {globalFilter.text && <span style={{ opacity: 0.65 }}>{` (${filteredCount} shown)`}</span>}
         </button>
