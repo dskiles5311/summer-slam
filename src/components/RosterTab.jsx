@@ -445,7 +445,7 @@ export default function RosterTab({
     }
     const lockedSorted = [...entries]
       .filter(e => (e.paid === 1 || e.paid === '1') && (e.appSigned === 1 || e.appSigned === '1'))
-      .filter(e => !lockedBoatFilter.trim() || String(e.boatNo || '').includes(lockedBoatFilter.trim()))
+      .filter(e => !lockedBoatFilter.trim() || String(e.boatNo || '') === lockedBoatFilter.trim())
       .sort((a, b) => {
         let va, vb;
         if (lockedSortBy === 'signedUpAt') {
