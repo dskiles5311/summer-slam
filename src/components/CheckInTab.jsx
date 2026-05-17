@@ -95,6 +95,7 @@ export default function CheckInTab({ entries, onSave }) {
       boatNo:    row.boatNo    || '',
       lunker:    row.lunker    ?? '',
       option:    row.option    ?? '',
+      paid:      row.paid      ?? '',
       appSigned: row.appSigned ?? '',
     });
   }
@@ -172,11 +173,12 @@ export default function CheckInTab({ entries, onSave }) {
           {results.map(row => {
             const isOpen = expandedId === row.id;
             const appNotSigned = !isOn(row.appSigned);
+            const notPaid = !isOn(row.paid);
             const alreadyCheckedIn = !!row.boatNo;
             return (
               <div key={row.id} style={{
                 borderRadius: 8,
-                border: `1.5px solid ${isOpen ? 'rgba(139,180,225,0.4)' : alreadyCheckedIn ? 'rgba(76,175,80,0.3)' : appNotSigned ? 'rgba(255,107,107,0.3)' : 'rgba(168,200,160,0.18)'}`,
+                border: `1.5px solid ${isOpen ? 'rgba(139,180,225,0.4)' : alreadyCheckedIn ? 'rgba(76,175,80,0.3)' : (appNotSigned || notPaid) ? 'rgba(255,107,107,0.3)' : 'rgba(168,200,160,0.18)'}`,
                 background: isOpen ? 'rgba(255,255,255,0.03)' : alreadyCheckedIn ? 'rgba(76,175,80,0.04)' : 'transparent',
                 overflow: 'hidden',
               }}>
@@ -204,6 +206,9 @@ export default function CheckInTab({ entries, onSave }) {
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                    {notPaid && (
+                      <span style={{ fontSize: 10, background: 'rgba(255,107,107,0.2)', color: '#ff6b6b', borderRadius: 4, padding: '1px 6px', fontWeight: 700 }}>$</span>
+                    )}
                     {appNotSigned && (
                       <span style={{ fontSize: 10, background: 'rgba(255,107,107,0.2)', color: '#ff6b6b', borderRadius: 4, padding: '1px 6px', fontWeight: 700 }}>!</span>
                     )}
@@ -217,6 +222,19 @@ export default function CheckInTab({ entries, onSave }) {
                 {isOpen && (
                   <form onSubmit={e => { e.preventDefault(); handleSave(row); }}
                     style={{ padding: '10px 12px 12px', borderTop: '1px solid rgba(168,200,160,0.12)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+
+                    {/* Not paid alert */}
+                    {!isOn(draft.paid) && (
+                      <div style={{
+                        background: 'rgba(255,107,107,0.1)',
+                        border: '1px solid rgba(255,107,107,0.4)',
+                        borderRadius: 6,
+                        padding: '8px 12px',
+                        fontSize: 12, color: '#ff9090', fontWeight: 700,
+                      }}>
+                        ⚠️ Entry fee not paid — collect payment before weigh-in.
+                      </div>
+                    )}
 
                     {/* App not signed alert */}
                     {!isOn(draft.appSigned) && (
