@@ -233,7 +233,7 @@ export default function LeaderboardTab({ entries, settings }) {
           const isOpt2    = option2Row && row.id === option2Row.id;
           const hasBadge  = isLunker1 || isLunker2 || isOpt1 || isOpt2;
 
-          const BADGE = { display: 'inline-flex', alignItems: 'center', gap: 3, borderRadius: 5, padding: '2px 7px', fontSize: 11, fontWeight: 700, letterSpacing: 0.3 };
+          const BADGE = { display: 'inline-flex', alignItems: 'center', gap: 4, borderRadius: 6, padding: '4px 10px', fontSize: 13, fontWeight: 700, letterSpacing: 0.3 };
 
           return (
             <div key={row.id} className={`lb-card ${cardClass}${idx >= topN ? ' lb-print-only' : ''}`}>
@@ -248,11 +248,11 @@ export default function LeaderboardTab({ entries, settings }) {
                   {coName !== '—' && <span className="lb-co">, {coName}</span>}
                 </div>
                 {hasBadge && (
-                  <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 5 }}>
-                    {isLunker1 && <span style={{ ...BADGE, background: 'rgba(255,180,80,0.18)', border: '1px solid rgba(255,180,80,0.6)', color: '#ffb450' }}>🎯 Lunker</span>}
-                    {isLunker2 && <span style={{ ...BADGE, background: 'rgba(200,200,210,0.12)', border: '1px solid rgba(200,200,210,0.4)', color: '#b0b8c8' }}>🎯 Lunker 2nd</span>}
-                    {isOpt1    && <span style={{ ...BADGE, background: 'rgba(120,200,255,0.15)', border: '1px solid rgba(120,200,255,0.5)', color: '#78c8ff' }}>⚡ Option 1</span>}
-                    {isOpt2    && <span style={{ ...BADGE, background: 'rgba(120,200,255,0.08)', border: '1px solid rgba(120,200,255,0.3)', color: 'rgba(120,200,255,0.75)' }}>⚡ Option 2</span>}
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
+                    {isLunker1 && <span style={{ ...BADGE, background: 'rgba(255,180,80,0.35)', border: '1px solid rgba(255,180,80,0.85)', color: '#ffb450' }}>🎯 Lunker</span>}
+                    {isLunker2 && <span style={{ ...BADGE, background: 'rgba(200,200,210,0.25)', border: '1px solid rgba(200,200,210,0.7)', color: '#c8d0e0' }}>🎯 Lunker 2nd</span>}
+                    {isOpt1    && <span style={{ ...BADGE, background: 'rgba(120,200,255,0.30)', border: '1px solid rgba(120,200,255,0.85)', color: '#78c8ff' }}>⚡ Option 1</span>}
+                    {isOpt2    && <span style={{ ...BADGE, background: 'rgba(120,200,255,0.18)', border: '1px solid rgba(120,200,255,0.6)', color: '#a8dcff' }}>⚡ Option 2</span>}
                   </div>
                 )}
               </div>
