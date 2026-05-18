@@ -313,7 +313,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
         {/* Tournament Day */}
         <div style={PANEL}>
           <h3 style={H3}>Tournament Day</h3>
-          <div className="form-field" style={{ maxWidth: 220 }}>
+          <div className="form-field" style={{ maxWidth: 220, margin: '0 auto' }}>
             <label htmlFor="st-tournament-date">Tournament Date</label>
             <input
               id="st-tournament-date"
@@ -326,11 +326,11 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
             />
           </div>
           {tournamentDate && (
-            <p style={{ color: 'var(--header-bg)', fontSize: 12, marginTop: 10 }}>
+            <p style={{ color: 'var(--header-bg)', fontSize: 12, marginTop: 10, textAlign: 'center' }}>
               {new Date(tournamentDate + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
           )}
-          <div className="form-field" style={{ maxWidth: 220, marginTop: 14 }}>
+          <div className="form-field" style={{ maxWidth: 220, marginTop: 14, margin: '14px auto 0' }}>
             <label htmlFor="st-checkin-opens">Check-In Opens</label>
             <input
               id="st-checkin-opens"
@@ -343,7 +343,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
             />
           </div>
           {checkInOpens && (
-            <p style={{ color: 'var(--header-bg)', fontSize: 12, marginTop: 6 }}>
+            <p style={{ color: 'var(--header-bg)', fontSize: 12, marginTop: 6, textAlign: 'center' }}>
               DNS markers appear on the leaderboard after {new Date('1970-01-01T' + checkInOpens).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
             </p>
           )}
@@ -520,7 +520,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
         {/* Leaderboard Display */}
         <div style={PANEL}>
           <h3 style={H3}>Leaderboard Display</h3>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 12 }}>
             <span style={{ fontSize: 13, color: 'var(--text)' }}>Recently Weighed Section</span>
             <button
               type="button"
@@ -536,7 +536,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
               {settings.showRecentWeighed !== false ? '✓ On' : '✕ Off'}
             </button>
           </div>
-          <div className="edit-grid-3">
+          <div className="edit-grid-3" style={{ maxWidth: 220, margin: '0 auto' }}>
             <div className="form-field">
               <label htmlFor="st-recent-weigh-count">Recent Weigh-Ins to Show</label>
               <input id="st-recent-weigh-count" name="recentWeighCount" type="number" value={settings.recentWeighCount ?? 2} min="1" max="10" step="1" disabled={locked || settings.showRecentWeighed === false}
@@ -548,7 +548,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           </p>
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', marginTop: 16, paddingTop: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 12 }}>
               <span style={{ fontSize: 13, color: 'var(--text)' }}>Currently Weighing Section</span>
               <button
                 type="button"
@@ -564,7 +564,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
                 {settings.showCurrentlyWeighing !== false ? '✓ On' : '✕ Off'}
               </button>
             </div>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end' }}>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end', justifyContent: 'center', maxWidth: 300, margin: '0 auto' }}>
               <div className="form-field" style={{ flex: 1 }}>
                 <label htmlFor="st-cw-duration">Display Duration</label>
                 <input id="st-cw-duration" name="currentlyWeighingDuration" type="number"
