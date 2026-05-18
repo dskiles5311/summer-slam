@@ -154,7 +154,7 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry, o
 
     if (ok) {
       const name = histName;
-      setHistory(prev => [{ boatNo: no, name, nf: adjustedNumFish, lw, raw: rawTw, adj: adjustedWeight, pen: pen.total }, ...prev].slice(0, 10));
+      setHistory(prev => [{ boatNo: no, name, nf: adjustedNumFish, origNumFish: nf, deadFish: pen.dead, shortFish: pen.shrt, lw, raw: rawTw, adj: adjustedWeight, pen: pen.total }, ...prev].slice(0, 10));
       reset();
     }
   }
@@ -163,6 +163,18 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry, o
     setBoatNo(''); setNumFish(''); setDeadFish(''); setShortFish('');
     setLunkerWeight(''); setTotalWeight(''); setStatus(null); setOverwriteConfirmed(false);
     boatRef.current?.focus();
+  }
+
+  function loadHistory(h) {
+    setBoatNo(String(h.boatNo));
+    setNumFish(String(h.origNumFish));
+    setDeadFish(String(h.deadFish));
+    setShortFish(String(h.shortFish));
+    setLunkerWeight(h.lw > 0 ? String(h.lw) : '');
+    setTotalWeight(String(h.raw));
+    setOverwriteConfirmed(true);
+    lookupBoat(String(h.boatNo));
+    fishRef.current?.focus();
   }
 
   const statusColors = { ok: '#4CAF50', warning: '#ffb450', error: '#ff6b6b', notfound: '#ff6b6b', adding: '#ffb450' };
@@ -334,7 +346,9 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry, o
           <h3 style={{ color: 'var(--header-bg)', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Recent</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {history.map((h, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.04)', borderRadius: 8, padding: '8px 12px', fontSize: 13 }}>
+              <div key={i} onClick={() => loadHistory(h)}
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.04)', borderRadius: 8, padding: '8px 12px', fontSize: 13, cursor: 'pointer', userSelect: 'none' }}
+                title="Click to reload and edit">
                 <span style={{ fontWeight: 700, color: 'var(--gold-light)', minWidth: 50 }}>#{h.boatNo}</span>
                 <span style={{ flex: 1, color: 'var(--white)' }}>{h.name}</span>
                 <span style={{ color: 'var(--header-bg)', fontSize: 12 }}>
@@ -344,6 +358,7 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry, o
                     : <>{h.adj.toFixed(2)} lbs</>
                   }
                 </span>
+                <span style={{ color: 'var(--header-bg)', fontSize: 11, marginLeft: 10 }}>✏️</span>
               </div>
             ))}
           </div>
