@@ -3,6 +3,7 @@ import { calcWeightedPayouts } from '../utils/calculations';
 import { exportCSV, importCSV } from '../utils/csv';
 import { evalMath } from '../utils/evalMath';
 import { fetchEventLog, clearEventLog } from '../utils/api';
+import { exportRosterPdf } from '../utils/exportRosterPdf';
 
 const PANEL = { background: 'var(--settings-panel-bg)', border: '1px solid rgba(139,180,225,0.2)', borderRadius: 10, padding: 20, marginBottom: 16 };
 const H3 = { color: 'var(--header-bg)', fontSize: 14, marginBottom: 14, textTransform: 'uppercase', letterSpacing: 1, textAlign: 'center' };
@@ -556,6 +557,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
             <button className="btn btn-outline" onClick={() => setShowCheckInLog(true)}>⚓ Check In Log</button>
             <button className="btn btn-outline" onClick={() => setShowOffWaterLog(true)}>🏁 Check Out Log</button>
             <button className="btn btn-outline" onClick={() => setShowLog(true)}>📋 Weigh-In Log</button>
+            {isUnlocked && <button className="btn btn-outline" onClick={() => exportRosterPdf(entries, settings)}>🖨️ Export PDF Report</button>}
             {isUnlocked && (
               <label className="btn btn-outline" style={{ cursor: 'pointer' }}>
                 📂 Import CSV
