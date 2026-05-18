@@ -428,6 +428,47 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           <p style={{ color: 'var(--header-bg)', fontSize: 11, marginTop: 8 }}>
             Shows the most recent weigh-ins in a bar above the leaderboard. Count is preserved when toggled off.
           </p>
+
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', marginTop: 16, paddingTop: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+              <span style={{ fontSize: 13, color: 'var(--text)' }}>Currently Weighing Section</span>
+              <button
+                type="button"
+                disabled={locked}
+                onClick={() => onUpdateSettings({ showCurrentlyWeighing: !(settings.showCurrentlyWeighing !== false) })}
+                style={{
+                  padding: '4px 14px', borderRadius: 6, fontWeight: 700, fontSize: 12, cursor: locked ? 'default' : 'pointer',
+                  border: `1.5px solid ${settings.showCurrentlyWeighing !== false ? '#4CAF50' : 'rgba(255,107,107,0.6)'}`,
+                  background: settings.showCurrentlyWeighing !== false ? 'rgba(76,175,80,0.15)' : 'rgba(255,107,107,0.1)',
+                  color: settings.showCurrentlyWeighing !== false ? '#4CAF50' : '#ff9090',
+                }}
+              >
+                {settings.showCurrentlyWeighing !== false ? '✓ On' : '✕ Off'}
+              </button>
+            </div>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end' }}>
+              <div className="form-field" style={{ flex: 1 }}>
+                <label htmlFor="st-cw-duration">Display Duration</label>
+                <input id="st-cw-duration" name="currentlyWeighingDuration" type="number"
+                  value={settings.currentlyWeighingDuration ?? 2} min="1" max="60" step="1"
+                  disabled={locked || settings.showCurrentlyWeighing === false}
+                  onChange={e => onUpdateSettings({ currentlyWeighingDuration: Math.max(1, parseInt(e.target.value) || 1) })} />
+              </div>
+              <div className="form-field" style={{ flex: 1 }}>
+                <label htmlFor="st-cw-unit">Unit</label>
+                <select id="st-cw-unit" name="currentlyWeighingUnit"
+                  value={settings.currentlyWeighingUnit ?? 'minutes'}
+                  disabled={locked || settings.showCurrentlyWeighing === false}
+                  onChange={e => onUpdateSettings({ currentlyWeighingUnit: e.target.value })}>
+                  <option value="seconds">Seconds</option>
+                  <option value="minutes">Minutes</option>
+                </select>
+              </div>
+            </div>
+            <p style={{ color: 'var(--header-bg)', fontSize: 11, marginTop: 8 }}>
+              Shows the boat currently being weighed at the top of the leaderboard. Disappears after the set duration. Duration is preserved when toggled off.
+            </p>
+          </div>
         </div>
 
         {/* Flight Schedule */}

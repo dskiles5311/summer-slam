@@ -37,7 +37,7 @@ function calcPenalties(numFish, deadFish, shortFish, penalties = {}) {
   };
 }
 
-export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry }) {
+export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry, onSetCurrentlyWeighing }) {
   const [boatNo, setBoatNo]           = useState('');
   const [numFish, setNumFish]         = useState('');
   const [deadFish, setDeadFish]       = useState('');
@@ -82,6 +82,14 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry })
     } else {
       setStatus({ type: 'ok', message: `Boat #${no} — ${name}`, entry });
     }
+    onSetCurrentlyWeighing?.({
+      boatNo: entry.boatNo,
+      boaterFirst: entry.boaterFirst,
+      boaterLast: entry.boaterLast,
+      coAnglerFirst: entry.coAnglerFirst,
+      coAnglerLast: entry.coAnglerLast,
+      setAt: Date.now(),
+    });
   }
 
   function handleBoatKeyDown(e) {

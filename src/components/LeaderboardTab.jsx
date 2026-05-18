@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { getLeaderboardEntries } from '../utils/calculations';
 import { exportHTML } from '../utils/exportHtml';
 
@@ -34,6 +35,16 @@ export default function LeaderboardTab({ entries, settings }) {
 
   const checkedInCount = entries.filter(e => e.boatNo).length;
   const boatsWeighed   = entries.filter(e => e.boatNo && parseFloat(e.totalWeight) > 0).length;
+
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const cwEntry    = settings.currentlyWeighing;
+  const cwDuration = (parseInt(settings.currentlyWeighingDuration) || 2) * (settings.currentlyWeighingUnit === 'seconds' ? 1000 : 60000);
+  const cwActive   = settings.showCurrentlyWeighing !== false && cwEntry && (now - cwEntry.setAt) < cwDuration;
 
   const showRecentWeighed = settings.showRecentWeighed !== false;
   const recentWeighCount = parseInt(settings.recentWeighCount) || 2;
@@ -111,6 +122,29 @@ export default function LeaderboardTab({ entries, settings }) {
           ) : <span className="sc-name">—</span>}
         </div>
       </div>
+
+      {cwActive && (
+        <div className="no-print" style={{ maxWidth: 900, marginLeft: 'auto', marginRight: 'auto', marginBottom: 12 }}>
+          <div className="rw-label" style={{ color: '#ffb450' }}>⚖️ Currently Weighing...</div>
+          <div className="rw-cards">
+            <div className="rw-card rw-latest" style={{ borderColor: 'rgba(255,180,80,0.5)', background: 'rgba(255,180,80,0.08)' }}>
+              <div className="rw-icon">
+                <span style={{ fontSize: 28 }}>⚖️</span>
+              </div>
+              <div className="rw-boat">
+                <div className="rw-boat-num">{cwEntry.boatNo || '—'}</div>
+                <div className="rw-boat-lbl">Boat #</div>
+              </div>
+              <div className="rw-names">
+                <span className="rw-boater">{[cwEntry.boaterFirst, cwEntry.boaterLast].filter(Boolean).join(' ') || '—'}</span>
+                {[cwEntry.coAnglerFirst, cwEntry.coAnglerLast].filter(Boolean).join(' ') && (
+                  <span className="rw-co">{[cwEntry.coAnglerFirst, cwEntry.coAnglerLast].filter(Boolean).join(' ')}</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {recentEntries.length > 0 && (
         <div className="no-print" style={{ maxWidth: 900, marginLeft: 'auto', marginRight: 'auto', marginBottom: 12 }}>

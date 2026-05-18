@@ -35,6 +35,10 @@ const DEFAULT_SETTINGS = {
   offWater:        {},
   recentWeighCount: 2,
   showRecentWeighed: true,
+  showCurrentlyWeighing: true,
+  currentlyWeighingDuration: 2,
+  currentlyWeighingUnit: 'minutes',
+  currentlyWeighing: null,
   flights: [],
 };
 
@@ -614,7 +618,8 @@ export default function App() {
               />
             </div>
             <div style={{ display: activeTab === 'weighin' ? '' : 'none' }}>
-              <WeighInTab entries={rawEntries} settings={settingsWithTheme} onWeighIn={handleWeighIn} onAddEntry={handleAddWeighInEntry} />
+              <WeighInTab entries={rawEntries} settings={settingsWithTheme} onWeighIn={handleWeighIn} onAddEntry={handleAddWeighInEntry}
+                onSetCurrentlyWeighing={payload => handleUpdateSettings({ currentlyWeighing: payload })} />
             </div>
             <div style={{ display: activeTab === 'contacts' ? '' : 'none' }}>
               <ContactsTab
