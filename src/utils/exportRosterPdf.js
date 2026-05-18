@@ -261,8 +261,8 @@ export function exportRosterPdf(entries, settings) {
     statCell(totalWeight.toFixed(2),  'Total Weight (lbs)'),
     statCell(totalFish,               'Total Fish'),
     statCell(avgWeight != null ? avgWeight.toFixed(2) : '—', 'Avg Weight / Boat (lbs)'),
-    statCell(totalDeadFish  > 0 ? `${totalDeadFish} (−${deadPenaltyLbs.toFixed(2)} lbs)`  : totalDeadFish,  'Dead Fish'),
-    statCell(totalShortFish > 0 ? `${totalShortFish} (−${shortPenaltyLbs.toFixed(2)} lbs)` : totalShortFish, 'Short Fish'),
+    statCell(totalDeadFish,  'Dead Fish'),
+    statCell(totalShortFish, 'Short Fish'),
   ] : [];
 
   const timingStats = [

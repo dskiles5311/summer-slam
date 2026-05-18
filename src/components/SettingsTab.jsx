@@ -27,6 +27,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   const [editingFlightIdx, setEditingFlightIdx] = useState(null);
   const [flightDraft, setFlightDraft]       = useState(null);
   const [flightError, setFlightError]       = useState(null);
+  const [defaultFlightSize, setDefaultFlightSize] = useState(parseInt(settings.defaultFlightSize) || 31);
 
   useEffect(() => {
     setTotalPayout(payoutSettings.totalPayout || 0);
@@ -37,6 +38,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   }, [payoutSettings]);
 
   useEffect(() => { setTournamentDate(settings.tournamentDate || ''); }, [settings.tournamentDate]);
+  useEffect(() => { setDefaultFlightSize(parseInt(settings.defaultFlightSize) || 31); }, [settings.defaultFlightSize]);
   useEffect(() => { setLocalFees(fees); }, [fees]);
   useEffect(() => { setLocalPenalties(penalties); }, [penalties]);
   useEffect(() => {
@@ -156,7 +158,16 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   }
 
   function handleFlightAdd() {
-    setFlightDraft({ boatStart: '', boatEnd: '', launchTime: '', checkInTime: '' });
+    const sorted = [...localFlights].sort((a, b) => (parseInt(a.boatStart) || 0) - (parseInt(b.boatStart) || 0));
+    const last = sorted[sorted.length - 1];
+    const size = parseInt(defaultFlightSize) || 31;
+    let nextStart = 1;
+    if (last) {
+      nextStart = last.boatEnd
+        ? parseInt(last.boatEnd) + 1
+        : parseInt(last.boatStart) + size;
+    }
+    setFlightDraft({ boatStart: nextStart, boatEnd: 0, launchTime: '', checkInTime: '' });
     setEditingFlightIdx('new');
   }
 
@@ -173,6 +184,35 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   }
 
   function handleFlightSave() {
+    if (editingFlightIdx === 'new') {
+      const newStart = parseInt(flightDraft.boatStart) || 0;
+      if (!newStart) {
+        setFlightError('Could not determine boat start. Please try again.');
+        return;
+      }
+      // Auto-cap any currently unbounded flight at newStart-1
+      const cappedFlights = localFlights.map(fl => {
+        if (!parseInt(fl.boatEnd) && parseInt(fl.boatStart) < newStart) {
+          return { ...fl, boatEnd: newStart - 1 };
+        }
+        return fl;
+      });
+      const f = {
+        boatStart:   newStart,
+        boatEnd:     0,
+        launchTime:  (flightDraft.launchTime  || '').trim(),
+        checkInTime: (flightDraft.checkInTime || '').trim(),
+      };
+      const updated = [...cappedFlights, { ...f, _key: Date.now() }];
+      setLocalFlights(updated);
+      onUpdateSettings({ flights: flightSortAndStrip(updated) });
+      setEditingFlightIdx(null);
+      setFlightDraft(null);
+      setFlightError(null);
+      return;
+    }
+
+    // Editing an existing flight — full validation
     const startRaw = evalMath(String(flightDraft.boatStart ?? ''));
     const endRaw   = evalMath(String(flightDraft.boatEnd   ?? ''));
     const start = isNaN(startRaw) ? 0 : Math.round(startRaw);
@@ -187,20 +227,15 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
       return;
     }
 
-    // Check for overlaps with other flights (skip the one being edited)
-    // Treat boatEnd=0 as unbounded (Infinity)
-    const others = editingFlightIdx === 'new'
-      ? localFlights
-      : localFlights.filter((_, i) => i !== editingFlightIdx);
-
+    const others = localFlights.filter((_, i) => i !== editingFlightIdx);
     const overlap = others.find(fl => {
-      const s    = parseInt(fl.boatStart) || 0;
-      const e    = parseInt(fl.boatEnd)   || Infinity;
+      const s      = parseInt(fl.boatStart) || 0;
+      const e      = parseInt(fl.boatEnd)   || Infinity;
       const newEnd = end || Infinity;
       return start <= e && newEnd >= s;
     });
     if (overlap) {
-      const overlapNum = localFlights.indexOf(overlap) + 1;
+      const overlapNum   = localFlights.indexOf(overlap) + 1;
       const overlapRange = overlap.boatEnd ? `#${overlap.boatStart}–#${overlap.boatEnd}` : `#${overlap.boatStart}+`;
       setFlightError(`Overlaps with Flight ${overlapNum} (boats ${overlapRange}).`);
       return;
@@ -213,12 +248,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
       launchTime:  (flightDraft.launchTime  || '').trim(),
       checkInTime: (flightDraft.checkInTime || '').trim(),
     };
-    let updated;
-    if (editingFlightIdx === 'new') {
-      updated = [...localFlights, { ...f, _key: Date.now() }];
-    } else {
-      updated = localFlights.map((fl, i) => i === editingFlightIdx ? { ...fl, ...f } : fl);
-    }
+    const updated = localFlights.map((fl, i) => i === editingFlightIdx ? { ...fl, ...f } : fl);
     setLocalFlights(updated);
     onUpdateSettings({ flights: flightSortAndStrip(updated) });
     setEditingFlightIdx(null);
@@ -554,14 +584,28 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
 
           {editingFlightIdx === 'new' && (
             <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(139,180,225,0.35)', borderRadius: 8, padding: '10px 14px', marginBottom: 8 }}>
-              <FlightForm draft={flightDraft} onChange={setFlightDraft} onSave={handleFlightSave} onCancel={handleFlightCancel} error={flightError} />
+              <FlightForm draft={flightDraft} onChange={setFlightDraft} onSave={handleFlightSave} onCancel={handleFlightCancel} error={flightError} isNew />
             </div>
           )}
 
           {!locked && editingFlightIdx === null && (
-            <button className="btn btn-primary btn-sm" style={{ marginTop: 4 }} onClick={handleFlightAdd}>
-              + Add Flight
-            </button>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, marginTop: 8, flexWrap: 'wrap' }}>
+              <div className="form-field" style={{ width: 140, marginBottom: 0 }}>
+                <label htmlFor="st-default-flight-size" style={{ fontSize: 12 }}>Boats Per Flight</label>
+                <input
+                  id="st-default-flight-size"
+                  type="number"
+                  value={defaultFlightSize}
+                  min="1"
+                  step="1"
+                  onChange={e => setDefaultFlightSize(parseInt(e.target.value) || 31)}
+                  onBlur={() => onUpdateSettings({ defaultFlightSize })}
+                />
+              </div>
+              <button className="btn btn-primary btn-sm" style={{ marginBottom: 2 }} onClick={handleFlightAdd}>
+                + Add Flight
+              </button>
+            </div>
           )}
         </div>
 
@@ -970,7 +1014,7 @@ function formatTime(raw) {
   return `${h}:${String(m).padStart(2, '0')}${ampm}`;
 }
 
-function FlightForm({ draft, onChange, onSave, onCancel, error }) {
+function FlightForm({ draft, onChange, onSave, onCancel, error, isNew }) {
   function evalBoat(val) {
     const result = evalMath(String(val ?? ''));
     return isNaN(result) || result < 1 ? (parseInt(val) || '') : Math.round(result);
@@ -986,6 +1030,11 @@ function FlightForm({ draft, onChange, onSave, onCancel, error }) {
 
   return (
     <div style={{ width: '100%' }}>
+      {isNew && (
+        <div style={{ marginBottom: 10, fontSize: 13, color: 'var(--gold-light)', fontWeight: 600 }}>
+          Boats #{draft.boatStart}+ (auto-assigned)
+        </div>
+      )}
       <div className="edit-grid-2" style={{ marginBottom: 8 }}>
         <div className="form-field">
           <label htmlFor="ff-launch-time">Launch Time</label>
@@ -995,26 +1044,30 @@ function FlightForm({ draft, onChange, onSave, onCancel, error }) {
                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onChange(prev => ({ ...prev, launchTime: formatTime(prev.launchTime) })); onSave(); } }} />
         </div>
         <div className="form-field">
-          <label htmlFor="ff-boat-start">Boat # Start</label>
-          <input id="ff-boat-start" name="boatStart" type="text" inputMode="numeric" value={draft.boatStart} placeholder="e.g. 31+1"
-                 onChange={e => onChange(prev => ({ ...prev, boatStart: e.target.value }))}
-                 onBlur={e => onChange(prev => ({ ...prev, boatStart: evalBoat(e.target.value) }))}
-                 onKeyDown={e => handleBoatKeyDown(e, 'boatStart')} />
-        </div>
-        <div className="form-field">
-          <label htmlFor="ff-boat-end">Boat # End</label>
-          <input id="ff-boat-end" name="boatEnd" type="text" inputMode="numeric" value={draft.boatEnd} placeholder="e.g. 30+30"
-                 onChange={e => onChange(prev => ({ ...prev, boatEnd: e.target.value }))}
-                 onBlur={e => onChange(prev => ({ ...prev, boatEnd: evalBoat(e.target.value) }))}
-                 onKeyDown={e => handleBoatKeyDown(e, 'boatEnd')} />
-        </div>
-        <div className="form-field">
           <label htmlFor="ff-check-in-time">Check-In Time</label>
           <input id="ff-check-in-time" name="checkInTime" type="text" value={draft.checkInTime} placeholder="e.g. 315 PM"
                  onChange={e => onChange(prev => ({ ...prev, checkInTime: e.target.value }))}
                  onBlur={e => onChange(prev => ({ ...prev, checkInTime: formatTime(e.target.value) }))}
                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onChange(prev => ({ ...prev, checkInTime: formatTime(prev.checkInTime) })); onSave(); } }} />
         </div>
+        {!isNew && (
+          <>
+            <div className="form-field">
+              <label htmlFor="ff-boat-start">Boat # Start</label>
+              <input id="ff-boat-start" name="boatStart" type="text" inputMode="numeric" value={draft.boatStart} placeholder="e.g. 31+1"
+                     onChange={e => onChange(prev => ({ ...prev, boatStart: e.target.value }))}
+                     onBlur={e => onChange(prev => ({ ...prev, boatStart: evalBoat(e.target.value) }))}
+                     onKeyDown={e => handleBoatKeyDown(e, 'boatStart')} />
+            </div>
+            <div className="form-field">
+              <label htmlFor="ff-boat-end">Boat # End</label>
+              <input id="ff-boat-end" name="boatEnd" type="text" inputMode="numeric" value={draft.boatEnd} placeholder="leave blank for unbounded"
+                     onChange={e => onChange(prev => ({ ...prev, boatEnd: e.target.value }))}
+                     onBlur={e => onChange(prev => ({ ...prev, boatEnd: evalBoat(e.target.value) }))}
+                     onKeyDown={e => handleBoatKeyDown(e, 'boatEnd')} />
+            </div>
+          </>
+        )}
       </div>
       {error && (
         <div style={{ fontSize: 12, color: '#ff9090', background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.35)', borderRadius: 6, padding: '6px 10px', marginBottom: 6 }}>
