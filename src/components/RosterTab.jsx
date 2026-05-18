@@ -9,6 +9,7 @@ import {
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { importCSV, exportCSV } from '../utils/csv';
 import { exportHTML } from '../utils/exportHtml';
+import { exportRosterPdf } from '../utils/exportRosterPdf';
 import ConfirmActionModal from './ConfirmActionModal';
 
 // ---------------------------------------------------------------------------
@@ -646,6 +647,9 @@ export default function RosterTab({
               </button>
               <button className="actions-item" onClick={() => { setActionsOpen(false); confirmed('export HTML', () => exportHTML(rows.map(r => r.original), 'Summer Slam Roster')); }}>
                 📄 Export HTML
+              </button>
+              <button className="actions-item" onClick={() => { setActionsOpen(false); exportRosterPdf(entries, settings); }}>
+                🖨️ Export PDF Report
               </button>
               <button className="actions-item" onClick={() => { setActionsOpen(false); confirmed('archive year', onArchive); }}>
                 🗂️ Archive Year
