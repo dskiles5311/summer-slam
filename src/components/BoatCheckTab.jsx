@@ -6,9 +6,15 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggleOf
   const offWaterCount = boatedEntries.filter(e => offWater[e.id]).length;
   const allClear = boatedEntries.length > 0 && offWaterCount === boatedEntries.length;
 
-  const [boatInput, setBoatInput] = useState('');
-  const [flashMsg, setFlashMsg]   = useState(null);
+  const [boatInput, setBoatInput]   = useState('');
+  const [flashMsg, setFlashMsg]     = useState(null);
+  const [listFilter, setListFilter] = useState('all');
   const inputRef = useRef(null);
+
+  const FILTERS = ['all', 'pending', 'done'];
+  function cycleFilter() {
+    setListFilter(f => FILTERS[(FILTERS.indexOf(f) + 1) % FILTERS.length]);
+  }
 
   const previewEntry = boatInput.trim()
     ? entries.find(en => String(en.boatNo) === boatInput.trim()) ?? null
@@ -45,17 +51,37 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggleOf
     }),
   [entries]);
 
+  const visibleRows = useMemo(() => {
+    if (listFilter === 'pending') return sorted.filter(e => !offWater[e.id]);
+    if (listFilter === 'done')    return sorted.filter(e =>  offWater[e.id]);
+    return sorted;
+  }, [sorted, listFilter, offWater]);
+
   return (
     <div className="tab-panel active">
       <div className="toolbar">
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            onClick={cycleFilter}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 8, background: 'none',
+              border: '1px solid rgba(139,180,225,0.25)', borderRadius: 8,
+              padding: '4px 12px', cursor: 'pointer', userSelect: 'none',
+            }}
+            title="Click to filter list"
+          >
             <span style={{ fontSize: 22, fontWeight: 700, color: allClear ? '#4CAF50' : '#78c8ff' }}>
               {offWaterCount} / {boatedEntries.length}
             </span>
-            <span style={{ color: 'var(--header-bg)', fontSize: 13 }}>off water</span>
-            {allClear && <span style={{ color: '#4CAF50', fontWeight: 700, fontSize: 14 }}>✔ All Clear!</span>}
-          </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>
+              <span style={{ color: 'var(--header-bg)', fontSize: 12 }}>off water</span>
+              <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5,
+                color: listFilter === 'all' ? 'var(--header-bg)' : listFilter === 'pending' ? '#ffb450' : '#78c8ff' }}>
+                {listFilter === 'all' ? 'All' : listFilter === 'pending' ? 'Not Out' : 'Off Water'}
+              </span>
+            </div>
+            {allClear && <span style={{ color: '#4CAF50', fontWeight: 700, fontSize: 13 }}>✔ All Clear!</span>}
+          </button>
         </div>
         <div style={{ flex: 1 }} />
         {isUnlocked && (
@@ -131,7 +157,7 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggleOf
             </tr>
           </thead>
           <tbody>
-            {sorted.map(row => {
+            {visibleRows.map(row => {
               const isOffWater = !!offWater[row.id];
               return (
                 <tr
