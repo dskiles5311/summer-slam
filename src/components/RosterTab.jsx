@@ -7,7 +7,6 @@ import {
   flexRender,
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { exportCSV } from '../utils/csv';
 import ConfirmActionModal from './ConfirmActionModal';
 
 // ---------------------------------------------------------------------------
@@ -629,9 +628,6 @@ export default function RosterTab({
           </button>
           {actionsOpen && (
             <div className="actions-dropdown" style={{ position: 'fixed', top: actionsPos.top, bottom: actionsPos.bottom, right: actionsPos.right }}>
-              <button className="actions-item" onClick={() => { setActionsOpen(false); confirmed('export CSV', () => exportCSV(entries, settings.payoutSettings)); }}>
-                💾 Export CSV
-              </button>
               <button className="actions-item" onClick={() => { setActionsOpen(false); confirmed('archive year', onArchive); }}>
                 🗂️ Archive Year
               </button>
