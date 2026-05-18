@@ -1009,13 +1009,16 @@ body.light .edit-section-label     { color: #1a5c28; border-bottom-color: #3a6e3
 [data-mike="true"] .leaderboard-header h2             { font-size: 38px; }
 [data-mike="true"] .stat-chip .val                    { font-size: 30px; }
 [data-mike="true"] .stat-chip .lbl                    { font-size: 15px; }
-[data-mike="true"] .lb-card                           { grid-template-columns: 100px 90px 1fr auto auto; padding: 24px 28px; }
+/* Fixed widths on stat/payout columns so 1fr name column gets consistent space */
+[data-mike="true"] .lb-card                           { grid-template-columns: 100px 90px 1fr 160px 140px; padding: 24px 28px; }
+/* Only show total weight in Mike Mode — less clutter, more name room */
+[data-mike="true"] .lb-stat-item:not(.highlight)      { display: none; }
 [data-mike="true"] .lb-rank                           { font-size: 62px; }
 [data-mike="true"] .lb-rank.rn                        { font-size: 46px; }
 [data-mike="true"] .lb-boatno-num                     { font-size: 46px; }
 [data-mike="true"] .lb-boatno-lbl                     { font-size: 15px; }
-/* Prevent mid-word breaks; single-line truncation keeps TV layout clean */
-[data-mike="true"] .lb-angler-name                    { font-size: 32px; overflow-wrap: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Word-boundary wrapping only — no mid-character breaks, no truncation */
+[data-mike="true"] .lb-angler-name                    { font-size: 32px; overflow-wrap: normal; }
 [data-mike="true"] .lb-angler-name .lb-co             { font-size: 27px; }
 [data-mike="true"] .lb-stat-item .val                 { font-size: 28px; }
 [data-mike="true"] .lb-stat-item .lbl                 { font-size: 17px; }
@@ -1036,7 +1039,7 @@ body.light .edit-section-label     { color: #1a5c28; border-bottom-color: #3a6e3
 
 /* iPad portrait / small tablet (≤768px) */
 @media (max-width: 768px) {
-  [data-mike="true"] .lb-card                         { grid-template-columns: 76px 76px 1fr auto auto; padding: 18px 18px; }
+  [data-mike="true"] .lb-card                         { grid-template-columns: 76px 76px 1fr 140px 120px; padding: 18px 18px; }
   [data-mike="true"] .lb-rank                         { font-size: 50px; }
   [data-mike="true"] .lb-rank.rn                      { font-size: 37px; }
   [data-mike="true"] .lb-boatno-num                   { font-size: 35px; }
@@ -1053,7 +1056,7 @@ body.light .edit-section-label     { color: #1a5c28; border-bottom-color: #3a6e3
 
 /* Large phone landscape / small tablet (≤700px) — widen columns to match larger fonts */
 @media (max-width: 700px) {
-  [data-mike="true"] .lb-card                         { grid-template-columns: 54px 54px 1fr auto auto; gap: 10px; padding: 14px 14px; }
+  [data-mike="true"] .lb-card                         { grid-template-columns: 54px 54px 1fr 110px 95px; gap: 10px; padding: 14px 14px; }
   [data-mike="true"] .lb-rank                         { font-size: 36px; }
   [data-mike="true"] .lb-rank.rn                      { font-size: 27px; }
   [data-mike="true"] .lb-boatno-num                   { font-size: 24px; }
@@ -1074,7 +1077,7 @@ body.light .edit-section-label     { color: #1a5c28; border-bottom-color: #3a6e3
 
 /* iPhone portrait / small phone (≤480px) — modest bump, preserve card layout */
 @media (max-width: 480px) {
-  [data-mike="true"] .lb-card                         { grid-template-columns: 44px 46px 1fr auto auto; gap: 8px; padding: 11px 11px; }
+  [data-mike="true"] .lb-card                         { grid-template-columns: 44px 46px 1fr 85px 72px; gap: 8px; padding: 11px 11px; }
   [data-mike="true"] .lb-rank                         { font-size: 27px; }
   [data-mike="true"] .lb-rank.rn                      { font-size: 21px; }
   [data-mike="true"] .lb-boatno-num                   { font-size: 18px; }
