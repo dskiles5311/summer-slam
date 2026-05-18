@@ -146,7 +146,7 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggleOf
         )}
       </div>
 
-      <div className="table-wrapper" style={{ flex: 1, minHeight: 0, maxHeight: 'none' }}>
+      <div className="table-wrapper">
         <table style={{ tableLayout: 'fixed', minWidth: 360 }}>
           <thead>
             <tr>

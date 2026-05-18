@@ -36,6 +36,7 @@ export default function FlightsTab({ entries, settings }) {
   if (flights.length === 0) {
     return (
       <div className="tab-panel active">
+        <div className="tab-scroll">
         <div className="toolbar">
           <h2 style={{ color: 'var(--gold-light)', fontSize: 18, fontWeight: 800 }}>Flights</h2>
         </div>
@@ -48,12 +49,14 @@ export default function FlightsTab({ entries, settings }) {
             Unlock the app and go to <strong style={{ color: 'var(--gold-light)' }}>Settings → Flight Schedule</strong> to add flights.
           </p>
         </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="tab-panel active">
+      <div className="tab-scroll">
       <div className="toolbar">
         <h2 style={{ color: 'var(--gold-light)', fontSize: 18, fontWeight: 800 }}>Flights</h2>
         <span style={{ fontSize: 12, color: 'var(--header-bg)' }}>
@@ -76,6 +79,7 @@ export default function FlightsTab({ entries, settings }) {
             )}
           </div>
         ))}
+      </div>
       </div>
     </div>
   );

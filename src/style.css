@@ -152,10 +152,20 @@ header {
 .nav-tab.active { color: var(--gold-light); border-bottom-color: var(--gold); }
 
 /* ── MAIN CONTENT ── */
-main { flex: 1; min-height: 0; padding: 0 20px 16px; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+main { flex: 1; min-height: 0; padding: 0 20px 16px; overflow: hidden; }
 
 .tab-panel { display: none; }
-.tab-panel.active { display: block; }
+.tab-panel.active { display: flex; flex-direction: column; height: 100%; }
+
+/* scroll container for non-table tabs */
+.tab-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
 
 /* ── TOOLBAR ── */
 .toolbar {
@@ -236,9 +246,10 @@ main { flex: 1; min-height: 0; padding: 0 20px 16px; overflow-y: auto; overflow-
 
 /* ── DATA TABLE ── */
 .table-wrapper {
+  flex: 1;
+  min-height: 0;
   overflow-x: auto;
   overflow-y: auto;
-  max-height: max(200px, calc(100dvh - 260px));
   border-radius: 10px;
   border: 1px solid rgba(168,200,160,0.2);
   background: rgba(255,255,255,0.02);
@@ -663,7 +674,7 @@ tbody td.td-name { white-space: nowrap; text-overflow: ellipsis; }
   body { background: white; color: black; font-size: 11px; height: auto; overflow: visible; }
   #app { height: auto; overflow: visible; }
   header { display: none; }
-  main { padding: 20px; background: white; height: auto; overflow: visible; }
+  main { padding: 20px; background: white; height: auto !important; overflow: visible !important; }
 
   .tab-panel { display: none !important; }
   .tab-panel.active { display: block !important; }

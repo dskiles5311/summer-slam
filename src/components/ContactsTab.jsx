@@ -436,7 +436,7 @@ export default function ContactsTab({ isUnlocked, contacts, contactsLoading, onC
         )}
       </div>
 
-      <div className="table-wrapper" style={{ flex: 1, minHeight: 0, maxHeight: 'none' }}>
+      <div className="table-wrapper">
         <table className="contacts-table" style={{ tableLayout: 'fixed' }}>
           <thead>
             <tr>

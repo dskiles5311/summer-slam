@@ -182,6 +182,7 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry, o
 
   return (
     <div className="tab-panel active">
+      <div className="tab-scroll">
       <div className="toolbar">
         <h2 style={{ color: 'var(--gold-light)', fontSize: 18, fontWeight: 800 }}>🎣 Weigh In</h2>
       </div>
@@ -364,6 +365,7 @@ export default function WeighInTab({ entries, settings, onWeighIn, onAddEntry, o
           </div>
         </div>
       )}
+      </div>
       </div>
     </div>
   );

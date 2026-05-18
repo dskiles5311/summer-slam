@@ -166,6 +166,7 @@ export default function SignUpTab({ onAddEntry, settings }) {
 
   return (
     <div className="tab-panel active">
+      <div className="tab-scroll">
       <div className="toolbar">
         <h2 style={{ color: 'var(--gold-light)', fontSize: 18, fontWeight: 800 }}>📝 Sign Up</h2>
       </div>
@@ -352,6 +353,7 @@ export default function SignUpTab({ onAddEntry, settings }) {
           </div>
         </div>
       )}
+      </div>
       </div>
     </div>
   );

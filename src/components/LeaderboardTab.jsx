@@ -61,6 +61,7 @@ export default function LeaderboardTab({ entries, settings }) {
 
   return (
     <div className="tab-panel active">
+      <div className="tab-scroll">
       <div className="leaderboard-header">
         <h2>🎣 Summer Slam! 🎣</h2>
         <p style={{ color: 'var(--header-bg)', fontSize: 12, letterSpacing: 2, textTransform: 'uppercase', marginTop: 4 }}>
@@ -289,6 +290,7 @@ export default function LeaderboardTab({ entries, settings }) {
             </div>
           );
         })}
+      </div>
       </div>
     </div>
   );

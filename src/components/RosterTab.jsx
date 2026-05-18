@@ -526,7 +526,7 @@ export default function RosterTab({
             }}
           />
         </div>
-        <div className="table-wrapper" style={{ flex: 1, minHeight: 0, maxHeight: 'none' }}>
+        <div className="table-wrapper">
           <table style={{ tableLayout: 'fixed', minWidth: 600 }}>
             <colgroup>
               <col style={{ width: '20%' }} /><col style={{ width: '20%' }} />
@@ -647,7 +647,7 @@ export default function RosterTab({
       </div>
 
       {/* Table */}
-      <div ref={tableContainerRef} className="table-wrapper" style={{ flex: 1, minHeight: 0, maxHeight: 'none' }}>
+      <div ref={tableContainerRef} className="table-wrapper">
         <table className="roster-table" style={{ tableLayout: 'fixed', minWidth: tableMinWidth }}>
           <colgroup>
             {table.getVisibleLeafColumns().map(col => (

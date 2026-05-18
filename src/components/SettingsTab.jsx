@@ -274,6 +274,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
 
   return (
     <div className="tab-panel active">
+      <div className="tab-scroll">
       <div className="toolbar">
         <h2 style={{ color: 'var(--gold-light)', fontSize: 18, fontWeight: 800 }}>Tournament Settings</h2>
         {locked && <span style={{ fontSize: 12, color: 'rgba(255,180,80,0.85)', fontWeight: 600 }}>🔒 Locked</span>}
@@ -663,6 +664,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
       {showSignUpLog  && <EventLogModal title="Sign-Up Log"   icon="📝" type="signup"   onClose={() => setShowSignUpLog(false)} />}
       {showCheckInLog && <EventLogModal title="Check In Log"  icon="⚓" type="checkin"  onClose={() => setShowCheckInLog(false)} />}
       {showOffWaterLog && <EventLogModal title="Check Out Log" icon="🏁" type="checkout" onClose={() => setShowOffWaterLog(false)} />}
+      </div>
     </div>
   );
 }
