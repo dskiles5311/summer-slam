@@ -23,6 +23,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   const [showCheckInLog, setShowCheckInLog] = useState(false);
   const [showOffWaterLog, setShowOffWaterLog] = useState(false);
   const [tournamentDate, setTournamentDate] = useState(settings.tournamentDate || '');
+  const [checkInOpens, setCheckInOpens]     = useState(settings.checkInOpens || '');
   const [localFlights, setLocalFlights]     = useState(() => (settings.flights || []).map((f, i) => ({ ...f, _key: i })));
   const [editingFlightIdx, setEditingFlightIdx] = useState(null);
   const [flightDraft, setFlightDraft]       = useState(null);
@@ -43,6 +44,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   }, [payoutSettings]);
 
   useEffect(() => { setTournamentDate(settings.tournamentDate || ''); }, [settings.tournamentDate]);
+  useEffect(() => { setCheckInOpens(settings.checkInOpens || ''); }, [settings.checkInOpens]);
   useEffect(() => { setDefaultFlightSize(parseInt(settings.defaultFlightSize) || 30); }, [settings.defaultFlightSize]);
   useEffect(() => { setLocalFees(fees); }, [fees]);
   useEffect(() => { setLocalPenalties(penalties); }, [penalties]);
@@ -326,6 +328,23 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           {tournamentDate && (
             <p style={{ color: 'var(--header-bg)', fontSize: 12, marginTop: 10 }}>
               {new Date(tournamentDate + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            </p>
+          )}
+          <div className="form-field" style={{ maxWidth: 220, marginTop: 14 }}>
+            <label htmlFor="st-checkin-opens">Check-In Opens</label>
+            <input
+              id="st-checkin-opens"
+              name="checkInOpens"
+              type="time"
+              value={checkInOpens}
+              disabled={locked}
+              onChange={e => setCheckInOpens(e.target.value)}
+              onBlur={() => onUpdateSettings({ checkInOpens })}
+            />
+          </div>
+          {checkInOpens && (
+            <p style={{ color: 'var(--header-bg)', fontSize: 12, marginTop: 6 }}>
+              DNS markers appear on the leaderboard after {new Date('1970-01-01T' + checkInOpens).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
             </p>
           )}
         </div>
