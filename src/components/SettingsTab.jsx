@@ -402,15 +402,31 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
         {/* Leaderboard Display */}
         <div style={PANEL}>
           <h3 style={H3}>Leaderboard Display</h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+            <span style={{ fontSize: 13, color: 'var(--text)' }}>Recently Weighed Section</span>
+            <button
+              type="button"
+              disabled={locked}
+              onClick={() => onUpdateSettings({ showRecentWeighed: !(settings.showRecentWeighed !== false) })}
+              style={{
+                padding: '4px 14px', borderRadius: 6, fontWeight: 700, fontSize: 12, cursor: locked ? 'default' : 'pointer',
+                border: `1.5px solid ${settings.showRecentWeighed !== false ? '#4CAF50' : 'rgba(255,107,107,0.6)'}`,
+                background: settings.showRecentWeighed !== false ? 'rgba(76,175,80,0.15)' : 'rgba(255,107,107,0.1)',
+                color: settings.showRecentWeighed !== false ? '#4CAF50' : '#ff9090',
+              }}
+            >
+              {settings.showRecentWeighed !== false ? '✓ On' : '✕ Off'}
+            </button>
+          </div>
           <div className="edit-grid-3">
             <div className="form-field">
               <label htmlFor="st-recent-weigh-count">Recent Weigh-Ins to Show</label>
-              <input id="st-recent-weigh-count" name="recentWeighCount" type="number" value={settings.recentWeighCount ?? 2} min="0" max="10" step="1" disabled={locked}
-                     onChange={e => onUpdateSettings({ recentWeighCount: Math.max(0, parseInt(e.target.value) || 0) })} />
+              <input id="st-recent-weigh-count" name="recentWeighCount" type="number" value={settings.recentWeighCount ?? 2} min="1" max="10" step="1" disabled={locked || settings.showRecentWeighed === false}
+                     onChange={e => onUpdateSettings({ recentWeighCount: Math.max(1, parseInt(e.target.value) || 1) })} />
             </div>
           </div>
           <p style={{ color: 'var(--header-bg)', fontSize: 11, marginTop: 8 }}>
-            Shows the most recent weigh-ins in a bar above the leaderboard. Set to 0 to hide.
+            Shows the most recent weigh-ins in a bar above the leaderboard. Count is preserved when toggled off.
           </p>
         </div>
 

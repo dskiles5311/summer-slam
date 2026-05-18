@@ -34,6 +34,7 @@ const DEFAULT_SETTINGS = {
   boatCheck:       {},
   offWater:        {},
   recentWeighCount: 2,
+  showRecentWeighed: true,
   flights: [],
 };
 

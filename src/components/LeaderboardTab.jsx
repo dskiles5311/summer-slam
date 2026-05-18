@@ -35,8 +35,9 @@ export default function LeaderboardTab({ entries, settings }) {
   const checkedInCount = entries.filter(e => e.boatNo).length;
   const boatsWeighed   = entries.filter(e => e.boatNo && parseFloat(e.totalWeight) > 0).length;
 
+  const showRecentWeighed = settings.showRecentWeighed !== false;
   const recentWeighCount = parseInt(settings.recentWeighCount) || 2;
-  const recentEntries = recentWeighCount > 0
+  const recentEntries = showRecentWeighed && recentWeighCount > 0
     ? [...entries]
         .filter(e => e.weighedAt)
         .sort((a, b) => new Date(b.weighedAt) - new Date(a.weighedAt))
