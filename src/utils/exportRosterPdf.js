@@ -163,7 +163,6 @@ export function exportRosterPdf(entries, settings) {
   const lunkerPot   = entries.filter(e => isOn(e.lunker)).length * (parseFloat(settings.fees?.lunkerFee) || 0);
   const optionPot   = entries.filter(e => isOn(e.option)).length  * (parseFloat(settings.fees?.optFee)   || 0);
   const totalBuyIn  = entries.reduce((s, e) => s + (parseFloat(e.buyIn) || 0), 0);
-  const deductions  = lunkerPot + optionPot;
   const totalWeight = weighed.reduce((s, e) => s + (parseFloat(e.totalWeight) || 0), 0);
   const totalFish   = weighed.reduce((s, e) => s + (parseInt(e.numFish)       || 0), 0);
 
@@ -244,7 +243,6 @@ export function exportRosterPdf(entries, settings) {
     statCell(individuals,         'Individuals'),
     statCell(checkedIn.length,    'Checked In'),
     statCell(`$${totalBuyIn.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 'Total Buy-In'),
-    statCell(`$${deductions.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 'Side Pot Deductions'),
     statCell(`$${lunkerPot.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 'Lunker Pot'),
     statCell(`$${optionPot.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 'Option Pot'),
     statCell(`$${option1Payout}`, `Option 1 Payout (${Math.round(option1Pct * 100)}%)`),
