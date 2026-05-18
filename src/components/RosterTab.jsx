@@ -328,7 +328,7 @@ export default function RosterTab({
         id: field, accessorKey: field,
         header: field === 'appSigned' ? 'App Signed' : field.charAt(0).toUpperCase() + field.slice(1),
         size: COL_WIDTHS[field],
-        enableSorting: false,
+        sortingFn: numericSort,
         meta: {
           tdStyle: { textAlign: 'center' },
           getTdStyle: () => ({ textAlign: 'center', cursor: isUnlocked ? 'pointer' : undefined }),
@@ -338,7 +338,8 @@ export default function RosterTab({
       })),
       {
         id: 'offWater', header: 'Off Water', size: COL_WIDTHS.offWater,
-        enableSorting: false,
+        accessorFn: r => offWater[r.id] ? 1 : 0,
+        sortingFn: withAttentionFirst((a, b) => (offWater[a.original.id] ? 1 : 0) - (offWater[b.original.id] ? 1 : 0)),
         meta: {
           tdStyle: { textAlign: 'center' },
           getTdStyle: () => ({ textAlign: 'center', cursor: isUnlocked ? 'pointer' : undefined }),
