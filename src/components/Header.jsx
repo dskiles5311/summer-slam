@@ -29,9 +29,9 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
           <button
             className={`theme-toggle${mikeMode ? ' mike-active' : ''}`}
             onClick={onToggleMikeMode}
-            title={mikeMode ? 'Switch to normal view' : 'Switch to large-text TV view'}
+            title={mikeMode ? 'Switch to regular view' : 'Switch to large-text TV view'}
           >
-            {mikeMode ? '👁️ Everyone Else' : '👁️ Mike'}
+            {mikeMode ? '👁️ Regular Mode' : '👁️ Mike Mode'}
           </button>
           <button
             className="theme-toggle"
