@@ -32,7 +32,7 @@ const DEFAULT_SETTINGS = {
     payouts:     [3500,1500,1000,800,600,280,270,270,265,265,250,250,250,250,250],
   },
   penalties:       { deadFishPenalty: 0.5, shortFishPenalty: 1.0, shortFishCountPenalty: 1, overLimitPenalty: 3.0, maxFish: 5, minFishLength: 15, latePenaltyPerMin: 1.0, latePenaltyDQMin: 15 },
-  defaultFlightSize: 31,
+  defaultFlightSize: 30,
   boatCheck:       {},
   offWater:        {},
   recentWeighCount: 2,

@@ -27,7 +27,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   const [editingFlightIdx, setEditingFlightIdx] = useState(null);
   const [flightDraft, setFlightDraft]       = useState(null);
   const [flightError, setFlightError]       = useState(null);
-  const [defaultFlightSize, setDefaultFlightSize] = useState(parseInt(settings.defaultFlightSize) || 31);
+  const [defaultFlightSize, setDefaultFlightSize] = useState(parseInt(settings.defaultFlightSize) || 30);
 
   useEffect(() => {
     setTotalPayout(payoutSettings.totalPayout || 0);
@@ -38,7 +38,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   }, [payoutSettings]);
 
   useEffect(() => { setTournamentDate(settings.tournamentDate || ''); }, [settings.tournamentDate]);
-  useEffect(() => { setDefaultFlightSize(parseInt(settings.defaultFlightSize) || 31); }, [settings.defaultFlightSize]);
+  useEffect(() => { setDefaultFlightSize(parseInt(settings.defaultFlightSize) || 30); }, [settings.defaultFlightSize]);
   useEffect(() => { setLocalFees(fees); }, [fees]);
   useEffect(() => { setLocalPenalties(penalties); }, [penalties]);
   useEffect(() => {
@@ -160,7 +160,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   function handleFlightAdd() {
     const sorted = [...localFlights].sort((a, b) => (parseInt(a.boatStart) || 0) - (parseInt(b.boatStart) || 0));
     const last = sorted[sorted.length - 1];
-    const size = parseInt(defaultFlightSize) || 31;
+    const size = parseInt(defaultFlightSize) || 30;
     let nextStart = 1;
     if (last) {
       nextStart = last.boatEnd
@@ -598,7 +598,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
                   value={defaultFlightSize}
                   min="1"
                   step="1"
-                  onChange={e => setDefaultFlightSize(parseInt(e.target.value) || 31)}
+                  onChange={e => setDefaultFlightSize(parseInt(e.target.value) || 30)}
                   onBlur={() => onUpdateSettings({ defaultFlightSize })}
                 />
               </div>
