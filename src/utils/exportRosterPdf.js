@@ -198,8 +198,10 @@ export function exportRosterPdf(entries, settings) {
   const avgWeight = weighed.length > 0 ? (totalWeight / weighed.length) : null;
 
   // Time on water per entry: offWaterAt minus that entry's flight launchTime
+  // Only include boats that were assigned a number (checked in) and returned off water
   const waterDurations = entries
     .map(e => {
+      if (!e.boatNo) return null;
       const offWater = parseTs(e.offWaterAt);
       if (!offWater) return null;
       const flight = flightFor(e, flights);
