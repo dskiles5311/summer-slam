@@ -30,7 +30,7 @@ const SECTION = {
   borderBottom: '1px solid rgba(168,200,160,0.25)',
 };
 
-const SUFFIX_OPTIONS = ['', 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V'];
+const SUFFIX_OPTIONS = ['', 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V', 'VI'];
 const SUFFIX_STYLE = {
   background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(139,180,225,0.3)',
   borderRadius: 8, color: 'var(--white)', fontSize: 16, padding: '10px 12px',

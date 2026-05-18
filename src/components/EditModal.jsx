@@ -4,7 +4,7 @@ import EmailInput from './EmailInput';
 import { formatPhone } from '../utils/phone';
 import { evalMath } from '../utils/evalMath';
 
-const SUFFIX_OPTIONS = ['', 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V'];
+const SUFFIX_OPTIONS = ['', 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V', 'VI'];
 const SUFFIX_STYLE = {
   background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(139,180,225,0.3)',
   borderRadius: 8, color: 'var(--white)', fontSize: 14, padding: '9px 10px',
