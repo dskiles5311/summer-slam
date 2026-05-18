@@ -2,7 +2,7 @@
 import { useRef, useEffect } from 'react';
 import { getStats } from '../utils/calculations';
 
-export default function Header({ entries, settings, activeTab, onTabChange, onThemeToggle, isUnlocked, onToggleLock, buyInBlurred, onToggleBuyInBlur }) {
+export default function Header({ entries, settings, activeTab, onTabChange, onThemeToggle, mikeMode, onToggleMikeMode, isUnlocked, onToggleLock, buyInBlurred, onToggleBuyInBlur }) {
   const stats = getStats(entries, settings.fees);
   const buyInFilter = buyInBlurred ? 'blur(6px)' : 'none';
   const navRef = useRef(null);
@@ -25,6 +25,13 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
         <div style={{ flex: 1, display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'flex-end' }}>
           <button className="theme-toggle" onClick={onThemeToggle}>
             {settings.theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
+          </button>
+          <button
+            className={`theme-toggle${mikeMode ? ' mike-active' : ''}`}
+            onClick={onToggleMikeMode}
+            title={mikeMode ? 'Switch to normal view' : 'Switch to large-text TV view'}
+          >
+            {mikeMode ? '👁️ Everyone Else' : '👁️ Mike'}
           </button>
           <button
             className="theme-toggle"

@@ -998,4 +998,63 @@ body.light .edit-section-label     { color: #1a5c28; border-bottom-color: #3a6e3
   body.light .contacts-table tr:hover { background: rgba(255,255,255,0.7); }
 }
 
+/* ======================================== */
+/* Mike Mode — large TV / bright-room view  */
+/* ======================================== */
+.mike-active { background: rgba(255,180,80,0.18) !important; border-color: rgba(255,180,80,0.6) !important; color: #ffb450 !important; }
+
+[data-mike="true"] .leaderboard-header h2            { font-size: 38px; }
+[data-mike="true"] .stat-chip .val                   { font-size: 30px; }
+[data-mike="true"] .stat-chip .lbl                   { font-size: 15px; }
+[data-mike="true"] .lb-rank                          { font-size: 62px; }
+[data-mike="true"] .lb-rank.rn                       { font-size: 46px; }
+[data-mike="true"] .lb-boatno-num                    { font-size: 46px; }
+[data-mike="true"] .lb-boatno-lbl                    { font-size: 15px; }
+[data-mike="true"] .lb-angler-name                   { font-size: 32px; }
+[data-mike="true"] .lb-angler-name .lb-co            { font-size: 27px; }
+[data-mike="true"] .lb-stat-item .val                { font-size: 28px; }
+[data-mike="true"] .lb-stat-item .lbl                { font-size: 17px; }
+[data-mike="true"] .lb-stat-item.highlight .val      { font-size: 34px; }
+[data-mike="true"] .lb-payout .val                   { font-size: 32px; }
+[data-mike="true"] .lb-payout .lbl                   { font-size: 17px; }
+[data-mike="true"] .lb-card                          { padding: 24px 28px; }
+[data-mike="true"] .summary-chip .sc-lbl             { font-size: 27px; }
+[data-mike="true"] .summary-chip .sc-val             { font-size: 30px; }
+[data-mike="true"] .summary-chip .sc-boat            { font-size: 24px; }
+[data-mike="true"] .summary-chip .sc-name            { font-size: 22px; }
+[data-mike="true"] .summary-chip .sc-co              { font-size: 20px; }
+[data-mike="true"] .rw-boater                        { font-size: 26px; }
+[data-mike="true"] .rw-co                            { font-size: 22px; }
+[data-mike="true"] .rw-boat-num                      { font-size: 35px; }
+[data-mike="true"] .rw-stat-val                      { font-size: 23px; }
+[data-mike="true"] .rw-stat.rw-highlight .rw-stat-val { font-size: 27px; }
+[data-mike="true"] .nav-tab                          { font-size: 18px; }
+
+@media (max-width: 768px) {
+  [data-mike="true"] .lb-rank                        { font-size: 50px; }
+  [data-mike="true"] .lb-rank.rn                     { font-size: 37px; }
+  [data-mike="true"] .lb-boatno-num                  { font-size: 35px; }
+  [data-mike="true"] .lb-angler-name                 { font-size: 27px; }
+  [data-mike="true"] .lb-angler-name .lb-co          { font-size: 23px; }
+  [data-mike="true"] .lb-stat-item.highlight .val    { font-size: 30px; }
+  [data-mike="true"] .lb-payout .val                 { font-size: 27px; }
+  [data-mike="true"] .summary-chip .sc-lbl           { font-size: 22px; }
+  [data-mike="true"] .summary-chip .sc-val           { font-size: 24px; }
+  [data-mike="true"] .summary-chip .sc-boat          { font-size: 21px; }
+  [data-mike="true"] .summary-chip .sc-name          { font-size: 19px; }
+  [data-mike="true"] .summary-chip .sc-co            { font-size: 18px; }
+}
+
+@media (max-width: 480px) {
+  [data-mike="true"] .lb-rank                        { font-size: 30px; }
+  [data-mike="true"] .lb-rank.rn                     { font-size: 23px; }
+  [data-mike="true"] .lb-boatno-num                  { font-size: 21px; }
+  [data-mike="true"] .lb-angler-name                 { font-size: 18px; }
+  [data-mike="true"] .lb-angler-name .lb-co          { font-size: 15px; }
+  [data-mike="true"] .lb-stat-item.highlight .val    { font-size: 20px; }
+  [data-mike="true"] .lb-stat-item .lbl              { font-size: 12px; }
+  [data-mike="true"] .lb-payout .val                 { font-size: 18px; }
+  [data-mike="true"] .lb-payout .lbl                 { font-size: 12px; }
+}
+
 /* Watermark */

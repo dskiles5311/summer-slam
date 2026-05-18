@@ -55,6 +55,7 @@ function mergeSettings(raw) {
 
 export default function App() {
   const [theme, setTheme]               = useState(() => localStorage.getItem('ss_theme') || 'light');
+  const [mikeMode, setMikeMode]         = useState(() => localStorage.getItem('ss_mike_mode') === 'true');
   const [activeTab, setActiveTab]       = useState('leaderboard');
   const [toasts, setToasts]             = useState([]);
   const [editingEntry, setEditingEntry] = useState(null);
@@ -114,6 +115,11 @@ export default function App() {
     document.body.classList.remove('light');
     if (theme === 'light') document.body.classList.add(theme);
   }, [theme]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-mike', mikeMode ? 'true' : 'false');
+    localStorage.setItem('ss_mike_mode', mikeMode);
+  }, [mikeMode]);
 
   async function handleUnlock(password) {
     await verifyPassword(password);
@@ -533,6 +539,8 @@ export default function App() {
           setTheme(next);
           localStorage.setItem('ss_theme', next);
         }}
+        mikeMode={mikeMode}
+        onToggleMikeMode={() => setMikeMode(m => !m)}
         isUnlocked={isUnlocked}
         onToggleLock={() => isUnlocked ? handleLock() : setShowUnlock(true)}
         buyInBlurred={buyInBlurred}
