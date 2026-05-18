@@ -14,7 +14,7 @@ export default function FlightsTab({ entries, settings }) {
     const n = parseInt(boatNo);
     if (isNaN(n)) return -1;
     return flights.findIndex(
-      f => n >= (parseInt(f.boatStart) || 0) && n <= (parseInt(f.boatEnd) || 0)
+      f => n >= (parseInt(f.boatStart) || 0) && (!f.boatEnd || n <= parseInt(f.boatEnd))
     );
   }
 

@@ -56,7 +56,7 @@ function fmtDur(ms) {
 function flightFor(entry, flights) {
   const n = parseInt(entry.boatNo);
   if (isNaN(n)) return null;
-  return flights.find(f => n >= parseInt(f.boatStart) && n <= parseInt(f.boatEnd)) || null;
+  return flights.find(f => n >= parseInt(f.boatStart) && (!f.boatEnd || n <= parseInt(f.boatEnd))) || null;
 }
 
 function rowName(r) {

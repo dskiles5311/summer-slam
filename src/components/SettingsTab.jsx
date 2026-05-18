@@ -161,28 +161,31 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
     const start = isNaN(startRaw) ? 0 : Math.round(startRaw);
     const end   = isNaN(endRaw)   ? 0 : Math.round(endRaw);
 
-    if (!start || !end) {
-      setFlightError('Boat # Start and End are required.');
+    if (!start) {
+      setFlightError('Boat # Start is required.');
       return;
     }
-    if (end < start) {
+    if (end && end < start) {
       setFlightError('Boat # End must be greater than or equal to Start.');
       return;
     }
 
     // Check for overlaps with other flights (skip the one being edited)
+    // Treat boatEnd=0 as unbounded (Infinity)
     const others = editingFlightIdx === 'new'
       ? localFlights
       : localFlights.filter((_, i) => i !== editingFlightIdx);
 
     const overlap = others.find(fl => {
-      const s = parseInt(fl.boatStart) || 0;
-      const e = parseInt(fl.boatEnd)   || 0;
-      return start <= e && end >= s;
+      const s    = parseInt(fl.boatStart) || 0;
+      const e    = parseInt(fl.boatEnd)   || Infinity;
+      const newEnd = end || Infinity;
+      return start <= e && newEnd >= s;
     });
     if (overlap) {
       const overlapNum = localFlights.indexOf(overlap) + 1;
-      setFlightError(`Overlaps with Flight ${overlapNum} (boats #${overlap.boatStart}–#${overlap.boatEnd}).`);
+      const overlapRange = overlap.boatEnd ? `#${overlap.boatStart}–#${overlap.boatEnd}` : `#${overlap.boatStart}+`;
+      setFlightError(`Overlaps with Flight ${overlapNum} (boats ${overlapRange}).`);
       return;
     }
 
@@ -515,7 +518,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <span style={{ fontWeight: 700, color: 'var(--gold-light)', marginRight: 8 }}>Flight {idx + 1}</span>
                     <span style={{ color: 'var(--header-bg)', fontSize: 13 }}>
-                      Boats #{fl.boatStart}–#{fl.boatEnd}
+                      {fl.boatEnd ? `Boats #${fl.boatStart}–#${fl.boatEnd}` : `Boats #${fl.boatStart}+`}
                       {fl.launchTime  && <span> · 🚤 {fl.launchTime}</span>}
                       {fl.checkInTime && <span> · 📋 {fl.checkInTime}</span>}
                     </span>

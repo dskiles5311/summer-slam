@@ -36,7 +36,7 @@ export function calcRanks(entries, settings) {
     if (!entry.checkedInAt || !entry.boatNo || !flights.length) return noLate;
 
     const boatNum = parseInt(entry.boatNo);
-    const flight  = flights.find(f => boatNum >= parseInt(f.boatStart) && boatNum <= parseInt(f.boatEnd));
+    const flight  = flights.find(f => boatNum >= parseInt(f.boatStart) && (!f.boatEnd || boatNum <= parseInt(f.boatEnd)));
     if (!flight?.checkInTime) return noLate;
 
     const checkedInDate = new Date(entry.checkedInAt);
