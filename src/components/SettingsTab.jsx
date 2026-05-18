@@ -643,9 +643,9 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
               {settings.showRecentWeighed !== false ? '✓ On' : '✕ Off'}
             </button>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 8 }}>
-            <label htmlFor="st-recent-weigh-count" style={{ fontSize: 13, color: 'var(--header-bg)', whiteSpace: 'nowrap' }}>Recent Weigh-Ins to Show</label>
-            <div className="form-field" style={{ width: 80, marginBottom: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 8 }}>
+            <div className="form-field" style={{ width: 180 }}>
+              <label htmlFor="st-recent-weigh-count">Recent Weigh-Ins to Show</label>
               <input id="st-recent-weigh-count" name="recentWeighCount" type="number" value={settings.recentWeighCount ?? 2} min="1" max="10" step="1" disabled={locked || settings.showRecentWeighed === false}
                      onChange={e => onUpdateSettings({ recentWeighCount: Math.max(1, parseInt(e.target.value) || 1) })} />
             </div>
