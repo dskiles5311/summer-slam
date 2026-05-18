@@ -36,19 +36,19 @@ export default function FlightsTab({ entries, settings }) {
   if (flights.length === 0) {
     return (
       <div className="tab-panel active">
-        <div className="tab-scroll">
         <div className="toolbar">
           <h2 style={{ color: 'var(--gold-light)', fontSize: 18, fontWeight: 800 }}>Flights</h2>
         </div>
-        <div style={{ maxWidth: 700, margin: '40px auto', textAlign: 'center' }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>🎣</div>
-          <p style={{ color: 'var(--header-bg)', fontSize: 15 }}>
-            No flights have been configured yet.
-          </p>
-          <p style={{ color: 'var(--header-bg)', fontSize: 13, marginTop: 8, opacity: 0.75 }}>
-            Unlock the app and go to <strong style={{ color: 'var(--gold-light)' }}>Settings → Flight Schedule</strong> to add flights.
-          </p>
-        </div>
+        <div className="tab-scroll">
+          <div style={{ maxWidth: 700, margin: '40px auto', textAlign: 'center' }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>🎣</div>
+            <p style={{ color: 'var(--header-bg)', fontSize: 15 }}>
+              No flights have been configured yet.
+            </p>
+            <p style={{ color: 'var(--header-bg)', fontSize: 13, marginTop: 8, opacity: 0.75 }}>
+              Unlock the app and go to <strong style={{ color: 'var(--gold-light)' }}>Settings → Flight Schedule</strong> to add flights.
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -56,30 +56,29 @@ export default function FlightsTab({ entries, settings }) {
 
   return (
     <div className="tab-panel active">
-      <div className="tab-scroll">
       <div className="toolbar">
         <h2 style={{ color: 'var(--gold-light)', fontSize: 18, fontWeight: 800 }}>Flights</h2>
         <span style={{ fontSize: 12, color: 'var(--header-bg)' }}>
           {entries.length} boat{entries.length !== 1 ? 's' : ''} · sorted by boat #
         </span>
       </div>
-
-      <div style={{ maxWidth: 700, margin: '0 auto', paddingTop: 8 }}>
-        {groups.map(({ flight, entries: flightEntries }, gIdx) => (
-          <div key={gIdx} style={{ marginBottom: 24 }}>
-            <FlightDivider flight={flight} flightNum={gIdx + 1} count={flightEntries.length} isLast={gIdx === groups.length - 1} />
-            {flightEntries.length === 0 ? (
-              <p style={{ color: 'var(--header-bg)', fontSize: 13, padding: '10px 4px', fontStyle: 'italic' }}>
-                No boats in this flight range yet.
-              </p>
-            ) : (
-              <div>
-                {flightEntries.map(entry => <BoatRow key={entry.id} entry={entry} />)}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+      <div className="tab-scroll">
+        <div style={{ maxWidth: 700, margin: '0 auto', paddingTop: 8 }}>
+          {groups.map(({ flight, entries: flightEntries }, gIdx) => (
+            <div key={gIdx} style={{ marginBottom: 24 }}>
+              <FlightDivider flight={flight} flightNum={gIdx + 1} count={flightEntries.length} isLast={gIdx === groups.length - 1} />
+              {flightEntries.length === 0 ? (
+                <p style={{ color: 'var(--header-bg)', fontSize: 13, padding: '10px 4px', fontStyle: 'italic' }}>
+                  No boats in this flight range yet.
+                </p>
+              ) : (
+                <div>
+                  {flightEntries.map(entry => <BoatRow key={entry.id} entry={entry} />)}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -88,11 +87,15 @@ export default function FlightsTab({ entries, settings }) {
 function FlightDivider({ flight, flightNum, count, isLast }) {
   return (
     <div style={{
-      background: 'rgba(200,169,106,0.12)',
-      border: '1px solid rgba(200,169,106,0.35)',
-      borderRadius: 8,
+      position: 'sticky',
+      top: 0,
+      zIndex: 5,
+      background: 'var(--navy)',
+      borderBottom: '2px solid rgba(200,169,106,0.5)',
       padding: '10px 16px',
       marginBottom: 10,
+      marginLeft: -20,
+      marginRight: -20,
       display: 'flex',
       alignItems: 'center',
       gap: 12,
@@ -118,8 +121,8 @@ function FlightDivider({ flight, flightNum, count, isLast }) {
 }
 
 function BoatRow({ entry }) {
-  const boater   = [entry.boaterFirst, entry.boaterLast  ].filter(Boolean).join(' ') || '—';
-  const coAngler = [entry.coAnglerFirst, entry.coAnglerLast].filter(Boolean).join(' ');
+  const boater   = [entry.boaterFirst, entry.boaterLast, entry.boaterSuffix].filter(Boolean).join(' ') || '—';
+  const coAngler = [entry.coAnglerFirst, entry.coAnglerLast, entry.coAnglerSuffix].filter(Boolean).join(' ');
 
   return (
     <div style={{
