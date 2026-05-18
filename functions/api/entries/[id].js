@@ -53,6 +53,10 @@ export async function onRequestPut({ params, request, env }) {
     const clientWeighedAt   = body.weighedAt  ? String(body.weighedAt)  : null;
     const clientUpdatedAt   = body.updatedAt  ? String(body.updatedAt)  : null;
 
+    // Snapshot before state for event comparison
+    const beforeResult = await db.execute({ sql: 'SELECT boat_no, total_weight, off_water_at FROM entries WHERE id=?', args: [params.id] });
+    const before = beforeResult.rows[0] ?? {};
+
     const result = await db.execute({
       sql: `UPDATE entries SET
               boater_first=?, boater_last=?, boater_phone=?, boater_email=?,
@@ -97,11 +101,38 @@ export async function onRequestPut({ params, request, env }) {
       return Response.json({ error: 'conflict' }, { status: 409 });
     }
 
-    const updated = await db.execute({
-      sql:  'SELECT * FROM entries WHERE id = ?',
-      args: [params.id],
-    });
-    return Response.json(toJS(updated.rows[0]));
+    const updated = await db.execute({ sql: 'SELECT * FROM entries WHERE id = ?', args: [params.id] });
+    const after   = updated.rows[0];
+    const boaterName = `${after.boater_first || ''} ${after.boater_last || ''}`.trim();
+    const afterBoat  = after.boat_no ?? '';
+
+    // Write lifecycle events (best-effort)
+    try {
+      await db.execute('CREATE TABLE IF NOT EXISTS event_log (id INTEGER PRIMARY KEY AUTOINCREMENT, event_type TEXT NOT NULL, entry_id INTEGER, boat_no TEXT, boater_name TEXT, value TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)');
+      const events = [];
+
+      // Check-in: boatNo newly assigned or changed
+      const newBoatNo = t(body.boatNo);
+      if (newBoatNo && (before.boat_no ?? '') !== newBoatNo) {
+        events.push({ sql: 'INSERT INTO event_log (event_type, entry_id, boat_no, boater_name, value) VALUES (?,?,?,?,?)', args: ['checkin', params.id, newBoatNo, boaterName, newBoatNo] });
+      }
+
+      // Check-out: off-water toggled either direction
+      if (body.offWater === true) {
+        events.push({ sql: 'INSERT INTO event_log (event_type, entry_id, boat_no, boater_name, value) VALUES (?,?,?,?,?)', args: ['checkout', params.id, afterBoat, boaterName, 'checked out'] });
+      } else if (body.offWater === false) {
+        events.push({ sql: 'INSERT INTO event_log (event_type, entry_id, boat_no, boater_name, value) VALUES (?,?,?,?,?)', args: ['checkout', params.id, afterBoat, boaterName, 'returned to water'] });
+      }
+
+      // Weigh-in: weight intentionally set (weighedAt provided by client)
+      if (clientWeighedAt && newTotalWeight > 0) {
+        events.push({ sql: 'INSERT INTO event_log (event_type, entry_id, boat_no, boater_name, value) VALUES (?,?,?,?,?)', args: ['weighin', params.id, afterBoat, boaterName, String(newTotalWeight)] });
+      }
+
+      if (events.length > 0) await db.batch(events);
+    } catch (_) {}
+
+    return Response.json(toJS(after));
   } catch (e) {
     return Response.json({ error: e.message }, { status: 500 });
   }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { calcWeightedPayouts } from '../utils/calculations';
 import { exportCSV, importCSV } from '../utils/csv';
 import { evalMath } from '../utils/evalMath';
+import { fetchEventLog, clearEventLog } from '../utils/api';
 
 const PANEL = { background: 'var(--settings-panel-bg)', border: '1px solid rgba(139,180,225,0.2)', borderRadius: 10, padding: 20, marginBottom: 16 };
 const H3 = { color: 'var(--header-bg)', fontSize: 14, marginBottom: 14, textTransform: 'uppercase', letterSpacing: 1, textAlign: 'center' };
@@ -569,9 +570,9 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
       </div>
 
       {showLog        && <WeighInLogModal   entries={entries} penalties={penalties} onClose={() => setShowLog(false)}        onClearLog={onClearWeighLog} />}
-      {showSignUpLog  && <EventLogModal title="Sign-Up Log"  icon="📝" tsKey="signedUpAt"  entries={entries} onClose={() => setShowSignUpLog(false)}  onClearLog={onClearSignUpLog} />}
-      {showCheckInLog && <EventLogModal title="Check In Log" icon="⚓" tsKey="checkedInAt" entries={entries} onClose={() => setShowCheckInLog(false)} onClearLog={onClearCheckInLog} />}
-      {showOffWaterLog && <EventLogModal title="Check Out Log" icon="🏁" tsKey="offWaterAt" entries={entries} onClose={() => setShowOffWaterLog(false)} onClearLog={onClearCheckOutLog} />}
+      {showSignUpLog  && <EventLogModal title="Sign-Up Log"   icon="📝" type="signup"   onClose={() => setShowSignUpLog(false)} />}
+      {showCheckInLog && <EventLogModal title="Check In Log"  icon="⚓" type="checkin"  onClose={() => setShowCheckInLog(false)} />}
+      {showOffWaterLog && <EventLogModal title="Check Out Log" icon="🏁" type="checkout" onClose={() => setShowOffWaterLog(false)} />}
     </div>
   );
 }
@@ -778,7 +779,18 @@ function WeighInLogModal({ entries, penalties, onClose, onClearLog }) {
   );
 }
 
-function EventLogModal({ title, icon, tsKey, entries, onClose, onClearLog }) {
+function EventLogModal({ title, icon, type, onClose }) {
+  const [events, setEvents]   = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState(null);
+
+  useEffect(() => {
+    setLoading(true);
+    fetchEventLog(type)
+      .then(data => { setEvents(data); setLoading(false); })
+      .catch(e => { setError(e.message); setLoading(false); });
+  }, [type]);
+
   function parseSqliteTs(ts) {
     if (!ts) return null;
     const iso = ts.includes('T') ? ts : ts.replace(' ', 'T');
@@ -786,33 +798,43 @@ function EventLogModal({ title, icon, tsKey, entries, onClose, onClearLog }) {
     return isNaN(d) ? null : d;
   }
 
-  const logged = [...entries]
-    .filter(e => e[tsKey])
-    .sort((a, b) => (parseSqliteTs(a[tsKey]) || 0) - (parseSqliteTs(b[tsKey]) || 0));
-
   function fmtTime(ts) {
     const d = parseSqliteTs(ts);
     if (!d) return '—';
     return `${d.toLocaleDateString([], { month: '2-digit', day: '2-digit', year: '2-digit' })} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
   }
 
+  const showValue = type === 'checkout' || type === 'weighin';
+  const valueLabel = type === 'checkout' ? 'Status' : 'Weight (lbs)';
+
   function handleExport() {
-    const rows = [['#', 'Time', 'Boat', 'Boater', 'Co-Angler']];
-    logged.forEach((e, i) => {
-      rows.push([
-        i + 1,
-        fmtTime(e[tsKey]),
-        e.boatNo || '—',
-        [e.boaterFirst, e.boaterLast].filter(Boolean).join(' ') || '—',
-        [e.coAnglerFirst, e.coAnglerLast].filter(Boolean).join(' ') || '—',
-      ]);
-    });
+    if (!events?.length) return;
+    const headers = ['#', 'Time', 'Boat #', 'Name', ...(showValue ? [valueLabel] : [])];
+    const rows = [headers, ...events.map((ev, i) => [
+      i + 1,
+      fmtTime(ev.createdAt),
+      ev.boatNo || '—',
+      ev.boaterName || '—',
+      ...(showValue ? [ev.value || '—'] : []),
+    ])];
     const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
     a.download = `${title.toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
   }
+
+  async function handleClear() {
+    if (!confirm(`Clear the ${title}? This cannot be undone.`)) return;
+    try {
+      await clearEventLog(type);
+      setEvents([]);
+    } catch (e) {
+      alert(`Failed to clear log: ${e.message}`);
+    }
+  }
+
+  const TH = { padding: '6px 10px', color: 'var(--header-bg)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, borderBottom: '1px solid rgba(139,180,225,0.2)', whiteSpace: 'nowrap', textAlign: 'left' };
 
   return (
     <div className="edit-overlay" onPointerDown={e => e.stopPropagation()} onPointerUp={e => { if (e.target === e.currentTarget) onClose(); }}>
@@ -822,38 +844,53 @@ function EventLogModal({ title, icon, tsKey, entries, onClose, onClearLog }) {
             <h3>{icon} {title}</h3>
             <button className="edit-panel-close" onClick={onClose}>✕</button>
           </div>
-          <p style={{ color: 'var(--header-bg)', fontSize: 12, marginBottom: 14 }}>
-            {logged.length} record{logged.length !== 1 ? 's' : ''} · read-only · ordered by time
-          </p>
-          {logged.length === 0 ? (
-            <p style={{ color: 'var(--header-bg)', textAlign: 'center', padding: '32px 0' }}>No records yet.</p>
-          ) : (
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-                <thead>
-                  <tr>
-                    {['#', 'Time', 'Boat', 'Boater', 'Co-Angler'].map(h => (
-                      <th key={h} style={{ textAlign: h === '#' ? 'right' : 'left', padding: '6px 10px', color: 'var(--header-bg)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, borderBottom: '1px solid rgba(139,180,225,0.2)', whiteSpace: 'nowrap' }}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {logged.map((e, i) => (
-                    <tr key={e.id} style={{ borderBottom: '1px solid rgba(139,180,225,0.08)' }}>
-                      <td style={{ padding: '7px 10px', color: 'var(--header-bg)', textAlign: 'right', fontWeight: 600 }}>{i + 1}</td>
-                      <td style={{ padding: '7px 10px', color: 'var(--gold-light)', fontWeight: 600, whiteSpace: 'nowrap' }}>{fmtTime(e[tsKey])}</td>
-                      <td style={{ padding: '7px 10px', fontWeight: 700 }}>#{e.boatNo || '—'}</td>
-                      <td style={{ padding: '7px 10px' }}>{[e.boaterFirst, e.boaterLast].filter(Boolean).join(' ') || '—'}</td>
-                      <td style={{ padding: '7px 10px', color: 'var(--header-bg)' }}>{[e.coAnglerFirst, e.coAnglerLast].filter(Boolean).join(' ') || '—'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+
+          {loading && <p style={{ color: 'var(--header-bg)', padding: '24px 0', textAlign: 'center' }}>Loading…</p>}
+          {error   && <p style={{ color: '#ff9090',          padding: '24px 0', textAlign: 'center' }}>Error: {error}</p>}
+
+          {events && (
+            <>
+              <p style={{ color: 'var(--header-bg)', fontSize: 12, marginBottom: 14 }}>
+                {events.length} event{events.length !== 1 ? 's' : ''} · append-only audit log · newest first
+              </p>
+              {events.length === 0 ? (
+                <p style={{ color: 'var(--header-bg)', textAlign: 'center', padding: '32px 0' }}>No events recorded yet.</p>
+              ) : (
+                <div style={{ overflowX: 'auto', maxHeight: '55vh', overflowY: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                    <thead>
+                      <tr>
+                        <th style={{ ...TH, textAlign: 'right', width: 36 }}>#</th>
+                        <th style={TH}>Time</th>
+                        <th style={TH}>Boat #</th>
+                        <th style={TH}>Name</th>
+                        {showValue && <th style={TH}>{valueLabel}</th>}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {events.map((ev, i) => (
+                        <tr key={ev.id} style={{ borderBottom: '1px solid rgba(139,180,225,0.08)' }}>
+                          <td style={{ padding: '7px 10px', color: 'var(--header-bg)', textAlign: 'right', fontWeight: 600 }}>{i + 1}</td>
+                          <td style={{ padding: '7px 10px', color: 'var(--gold-light)', fontWeight: 600, whiteSpace: 'nowrap' }}>{fmtTime(ev.createdAt)}</td>
+                          <td style={{ padding: '7px 10px', fontWeight: 700 }}>{ev.boatNo ? `#${ev.boatNo}` : '—'}</td>
+                          <td style={{ padding: '7px 10px' }}>{ev.boaterName || '—'}</td>
+                          {showValue && (
+                            <td style={{ padding: '7px 10px', color: ev.value === 'returned to water' ? '#ffb450' : ev.value === 'checked out' ? '#4CAF50' : 'var(--white)' }}>
+                              {ev.value || '—'}
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
           )}
+
           <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-            <button className="btn btn-outline btn-lg" onClick={handleExport} disabled={logged.length === 0}>💾 Export CSV</button>
-            {onClearLog && <button className="btn btn-danger btn-lg" onClick={() => { if (!confirm(`Clear the ${title}? This cannot be undone.`)) return; onClearLog(); onClose(); }}>🗑️ Clear Log</button>}
+            <button className="btn btn-outline btn-lg" onClick={handleExport} disabled={!events?.length}>💾 Export CSV</button>
+            <button className="btn btn-danger btn-lg" onClick={handleClear} disabled={!events?.length}>🗑️ Clear Log</button>
             <button className="btn btn-outline btn-lg" onClick={onClose}>Close</button>
           </div>
         </div>

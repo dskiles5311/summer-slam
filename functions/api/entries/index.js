@@ -96,10 +96,16 @@ export async function onRequestPost({ request, env }) {
       ],
     });
 
-    const newRow = await db.execute({
-      sql:  'SELECT * FROM entries WHERE id = ?',
-      args: [Number(result.lastInsertRowid)],
-    });
+    const newId  = Number(result.lastInsertRowid);
+    const newRow = await db.execute({ sql: 'SELECT * FROM entries WHERE id = ?', args: [newId] });
+
+    // Write signup event (best-effort — don't fail the request if it errors)
+    try {
+      await db.execute('CREATE TABLE IF NOT EXISTS event_log (id INTEGER PRIMARY KEY AUTOINCREMENT, event_type TEXT NOT NULL, entry_id INTEGER, boat_no TEXT, boater_name TEXT, value TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)');
+      const boaterName = `${t(body.boaterFirst)} ${t(body.boaterLast)}`.trim();
+      await db.execute({ sql: 'INSERT INTO event_log (event_type, entry_id, boat_no, boater_name, value) VALUES (?,?,?,?,?)', args: ['signup', newId, '', boaterName, ''] });
+    } catch (_) {}
+
     return Response.json(toJS(newRow.rows[0]), { status: 201 });
   } catch (e) {
     return Response.json({ error: e.message }, { status: 500 });

@@ -142,6 +142,19 @@ export async function clearCheckOutLog() {
   if (!res.ok) throw new Error('Failed to clear check-out log');
 }
 
+export async function fetchEventLog(type) {
+  const url = type ? `${BASE}/event-log?type=${encodeURIComponent(type)}` : `${BASE}/event-log`;
+  const res = await fetchWithTimeout(url, { headers: authHeaders() });
+  if (!res.ok) throw new Error('Failed to fetch event log');
+  return res.json();
+}
+
+export async function clearEventLog(type) {
+  const url = type ? `${BASE}/event-log?type=${encodeURIComponent(type)}` : `${BASE}/event-log`;
+  const res = await fetchWithTimeout(url, { method: 'DELETE', headers: authHeaders() });
+  if (!res.ok) throw new Error('Failed to clear event log');
+}
+
 export async function fetchSettings() {
   const res = await fetchWithTimeout(`${BASE}/settings`);
   if (!res.ok) throw new Error('Failed to fetch settings');
