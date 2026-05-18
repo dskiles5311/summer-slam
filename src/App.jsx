@@ -537,7 +537,7 @@ const saveSettingsMut   = useSaveSettings();
       )}
 
       <main>
-        <div style={{ display: activeTab === 'roster' ? '' : 'none' }}>
+        <div style={{ display: activeTab === 'roster' ? 'contents' : 'none' }}>
           <RosterTab
             entries={rankedEntries}
             settings={settingsWithTheme}
@@ -555,35 +555,35 @@ const saveSettingsMut   = useSaveSettings();
             onArchive={handleArchive}
           />
         </div>
-        <div style={{ display: activeTab === 'leaderboard' ? '' : 'none' }}>
+        <div style={{ display: activeTab === 'leaderboard' ? 'contents' : 'none' }}>
           <LeaderboardTab entries={rankedEntries} settings={settingsWithTheme} />
         </div>
-        <div style={{ display: activeTab === 'rules' ? '' : 'none' }}>
+        <div style={{ display: activeTab === 'rules' ? 'contents' : 'none' }}>
           <RulesTab settings={settings} />
         </div>
-        <div style={{ display: activeTab === 'offlimits' ? '' : 'none' }}>
+        <div style={{ display: activeTab === 'offlimits' ? 'contents' : 'none' }}>
           <OffLimitsTab settings={settings} />
         </div>
-        <div style={{ display: activeTab === 'archive' ? '' : 'none' }}>
+        <div style={{ display: activeTab === 'archive' ? 'contents' : 'none' }}>
           <ArchiveTab
             isUnlocked={isUnlocked}
             rosterCount={rawEntries.length}
             onLoadArchive={handleLoadArchive}
           />
         </div>
-        <div style={{ display: activeTab === 'flights' ? '' : 'none' }}>
+        <div style={{ display: activeTab === 'flights' ? 'contents' : 'none' }}>
           <FlightsTab entries={rankedEntries} settings={settingsWithTheme} />
         </div>
 
         {everUnlocked && (
           <>
-            <div style={{ display: activeTab === 'signup' ? '' : 'none' }}>
+            <div style={{ display: activeTab === 'signup' ? 'contents' : 'none' }}>
               <SignUpTab onAddEntry={handleSignUpEntry} settings={settingsWithTheme} />
             </div>
-            <div style={{ display: activeTab === 'checkin' ? '' : 'none' }}>
+            <div style={{ display: activeTab === 'checkin' ? 'contents' : 'none' }}>
               <CheckInTab entries={rankedEntries} onSave={handleCheckInSave} />
             </div>
-            <div style={{ display: activeTab === 'boatcheck' ? '' : 'none' }}>
+            <div style={{ display: activeTab === 'boatcheck' ? 'contents' : 'none' }}>
               <BoatCheckTab
                 entries={rankedEntries}
                 settings={settingsWithTheme}
@@ -592,11 +592,11 @@ const saveSettingsMut   = useSaveSettings();
                 onReset={handleResetBoatCheck}
               />
             </div>
-            <div style={{ display: activeTab === 'weighin' ? '' : 'none' }}>
+            <div style={{ display: activeTab === 'weighin' ? 'contents' : 'none' }}>
               <WeighInTab entries={rawEntries} settings={settingsWithTheme} onWeighIn={handleWeighIn} onAddEntry={handleAddWeighInEntry}
                 onSetCurrentlyWeighing={payload => handleUpdateSettings({ currentlyWeighing: payload })} />
             </div>
-            <div style={{ display: activeTab === 'contacts' ? '' : 'none' }}>
+            <div style={{ display: activeTab === 'contacts' ? 'contents' : 'none' }}>
               <ContactsTab
                 isUnlocked={isUnlocked}
                 contacts={contacts}
@@ -606,7 +606,7 @@ const saveSettingsMut   = useSaveSettings();
                 deleteContact={(id) => deleteContactMut.mutateAsync(id)}
               />
             </div>
-            <div style={{ display: activeTab === 'settings' ? '' : 'none' }}>
+            <div style={{ display: activeTab === 'settings' ? 'contents' : 'none' }}>
               <SettingsTab
                 settings={settingsWithTheme}
                 entries={rankedEntries}
