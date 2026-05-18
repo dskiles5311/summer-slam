@@ -251,10 +251,10 @@ export default function LeaderboardTab({ entries, settings }) {
                 </div>
                 {hasBadge && (
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
-                    {isLunker1 && <span style={{ ...BADGE, background: 'rgba(255,180,80,0.55)', border: '1px solid rgba(255,180,80,1)', color: '#ffe0a0' }}>🎯 Lunker</span>}
-                    {isLunker2 && <span style={{ ...BADGE, background: 'rgba(200,200,210,0.45)', border: '1px solid rgba(200,200,210,0.9)', color: '#dde0ea' }}>🎯 Lunker 2nd</span>}
-                    {isOpt1    && <span style={{ ...BADGE, background: 'rgba(120,200,255,0.50)', border: '1px solid rgba(120,200,255,1)', color: '#d0f0ff' }}>⚡ Option 1</span>}
-                    {isOpt2    && <span style={{ ...BADGE, background: 'rgba(120,200,255,0.35)', border: '1px solid rgba(120,200,255,0.85)', color: '#b8e4ff' }}>⚡ Option 2</span>}
+                    {isLunker1 && <span style={{ ...BADGE, background: '#b06000', border: '1px solid #ffb450', color: '#fff' }}>🎯 Lunker</span>}
+                    {isLunker2 && <span style={{ ...BADGE, background: '#444', border: '1px solid #aaa', color: '#fff' }}>🎯 Lunker 2nd</span>}
+                    {isOpt1    && <span style={{ ...BADGE, background: '#0a5a9e', border: '1px solid #78c8ff', color: '#fff' }}>⚡ Option 1</span>}
+                    {isOpt2    && <span style={{ ...BADGE, background: '#1e6e9e', border: '1px solid #a8dcff', color: '#fff' }}>⚡ Option 2</span>}
                   </div>
                 )}
               </div>
