@@ -14,6 +14,10 @@ export default function LeaderboardTab({ entries, settings }) {
   const lunkerRow = lunkerRows.length
     ? lunkerRows.reduce((best, r) => parseFloat(r.lunkerWeight) > parseFloat(best.lunkerWeight) ? r : best)
     : null;
+  const lunkerRow2 = lunkerRows.length > 1
+    ? lunkerRows.filter(r => r.id !== lunkerRow?.id)
+        .reduce((best, r) => parseFloat(r.lunkerWeight) > parseFloat(best.lunkerWeight) ? r : best)
+    : null;
   const lunkerToBeat = lunkerRow ? parseFloat(lunkerRow.lunkerWeight).toFixed(2) : '0.00';
 
   const bagRows = entries.filter(r => r.paid === 1 && r.appSigned === 1 && parseFloat(r.totalWeight) > 0);
@@ -223,6 +227,14 @@ export default function LeaderboardTab({ entries, settings }) {
             : (payouts[r - 1] || 0);
           const coName = [row.coAnglerFirst, row.coAnglerLast].filter(Boolean).join(' ') || '—';
 
+          const isLunker1 = lunkerRow  && row.id === lunkerRow.id;
+          const isLunker2 = lunkerRow2 && row.id === lunkerRow2.id;
+          const isOpt1    = option1Row && row.id === option1Row.id;
+          const isOpt2    = option2Row && row.id === option2Row.id;
+          const hasBadge  = isLunker1 || isLunker2 || isOpt1 || isOpt2;
+
+          const BADGE = { display: 'inline-flex', alignItems: 'center', gap: 3, borderRadius: 5, padding: '2px 7px', fontSize: 11, fontWeight: 700, letterSpacing: 0.3 };
+
           return (
             <div key={row.id} className={`lb-card ${cardClass}${idx >= topN ? ' lb-print-only' : ''}`}>
               <div className={`lb-rank ${rankClass}`}>{rankDisplay}</div>
@@ -235,6 +247,14 @@ export default function LeaderboardTab({ entries, settings }) {
                   {row.boaterFirst} {row.boaterLast}
                   {coName !== '—' && <span className="lb-co">, {coName}</span>}
                 </div>
+                {hasBadge && (
+                  <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 5 }}>
+                    {isLunker1 && <span style={{ ...BADGE, background: 'rgba(255,180,80,0.18)', border: '1px solid rgba(255,180,80,0.6)', color: '#ffb450' }}>🎯 Lunker</span>}
+                    {isLunker2 && <span style={{ ...BADGE, background: 'rgba(200,200,210,0.12)', border: '1px solid rgba(200,200,210,0.4)', color: '#b0b8c8' }}>🎯 Lunker 2nd</span>}
+                    {isOpt1    && <span style={{ ...BADGE, background: 'rgba(120,200,255,0.15)', border: '1px solid rgba(120,200,255,0.5)', color: '#78c8ff' }}>⚡ Option 1</span>}
+                    {isOpt2    && <span style={{ ...BADGE, background: 'rgba(120,200,255,0.08)', border: '1px solid rgba(120,200,255,0.3)', color: 'rgba(120,200,255,0.75)' }}>⚡ Option 2</span>}
+                  </div>
+                )}
               </div>
               <div className="lb-stats">
                 <div className="lb-stat-item">
