@@ -30,9 +30,16 @@ const SECTION = {
   borderBottom: '1px solid rgba(168,200,160,0.25)',
 };
 
+const SUFFIX_OPTIONS = ['', 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V'];
+const SUFFIX_STYLE = {
+  background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(139,180,225,0.3)',
+  borderRadius: 8, color: 'var(--white)', fontSize: 16, padding: '10px 12px',
+  width: '100%', boxSizing: 'border-box', outline: 'none', cursor: 'pointer', minHeight: 44,
+};
+
 const EMPTY = {
-  boaterFirst: '', boaterLast: '', boaterPhone: '', boaterEmail: '',
-  coAnglerFirst: '', coAnglerLast: '', coAnglerPhone: '', coAnglerEmail: '',
+  boaterFirst: '', boaterLast: '', boaterSuffix: '', boaterPhone: '', boaterEmail: '',
+  coAnglerFirst: '', coAnglerLast: '', coAnglerSuffix: '', coAnglerPhone: '', coAnglerEmail: '',
   lunker: '', option: '', paid: '', appSigned: '', buyIn: '',
 };
 
@@ -107,14 +114,16 @@ export default function SignUpTab({ onAddEntry, settings }) {
     if (Object.keys(errs).length) { setErrors(errs); return; }
 
     const entry = {
-      boaterFirst:   form.boaterFirst.trim(),
-      boaterLast:    form.boaterLast.trim(),
-      boaterPhone:   form.boaterPhone.trim(),
-      boaterEmail:   form.boaterEmail.trim(),
-      coAnglerFirst: form.coAnglerFirst.trim(),
-      coAnglerLast:  form.coAnglerLast.trim(),
-      coAnglerPhone: form.coAnglerPhone.trim(),
-      coAnglerEmail: form.coAnglerEmail.trim(),
+      boaterFirst:    form.boaterFirst.trim(),
+      boaterLast:     form.boaterLast.trim(),
+      boaterSuffix:   form.boaterSuffix,
+      boaterPhone:    form.boaterPhone.trim(),
+      boaterEmail:    form.boaterEmail.trim(),
+      coAnglerFirst:  form.coAnglerFirst.trim(),
+      coAnglerLast:   form.coAnglerLast.trim(),
+      coAnglerSuffix: form.coAnglerSuffix,
+      coAnglerPhone:  form.coAnglerPhone.trim(),
+      coAnglerEmail:  form.coAnglerEmail.trim(),
       lunker:    form.lunker    === '' ? '' : parseInt(form.lunker),
       option:    form.option    === '' ? '' : parseInt(form.option),
       paid:      form.paid      === '' ? '' : parseInt(form.paid),
@@ -166,7 +175,7 @@ export default function SignUpTab({ onAddEntry, settings }) {
         {/* ── Boater ── */}
         <div>
           <div style={SECTION}>Boater</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 10, marginBottom: 10 }}>
             <div>
               <label htmlFor="su-boater-first" style={LABEL}>First Name *</label>
               <input ref={boaterFirstRef} id="su-boater-first" name="boaterFirst" type="text" value={form.boaterFirst} placeholder="First"
@@ -180,10 +189,16 @@ export default function SignUpTab({ onAddEntry, settings }) {
                 value={form.boaterLast}
                 placeholder="Last"
                 onChange={v => { boaterContactIdRef.current = null; set('boaterLast', v); }}
-                onSelect={c => { boaterContactIdRef.current = c.id; setForm(p => ({ ...p, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || p.boaterEmail })); }}
+                onSelect={c => { boaterContactIdRef.current = c.id; setForm(p => ({ ...p, boaterFirst: c.firstName, boaterLast: c.lastName, boaterSuffix: c.suffix || '', boaterPhone: c.phone, boaterEmail: c.email || p.boaterEmail })); }}
                 inputProps={{ id: 'su-boater-last', name: 'boaterLast', style: fieldBorder('boaterLast') }}
               />
               {err('boaterLast')}
+            </div>
+            <div>
+              <label style={LABEL}>Suffix</label>
+              <select value={form.boaterSuffix} onChange={e => set('boaterSuffix', e.target.value)} style={SUFFIX_STYLE}>
+                {SUFFIX_OPTIONS.map(o => <option key={o} value={o}>{o || '—'}</option>)}
+              </select>
             </div>
           </div>
           <div>
@@ -196,7 +211,7 @@ export default function SignUpTab({ onAddEntry, settings }) {
               value={form.boaterPhone}
               placeholder="555-123-4567"
               onChange={v => set('boaterPhone', v)}
-              onSelect={c => { boaterContactIdRef.current = c.id; setForm(p => ({ ...p, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || p.boaterEmail })); }}
+              onSelect={c => { boaterContactIdRef.current = c.id; setForm(p => ({ ...p, boaterFirst: c.firstName, boaterLast: c.lastName, boaterSuffix: c.suffix || '', boaterPhone: c.phone, boaterEmail: c.email || p.boaterEmail })); }}
               onBlur={e => set('boaterPhone', formatPhone(e.target.value))}
               inputProps={{ id: 'su-boater-phone', name: 'boaterPhone', style: fieldBorder('boaterPhone'), type: 'tel' }}
             />
@@ -210,7 +225,7 @@ export default function SignUpTab({ onAddEntry, settings }) {
             Co-Angler{' '}
             <span style={{ fontWeight: 400, opacity: 0.55, fontSize: 11, textTransform: 'none', letterSpacing: 0 }}>(optional)</span>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 10, marginBottom: 10 }}>
             <div>
               <label htmlFor="su-co-first" style={LABEL}>First Name</label>
               <input id="su-co-first" name="coAnglerFirst" type="text" value={form.coAnglerFirst} placeholder="First"
@@ -224,10 +239,16 @@ export default function SignUpTab({ onAddEntry, settings }) {
                 value={form.coAnglerLast}
                 placeholder="Last"
                 onChange={v => { coAnglerContactIdRef.current = null; set('coAnglerLast', v); }}
-                onSelect={c => { coAnglerContactIdRef.current = c.id; setForm(p => ({ ...p, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || p.coAnglerEmail })); }}
+                onSelect={c => { coAnglerContactIdRef.current = c.id; setForm(p => ({ ...p, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerSuffix: c.suffix || '', coAnglerPhone: c.phone, coAnglerEmail: c.email || p.coAnglerEmail })); }}
                 inputProps={{ id: 'su-co-last', name: 'coAnglerLast', style: fieldBorder('coAnglerLast') }}
               />
               {err('coAnglerLast')}
+            </div>
+            <div>
+              <label style={LABEL}>Suffix</label>
+              <select value={form.coAnglerSuffix} onChange={e => set('coAnglerSuffix', e.target.value)} style={SUFFIX_STYLE}>
+                {SUFFIX_OPTIONS.map(o => <option key={o} value={o}>{o || '—'}</option>)}
+              </select>
             </div>
           </div>
           <div>
@@ -242,7 +263,7 @@ export default function SignUpTab({ onAddEntry, settings }) {
               value={form.coAnglerPhone}
               placeholder="555-123-4567"
               onChange={v => set('coAnglerPhone', v)}
-              onSelect={c => { coAnglerContactIdRef.current = c.id; setForm(p => ({ ...p, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || p.coAnglerEmail })); }}
+              onSelect={c => { coAnglerContactIdRef.current = c.id; setForm(p => ({ ...p, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerSuffix: c.suffix || '', coAnglerPhone: c.phone, coAnglerEmail: c.email || p.coAnglerEmail })); }}
               onBlur={e => set('coAnglerPhone', formatPhone(e.target.value))}
               inputProps={{ id: 'su-co-phone', name: 'coAnglerPhone', style: fieldBorder('coAnglerPhone'), type: 'tel' }}
             />
@@ -310,11 +331,11 @@ export default function SignUpTab({ onAddEntry, settings }) {
                 padding: '8px 12px', fontSize: 13,
               }}>
                 <span style={{ fontWeight: 700, color: 'var(--white)' }}>
-                  {r.boaterFirst} {r.boaterLast}
+                  {[r.boaterFirst, r.boaterLast, r.boaterSuffix].filter(Boolean).join(' ')}
                 </span>
                 {(r.coAnglerFirst || r.coAnglerLast) && (
                   <span style={{ flex: 1, color: 'var(--header-bg)', marginLeft: 8 }}>
-                    / {r.coAnglerFirst} {r.coAnglerLast}
+                    / {[r.coAnglerFirst, r.coAnglerLast, r.coAnglerSuffix].filter(Boolean).join(' ')}
                   </span>
                 )}
                 <span style={{ color: 'var(--gold-light)', fontSize: 12, marginLeft: 8, whiteSpace: 'nowrap' }}>

@@ -20,16 +20,16 @@ export async function onRequestPost({ request, env }) {
     const t = v => (v ?? '').trim();
     const stmts = entries.map(body => ({
       sql: `INSERT INTO entries
-              (boater_first, boater_last, boater_phone, boater_email,
-               co_angler_first, co_angler_last, co_angler_phone, co_angler_email,
+              (boater_first, boater_last, boater_suffix, boater_phone, boater_email,
+               co_angler_first, co_angler_last, co_angler_suffix, co_angler_phone, co_angler_email,
                boat_no, num_fish, lunker_weight, total_weight,
                lunker, option_field, paid, app_signed, buy_in,
                raw_weight, dead_fish, short_fish, needs_attention,
                weighed_at, signed_up_at, checked_in_at, off_water_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
-        t(body.boaterFirst),   t(body.boaterLast),    t(body.boaterPhone),   t(body.boaterEmail),
-        t(body.coAnglerFirst), t(body.coAnglerLast),  t(body.coAnglerPhone), t(body.coAnglerEmail),
+        t(body.boaterFirst),   t(body.boaterLast),   t(body.boaterSuffix ?? ''),   t(body.boaterPhone),   t(body.boaterEmail),
+        t(body.coAnglerFirst), t(body.coAnglerLast), t(body.coAnglerSuffix ?? ''), t(body.coAnglerPhone), t(body.coAnglerEmail),
         t(body.boatNo),
         Number(body.numFish)      || 0,
         Number(body.lunkerWeight) || 0,

@@ -63,7 +63,7 @@ function rosterFilterFn(row, _columnId, filterValue) {
   if (regFilter === 'unregistered' && isPaid && isSigned)    return false;
   if (!text) return true;
   const q = text.toLowerCase();
-  return `${r.boaterFirst} ${r.boaterLast} ${r.coAnglerFirst} ${r.coAnglerLast} ${r.boatNo}`.toLowerCase().includes(q);
+  return `${r.boaterFirst} ${r.boaterLast} ${r.boaterSuffix} ${r.coAnglerFirst} ${r.coAnglerLast} ${r.coAnglerSuffix} ${r.boatNo}`.toLowerCase().includes(q);
 }
 rosterFilterFn.autoRemove = v => !v?.text && (!v?.regFilter || v.regFilter === 'all');
 
@@ -224,7 +224,7 @@ export default function RosterTab({
         id: 'boaterLast', accessorKey: 'boaterLast', header: 'Boater Last', size: COL_WIDTHS.boaterLast,
         sortingFn: stringSort,
         meta: { tdClassName: 'td-name' },
-        cell: ({ row: { original: r } }) => r.boaterLast,
+        cell: ({ row: { original: r } }) => r.boaterSuffix ? `${r.boaterLast} ${r.boaterSuffix}` : r.boaterLast,
       },
       {
         id: 'coAnglerFirst', accessorKey: 'coAnglerFirst', header: 'Co-Angler First', size: COL_WIDTHS.coAnglerFirst,
@@ -236,7 +236,7 @@ export default function RosterTab({
         id: 'coAnglerLast', accessorKey: 'coAnglerLast', header: 'Co-Angler Last', size: COL_WIDTHS.coAnglerLast,
         sortingFn: stringSort,
         meta: { tdClassName: 'td-name' },
-        cell: ({ row: { original: r } }) => r.coAnglerLast,
+        cell: ({ row: { original: r } }) => r.coAnglerSuffix ? `${r.coAnglerLast} ${r.coAnglerSuffix}` : r.coAnglerLast,
       },
       {
         id: 'boatNo', accessorKey: 'boatNo', header: 'Boat #', size: COL_WIDTHS.boatNo,
@@ -547,9 +547,9 @@ export default function RosterTab({
               {lockedSorted.map(row => (
                 <tr key={row.id}>
                   <td className="td-name">{row.boaterFirst}</td>
-                  <td className="td-name">{row.boaterLast}</td>
+                  <td className="td-name">{row.boaterLast}{row.boaterSuffix ? ` ${row.boaterSuffix}` : ''}</td>
                   <td className="td-name">{row.coAnglerFirst}</td>
-                  <td className="td-name">{row.coAnglerLast}</td>
+                  <td className="td-name">{row.coAnglerLast}{row.coAnglerSuffix ? ` ${row.coAnglerSuffix}` : ''}</td>
                   <td style={{ textAlign: 'center', fontWeight: 700, color: row.boatNo ? 'var(--gold-light)' : 'var(--header-bg)' }}>{row.boatNo || '—'}</td>
                   <td style={{ textAlign: 'center', fontSize: 11, color: 'var(--header-bg)', whiteSpace: 'nowrap' }}>{fmtSignedUp(row.signedUpAt)}</td>
                 </tr>

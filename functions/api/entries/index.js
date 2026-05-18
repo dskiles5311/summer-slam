@@ -13,10 +13,12 @@ function toJS(row, hidePI = false) {
     id:             Number(row.id),
     boaterFirst:    row.boater_first    ?? '',
     boaterLast:     row.boater_last     ?? '',
+    boaterSuffix:   row.boater_suffix   ?? '',
     boaterPhone:    hidePI ? '' : (row.boater_phone    ?? ''),
     boaterEmail:    hidePI ? '' : (row.boater_email    ?? ''),
     coAnglerFirst:  row.co_angler_first ?? '',
     coAnglerLast:   row.co_angler_last  ?? '',
+    coAnglerSuffix: row.co_angler_suffix ?? '',
     coAnglerPhone:  hidePI ? '' : (row.co_angler_phone ?? ''),
     coAnglerEmail:  hidePI ? '' : (row.co_angler_email ?? ''),
     boatNo:         row.boat_no         ?? '',
@@ -71,15 +73,15 @@ export async function onRequestPost({ request, env }) {
 
     const result = await db.execute({
       sql: `INSERT INTO entries
-              (boater_first, boater_last, boater_phone, boater_email,
-               co_angler_first, co_angler_last, co_angler_phone, co_angler_email,
+              (boater_first, boater_last, boater_suffix, boater_phone, boater_email,
+               co_angler_first, co_angler_last, co_angler_suffix, co_angler_phone, co_angler_email,
                boat_no, num_fish, lunker_weight, total_weight,
                lunker, option_field, paid, app_signed, buy_in,
                raw_weight, dead_fish, short_fish, needs_attention, signed_up_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
       args: [
-        t(body.boaterFirst),   t(body.boaterLast),    t(body.boaterPhone),   t(body.boaterEmail),
-        t(body.coAnglerFirst), t(body.coAnglerLast),  t(body.coAnglerPhone), t(body.coAnglerEmail),
+        t(body.boaterFirst),   t(body.boaterLast),   t(body.boaterSuffix ?? ''),   t(body.boaterPhone),   t(body.boaterEmail),
+        t(body.coAnglerFirst), t(body.coAnglerLast), t(body.coAnglerSuffix ?? ''), t(body.coAnglerPhone), t(body.coAnglerEmail),
         t(body.boatNo),
         Number(body.numFish)      || 0,
         Number(body.lunkerWeight) || 0,
@@ -102,7 +104,7 @@ export async function onRequestPost({ request, env }) {
     // Write signup event (best-effort — don't fail the request if it errors)
     try {
       await db.execute('CREATE TABLE IF NOT EXISTS event_log (id INTEGER PRIMARY KEY AUTOINCREMENT, event_type TEXT NOT NULL, entry_id INTEGER, boat_no TEXT, boater_name TEXT, value TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)');
-      const boaterName = `${t(body.boaterFirst)} ${t(body.boaterLast)}`.trim();
+      const boaterName = [t(body.boaterFirst), t(body.boaterLast), t(body.boaterSuffix ?? '')].filter(Boolean).join(' ');
       await db.execute({ sql: 'INSERT INTO event_log (event_type, entry_id, boat_no, boater_name, value) VALUES (?,?,?,?,?)', args: ['signup', newId, '', boaterName, ''] });
     } catch (_) {}
 

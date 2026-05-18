@@ -28,10 +28,11 @@ CREATE TABLE IF NOT EXISTS contacts (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   first_name TEXT NOT NULL COLLATE NOCASE,
   last_name  TEXT NOT NULL COLLATE NOCASE,
+  suffix     TEXT NOT NULL DEFAULT '' COLLATE NOCASE,
   phone      TEXT DEFAULT '',
   email      TEXT DEFAULT '',
   last_seen  DATETIME DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(first_name, last_name, phone)
+  UNIQUE(first_name, last_name, suffix, phone)
 );
 
 CREATE TABLE IF NOT EXISTS settings (

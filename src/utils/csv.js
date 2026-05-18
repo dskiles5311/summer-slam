@@ -76,9 +76,11 @@ export function importCSV(file) {
         const fieldMap = {
           'boater first': 'boaterFirst', 'boater_first': 'boaterFirst',
           'boater last': 'boaterLast', 'boater_last': 'boaterLast',
+          'boater suffix': 'boaterSuffix', 'boater_suffix': 'boaterSuffix',
           'boater phone': 'boaterPhone', 'boater_phone': 'boaterPhone',
           'co-angler first': 'coAnglerFirst', 'co-angler_first': 'coAnglerFirst',
           'co-angler last': 'coAnglerLast', 'co-angler_last': 'coAnglerLast',
+          'co-angler suffix': 'coAnglerSuffix', 'co-angler_suffix': 'coAnglerSuffix',
           'co-angler phone': 'coAnglerPhone', 'co-angler_phone': 'coAnglerPhone',
           'boat no': 'boatNo', 'boat_no': 'boatNo', 'boat no.': 'boatNo', 'boat_no.': 'boatNo',
           '# fish': 'numFish', 'num fish': 'numFish', 'number of fish': 'numFish', 'number_of_fish': 'numFish',
@@ -99,7 +101,7 @@ export function importCSV(file) {
         for (let i = 1; i < lines.length; i++) {
           const vals = parseCSVLine(lines[i]);
           const row = {
-            boaterFirst: '', boaterLast: '', boaterPhone: '', coAnglerFirst: '', coAnglerLast: '', coAnglerPhone: '',
+            boaterFirst: '', boaterLast: '', boaterSuffix: '', boaterPhone: '', coAnglerFirst: '', coAnglerLast: '', coAnglerSuffix: '', coAnglerPhone: '',
             boatNo: '', numFish: 0, lunkerWeight: 0, totalWeight: 0,
             lunker: 0, option: 0, paid: 0, appSigned: 0, buyIn: 0,
             rawWeight: null, deadFish: 0, shortFish: 0, needsAttention: false,

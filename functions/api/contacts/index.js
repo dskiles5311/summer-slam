@@ -38,6 +38,7 @@ export async function onRequestGet({ request, env }) {
       id:        Number(r.id),
       firstName: r.first_name,
       lastName:  r.last_name,
+      suffix:    r.suffix || '',
       phone:     r.phone || '',
       email:     r.email || '',
       lastSeen:  r.last_seen || null,
@@ -54,6 +55,7 @@ export async function onRequestPost({ request, env }) {
     const body      = await request.json();
     const firstName    = (body.firstName    ?? '').trim();
     const lastName     = (body.lastName     ?? '').trim();
+    const suffix       = (body.suffix       ?? '').trim();
     const phone        = formatPhone((body.phone ?? '').trim());
     const email        = (body.email ?? '').trim();
     const oldFirstName = (body.oldFirstName ?? '').trim();
@@ -69,8 +71,8 @@ export async function onRequestPost({ request, env }) {
         const newPhone = phone !== '' ? phone : (existing.phone || '');
         const newEmail = email !== '' ? email : (existing.email || '');
         await db.execute({
-          sql:  `UPDATE contacts SET first_name=?, last_name=?, phone=?, email=?, last_seen=CURRENT_TIMESTAMP WHERE id=?`,
-          args: [firstName, lastName, newPhone, newEmail, contactId],
+          sql:  `UPDATE contacts SET first_name=?, last_name=?, suffix=?, phone=?, email=?, last_seen=CURRENT_TIMESTAMP WHERE id=?`,
+          args: [firstName, lastName, suffix, newPhone, newEmail, contactId],
         });
         return Response.json({ success: true }, { status: 201 });
       }
@@ -87,30 +89,26 @@ export async function onRequestPost({ request, env }) {
         const newPhone = phone !== '' ? phone : (oldRow.phone || '');
         const newEmail = email !== '' ? email : (oldRow.email || '');
         await db.execute({
-          sql:  `UPDATE contacts SET first_name=?, last_name=?, phone=?, email=?, last_seen=CURRENT_TIMESTAMP WHERE id=?`,
-          args: [firstName, lastName, newPhone, newEmail, Number(oldRow.id)],
+          sql:  `UPDATE contacts SET first_name=?, last_name=?, suffix=?, phone=?, email=?, last_seen=CURRENT_TIMESTAMP WHERE id=?`,
+          args: [firstName, lastName, suffix, newPhone, newEmail, Number(oldRow.id)],
         });
         return Response.json({ success: true }, { status: 201 });
       }
     }
 
     if (phone) {
-      // Atomic upsert keyed on (first_name, last_name, phone) — the table's unique constraint.
-      // Eliminates the SELECT-then-INSERT race: two concurrent requests for the same person
-      // will serialize at the DB level; one inserts, one updates. Both succeed cleanly.
       await db.execute({
-        sql: `INSERT INTO contacts (first_name, last_name, phone, email, last_seen)
-              VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-              ON CONFLICT(first_name, last_name, phone) DO UPDATE SET
+        sql: `INSERT INTO contacts (first_name, last_name, suffix, phone, email, last_seen)
+              VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+              ON CONFLICT(first_name, last_name, suffix, phone) DO UPDATE SET
                 email     = CASE WHEN excluded.email != '' THEN excluded.email ELSE contacts.email END,
                 last_seen = CURRENT_TIMESTAMP`,
-        args: [firstName, lastName, phone, email],
+        args: [firstName, lastName, suffix, phone, email],
       });
     } else {
-      // No phone — fall back to name lookup so we don't insert a blank-phone duplicate.
       const existing = await db.execute({
-        sql:  `SELECT id, email FROM contacts WHERE first_name = ? AND last_name = ? COLLATE NOCASE ORDER BY last_seen DESC LIMIT 1`,
-        args: [firstName, lastName],
+        sql:  `SELECT id, email FROM contacts WHERE first_name = ? AND last_name = ? AND suffix = ? COLLATE NOCASE ORDER BY last_seen DESC LIMIT 1`,
+        args: [firstName, lastName, suffix],
       });
       if (existing.rows.length > 0) {
         const row      = existing.rows[0];
@@ -121,8 +119,8 @@ export async function onRequestPost({ request, env }) {
         });
       } else {
         await db.execute({
-          sql:  `INSERT OR IGNORE INTO contacts (first_name, last_name, phone, email, last_seen) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`,
-          args: [firstName, lastName, '', email],
+          sql:  `INSERT OR IGNORE INTO contacts (first_name, last_name, suffix, phone, email, last_seen) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+          args: [firstName, lastName, suffix, '', email],
         });
       }
     }

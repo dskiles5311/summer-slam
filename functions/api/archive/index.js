@@ -36,19 +36,21 @@ export async function onRequestPost({ request, env }) {
       { sql: 'DELETE FROM archives WHERE year = ?', args: [String(year)] },
       ...entries.map(e => ({
         sql: `INSERT INTO archives
-                (year, place, boater_first, boater_last, co_angler_first, co_angler_last,
+                (year, place, boater_first, boater_last, boater_suffix, co_angler_first, co_angler_last, co_angler_suffix,
                  boat_no, num_fish, lunker_weight, total_weight, raw_weight, dead_fish, short_fish,
                  boater_phone, boater_email, co_angler_phone, co_angler_email,
                  lunker, option_field, paid, app_signed, buy_in, needs_attention,
                  weighed_at, signed_up_at, checked_in_at, off_water_at)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         args: [
           String(year),
           e.place != null ? Number(e.place) : null,
           e.boaterFirst    ?? '',
           e.boaterLast     ?? '',
+          e.boaterSuffix   ?? '',
           e.coAnglerFirst  ?? '',
           e.coAnglerLast   ?? '',
+          e.coAnglerSuffix ?? '',
           e.boatNo         ?? '',
           Number(e.numFish)      || 0,
           Number(e.lunkerWeight) || 0,

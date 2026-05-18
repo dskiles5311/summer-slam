@@ -61,8 +61,8 @@ function flightFor(entry, flights) {
 
 function rowName(r) {
   if (!r) return '—';
-  const boater = [r.boaterFirst, r.boaterLast].filter(Boolean).join(' ') || '—';
-  const co = [r.coAnglerFirst, r.coAnglerLast].filter(Boolean).join(' ');
+  const boater = [r.boaterFirst, r.boaterLast, r.boaterSuffix].filter(Boolean).join(' ') || '—';
+  const co = [r.coAnglerFirst, r.coAnglerLast, r.coAnglerSuffix].filter(Boolean).join(' ');
   return co ? `${boater} / ${co}` : boater;
 }
 

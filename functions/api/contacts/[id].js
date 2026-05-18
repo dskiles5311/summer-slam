@@ -10,38 +10,40 @@ export async function onRequestPut({ params, request, env }) {
   if (!/^\d+$/.test(params.id)) return Response.json({ error: 'Invalid id' }, { status: 400 });
   try {
     const db = getDb(env);
-    const { firstName, lastName, phone, email } = await request.json();
+    const { firstName, lastName, suffix, phone, email } = await request.json();
 
     // Read old name before updating so we can cascade to entries
-    const before = await db.execute({ sql: 'SELECT first_name, last_name FROM contacts WHERE id=?', args: [params.id] });
+    const before = await db.execute({ sql: 'SELECT first_name, last_name, suffix FROM contacts WHERE id=?', args: [params.id] });
     if (!before.rows[0]) return Response.json({ error: 'Not found' }, { status: 404 });
-    const oldFirst = before.rows[0].first_name;
-    const oldLast  = before.rows[0].last_name;
-    const newFirst = firstName ?? '';
-    const newLast  = lastName  ?? '';
+    const oldFirst  = before.rows[0].first_name;
+    const oldLast   = before.rows[0].last_name;
+    const oldSuffix = before.rows[0].suffix ?? '';
+    const newFirst  = firstName ?? '';
+    const newLast   = lastName  ?? '';
+    const newSuffix = suffix    ?? '';
 
     await db.execute({
-      sql:  `UPDATE contacts SET first_name=?, last_name=?, phone=?, email=? WHERE id=?`,
-      args: [newFirst, newLast, phone ?? '', email ?? '', params.id],
+      sql:  `UPDATE contacts SET first_name=?, last_name=?, suffix=?, phone=?, email=? WHERE id=?`,
+      args: [newFirst, newLast, newSuffix, phone ?? '', email ?? '', params.id],
     });
 
-    // Cascade name change to entries and archives if the name actually changed
-    if (oldFirst !== newFirst || oldLast !== newLast) {
+    // Cascade name/suffix change to entries and archives
+    if (oldFirst !== newFirst || oldLast !== newLast || oldSuffix !== newSuffix) {
       await db.execute({
-        sql:  `UPDATE entries SET boater_first=?, boater_last=? WHERE boater_first=? COLLATE NOCASE AND boater_last=? COLLATE NOCASE`,
-        args: [newFirst, newLast, oldFirst, oldLast],
+        sql:  `UPDATE entries SET boater_first=?, boater_last=?, boater_suffix=? WHERE boater_first=? COLLATE NOCASE AND boater_last=? COLLATE NOCASE AND boater_suffix=? COLLATE NOCASE`,
+        args: [newFirst, newLast, newSuffix, oldFirst, oldLast, oldSuffix],
       });
       await db.execute({
-        sql:  `UPDATE entries SET co_angler_first=?, co_angler_last=? WHERE co_angler_first=? COLLATE NOCASE AND co_angler_last=? COLLATE NOCASE`,
-        args: [newFirst, newLast, oldFirst, oldLast],
+        sql:  `UPDATE entries SET co_angler_first=?, co_angler_last=?, co_angler_suffix=? WHERE co_angler_first=? COLLATE NOCASE AND co_angler_last=? COLLATE NOCASE AND co_angler_suffix=? COLLATE NOCASE`,
+        args: [newFirst, newLast, newSuffix, oldFirst, oldLast, oldSuffix],
       });
       await db.execute({
-        sql:  `UPDATE archives SET boater_first=?, boater_last=? WHERE boater_first=? COLLATE NOCASE AND boater_last=? COLLATE NOCASE`,
-        args: [newFirst, newLast, oldFirst, oldLast],
+        sql:  `UPDATE archives SET boater_first=?, boater_last=?, boater_suffix=? WHERE boater_first=? COLLATE NOCASE AND boater_last=? COLLATE NOCASE AND boater_suffix=? COLLATE NOCASE`,
+        args: [newFirst, newLast, newSuffix, oldFirst, oldLast, oldSuffix],
       });
       await db.execute({
-        sql:  `UPDATE archives SET co_angler_first=?, co_angler_last=? WHERE co_angler_first=? COLLATE NOCASE AND co_angler_last=? COLLATE NOCASE`,
-        args: [newFirst, newLast, oldFirst, oldLast],
+        sql:  `UPDATE archives SET co_angler_first=?, co_angler_last=?, co_angler_suffix=? WHERE co_angler_first=? COLLATE NOCASE AND co_angler_last=? COLLATE NOCASE AND co_angler_suffix=? COLLATE NOCASE`,
+        args: [newFirst, newLast, newSuffix, oldFirst, oldLast, oldSuffix],
       });
     }
 
@@ -51,6 +53,7 @@ export async function onRequestPut({ params, request, env }) {
       id:        Number(r.id),
       firstName: r.first_name,
       lastName:  r.last_name,
+      suffix:    r.suffix || '',
       phone:     r.phone || '',
       email:     r.email || '',
     });

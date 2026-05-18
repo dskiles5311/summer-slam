@@ -4,9 +4,16 @@ import EmailInput from './EmailInput';
 import { formatPhone } from '../utils/phone';
 import { evalMath } from '../utils/evalMath';
 
+const SUFFIX_OPTIONS = ['', 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V'];
+const SUFFIX_STYLE = {
+  background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(139,180,225,0.3)',
+  borderRadius: 8, color: 'var(--white)', fontSize: 14, padding: '9px 10px',
+  width: '100%', boxSizing: 'border-box', outline: 'none', cursor: 'pointer',
+};
+
 const EMPTY = {
-  boaterFirst: '', boaterLast: '', boaterPhone: '', boaterEmail: '',
-  coAnglerFirst: '', coAnglerLast: '', coAnglerPhone: '', coAnglerEmail: '',
+  boaterFirst: '', boaterLast: '', boaterSuffix: '', boaterPhone: '', boaterEmail: '',
+  coAnglerFirst: '', coAnglerLast: '', coAnglerSuffix: '', coAnglerPhone: '', coAnglerEmail: '',
   boatNo: '', numFish: '', lunkerWeight: '', totalWeight: '',
   lunker: '', option: '', paid: '', appSigned: '', buyIn: '',
   needsAttention: false,
@@ -64,14 +71,16 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
   useEffect(() => {
     setErrors({});
     setForm({
-      boaterFirst:    entry.boaterFirst   ?? '',
-      boaterLast:     entry.boaterLast    ?? '',
+      boaterFirst:    entry.boaterFirst    ?? '',
+      boaterLast:     entry.boaterLast     ?? '',
+      boaterSuffix:   entry.boaterSuffix   ?? '',
       boaterPhone:    formatPhone(entry.boaterPhone   ?? ''),
-      boaterEmail:    entry.boaterEmail   ?? '',
-      coAnglerFirst:  entry.coAnglerFirst ?? '',
-      coAnglerLast:   entry.coAnglerLast  ?? '',
+      boaterEmail:    entry.boaterEmail    ?? '',
+      coAnglerFirst:  entry.coAnglerFirst  ?? '',
+      coAnglerLast:   entry.coAnglerLast   ?? '',
+      coAnglerSuffix: entry.coAnglerSuffix ?? '',
       coAnglerPhone:  formatPhone(entry.coAnglerPhone ?? ''),
-      coAnglerEmail:  entry.coAnglerEmail ?? '',
+      coAnglerEmail:  entry.coAnglerEmail  ?? '',
       boatNo:         entry.boatNo        ?? '',
       numFish:        entry.numFish       ?? '',
       lunkerWeight:   entry.lunkerWeight  ?? '',
@@ -99,10 +108,11 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
   function swapAnglers() {
     setForm(prev => ({
       ...prev,
-      boaterFirst:   prev.coAnglerFirst,  coAnglerFirst: prev.boaterFirst,
-      boaterLast:    prev.coAnglerLast,   coAnglerLast:  prev.boaterLast,
-      boaterPhone:   prev.coAnglerPhone,  coAnglerPhone: prev.boaterPhone,
-      boaterEmail:   prev.coAnglerEmail,  coAnglerEmail: prev.boaterEmail,
+      boaterFirst:    prev.coAnglerFirst,   coAnglerFirst:  prev.boaterFirst,
+      boaterLast:     prev.coAnglerLast,    coAnglerLast:   prev.boaterLast,
+      boaterSuffix:   prev.coAnglerSuffix,  coAnglerSuffix: prev.boaterSuffix,
+      boaterPhone:    prev.coAnglerPhone,   coAnglerPhone:  prev.boaterPhone,
+      boaterEmail:    prev.coAnglerEmail,   coAnglerEmail:  prev.boaterEmail,
     }));
   }
 
@@ -195,7 +205,7 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
                     value={form.boaterLast}
                     placeholder="Last"
                     onChange={v => set('boaterLast', v)}
-                    onSelect={c => setForm(prev => ({ ...prev, boaterFirst: c.firstName, boaterLast: c.lastName, boaterPhone: c.phone, boaterEmail: c.email || prev.boaterEmail }))}
+                    onSelect={c => setForm(prev => ({ ...prev, boaterFirst: c.firstName, boaterLast: c.lastName, boaterSuffix: c.suffix || '', boaterPhone: c.phone, boaterEmail: c.email || prev.boaterEmail }))}
                     inputProps={{ id: 'em-boater-last', name: 'boaterLast', style: errBorder('boaterLast') }}
                   />
                 ) : (
@@ -204,6 +214,12 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
                          style={errBorder('boaterLast')} />
                 )}
                 {err('boaterLast')}
+              </div>
+              <div className="form-field" style={{ gridColumn: '1 / -1' }}>
+                <label htmlFor="em-boater-suffix">Suffix</label>
+                <select id="em-boater-suffix" value={form.boaterSuffix} onChange={e => set('boaterSuffix', e.target.value)} style={{ ...SUFFIX_STYLE, maxWidth: 120 }}>
+                  {SUFFIX_OPTIONS.map(o => <option key={o} value={o}>{o || '—'}</option>)}
+                </select>
               </div>
               <div className="form-field">
                 <label htmlFor="em-boater-phone">Boater Phone{isNew ? ' *' : ''}</label>
@@ -248,13 +264,19 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
                     value={form.coAnglerLast}
                     placeholder="Last"
                     onChange={v => set('coAnglerLast', v)}
-                    onSelect={c => setForm(prev => ({ ...prev, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerPhone: c.phone, coAnglerEmail: c.email || prev.coAnglerEmail }))}
+                    onSelect={c => setForm(prev => ({ ...prev, coAnglerFirst: c.firstName, coAnglerLast: c.lastName, coAnglerSuffix: c.suffix || '', coAnglerPhone: c.phone, coAnglerEmail: c.email || prev.coAnglerEmail }))}
                     inputProps={{ id: 'em-co-last', name: 'coAnglerLast' }}
                   />
                 ) : (
                   <input id="em-co-last" name="coAnglerLast" type="text" value={form.coAnglerLast} placeholder="Last"
                          onChange={e => set('coAnglerLast', e.target.value)} />
                 )}
+              </div>
+              <div className="form-field" style={{ gridColumn: '1 / -1' }}>
+                <label htmlFor="em-co-suffix">Suffix</label>
+                <select id="em-co-suffix" value={form.coAnglerSuffix} onChange={e => set('coAnglerSuffix', e.target.value)} style={{ ...SUFFIX_STYLE, maxWidth: 120 }}>
+                  {SUFFIX_OPTIONS.map(o => <option key={o} value={o}>{o || '—'}</option>)}
+                </select>
               </div>
               <div className="form-field">
                 <label htmlFor="em-co-phone">Co-Angler Phone{isNew && (form.coAnglerFirst || form.coAnglerLast) ? ' *' : ''}</label>

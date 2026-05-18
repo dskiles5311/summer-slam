@@ -79,9 +79,9 @@ export default function LeaderboardTab({ entries, settings }) {
           {bagRow && (
             <>
               {bagRow.boatNo && <span className="sc-boat">Boat #{bagRow.boatNo}</span>}
-              <span className="sc-name">{`${bagRow.boaterFirst} ${bagRow.boaterLast}`.trim() || '—'}</span>
-              {`${bagRow.coAnglerFirst || ''} ${bagRow.coAnglerLast || ''}`.trim() && (
-                <span className="sc-co">{`${bagRow.coAnglerFirst || ''} ${bagRow.coAnglerLast || ''}`.trim()}</span>
+              <span className="sc-name">{[bagRow.boaterFirst, bagRow.boaterLast, bagRow.boaterSuffix].filter(Boolean).join(' ') || '—'}</span>
+              {[bagRow.coAnglerFirst, bagRow.coAnglerLast, bagRow.coAnglerSuffix].filter(Boolean).join(' ') && (
+                <span className="sc-co">{[bagRow.coAnglerFirst, bagRow.coAnglerLast, bagRow.coAnglerSuffix].filter(Boolean).join(' ')}</span>
               )}
             </>
           )}
@@ -92,9 +92,9 @@ export default function LeaderboardTab({ entries, settings }) {
           {lunkerRow && (
             <>
               {lunkerRow.boatNo && <span className="sc-boat">Boat #{lunkerRow.boatNo}</span>}
-              <span className="sc-name">{`${lunkerRow.boaterFirst} ${lunkerRow.boaterLast}`.trim() || '—'}</span>
-              {`${lunkerRow.coAnglerFirst || ''} ${lunkerRow.coAnglerLast || ''}`.trim() && (
-                <span className="sc-co">{`${lunkerRow.coAnglerFirst || ''} ${lunkerRow.coAnglerLast || ''}`.trim()}</span>
+              <span className="sc-name">{[lunkerRow.boaterFirst, lunkerRow.boaterLast, lunkerRow.boaterSuffix].filter(Boolean).join(' ') || '—'}</span>
+              {[lunkerRow.coAnglerFirst, lunkerRow.coAnglerLast, lunkerRow.coAnglerSuffix].filter(Boolean).join(' ') && (
+                <span className="sc-co">{[lunkerRow.coAnglerFirst, lunkerRow.coAnglerLast, lunkerRow.coAnglerSuffix].filter(Boolean).join(' ')}</span>
               )}
             </>
           )}
@@ -105,9 +105,9 @@ export default function LeaderboardTab({ entries, settings }) {
           {option1Row ? (
             <>
               {option1Row.boatNo && <span className="sc-boat">Boat #{option1Row.boatNo}</span>}
-              <span className="sc-name">{`${option1Row.boaterFirst} ${option1Row.boaterLast}`.trim() || '—'}</span>
-              {`${option1Row.coAnglerFirst || ''} ${option1Row.coAnglerLast || ''}`.trim() && (
-                <span className="sc-co">{`${option1Row.coAnglerFirst || ''} ${option1Row.coAnglerLast || ''}`.trim()}</span>
+              <span className="sc-name">{[option1Row.boaterFirst, option1Row.boaterLast, option1Row.boaterSuffix].filter(Boolean).join(' ') || '—'}</span>
+              {[option1Row.coAnglerFirst, option1Row.coAnglerLast, option1Row.coAnglerSuffix].filter(Boolean).join(' ') && (
+                <span className="sc-co">{[option1Row.coAnglerFirst, option1Row.coAnglerLast, option1Row.coAnglerSuffix].filter(Boolean).join(' ')}</span>
               )}
             </>
           ) : <span className="sc-name">—</span>}
@@ -118,9 +118,9 @@ export default function LeaderboardTab({ entries, settings }) {
           {option2Row ? (
             <>
               {option2Row.boatNo && <span className="sc-boat">Boat #{option2Row.boatNo}</span>}
-              <span className="sc-name">{`${option2Row.boaterFirst} ${option2Row.boaterLast}`.trim() || '—'}</span>
-              {`${option2Row.coAnglerFirst || ''} ${option2Row.coAnglerLast || ''}`.trim() && (
-                <span className="sc-co">{`${option2Row.coAnglerFirst || ''} ${option2Row.coAnglerLast || ''}`.trim()}</span>
+              <span className="sc-name">{[option2Row.boaterFirst, option2Row.boaterLast, option2Row.boaterSuffix].filter(Boolean).join(' ') || '—'}</span>
+              {[option2Row.coAnglerFirst, option2Row.coAnglerLast, option2Row.coAnglerSuffix].filter(Boolean).join(' ') && (
+                <span className="sc-co">{[option2Row.coAnglerFirst, option2Row.coAnglerLast, option2Row.coAnglerSuffix].filter(Boolean).join(' ')}</span>
               )}
             </>
           ) : <span className="sc-name">—</span>}
@@ -140,9 +140,9 @@ export default function LeaderboardTab({ entries, settings }) {
                 <div className="rw-boat-lbl">Boat #</div>
               </div>
               <div className="rw-names">
-                <span className="rw-boater">{[cwEntry.boaterFirst, cwEntry.boaterLast].filter(Boolean).join(' ') || '—'}</span>
-                {[cwEntry.coAnglerFirst, cwEntry.coAnglerLast].filter(Boolean).join(' ') && (
-                  <span className="rw-co">{[cwEntry.coAnglerFirst, cwEntry.coAnglerLast].filter(Boolean).join(' ')}</span>
+                <span className="rw-boater">{[cwEntry.boaterFirst, cwEntry.boaterLast, cwEntry.boaterSuffix].filter(Boolean).join(' ') || '—'}</span>
+                {[cwEntry.coAnglerFirst, cwEntry.coAnglerLast, cwEntry.coAnglerSuffix].filter(Boolean).join(' ') && (
+                  <span className="rw-co">{[cwEntry.coAnglerFirst, cwEntry.coAnglerLast, cwEntry.coAnglerSuffix].filter(Boolean).join(' ')}</span>
                 )}
               </div>
             </div>
@@ -158,7 +158,7 @@ export default function LeaderboardTab({ entries, settings }) {
               const lw  = parseFloat(row.lunkerWeight) || 0;
               const raw = parseFloat(row.totalWeight) || 0;
               const tw  = row._isDQ ? 0 : (row._effectiveWeight ?? raw);
-              const coName = [row.coAnglerFirst, row.coAnglerLast].filter(Boolean).join(' ');
+              const coName = [row.coAnglerFirst, row.coAnglerLast, row.coAnglerSuffix].filter(Boolean).join(' ');
               return (
                 <div key={row.id} className={`rw-card${i === 0 ? ' rw-latest' : ''}`}>
                   <div className="rw-icon">
@@ -171,7 +171,7 @@ export default function LeaderboardTab({ entries, settings }) {
                     <div className="rw-boat-lbl">Boat #</div>
                   </div>
                   <div className="rw-names">
-                    <span className="rw-boater">{[row.boaterFirst, row.boaterLast].filter(Boolean).join(' ') || '—'}</span>
+                    <span className="rw-boater">{[row.boaterFirst, row.boaterLast, row.boaterSuffix].filter(Boolean).join(' ') || '—'}</span>
                     {coName && <span className="rw-co">{coName}</span>}
                   </div>
                   <div className="rw-stats">
@@ -225,7 +225,7 @@ export default function LeaderboardTab({ entries, settings }) {
           const payoutAmt = tiedCount > 1
             ? Math.round(payoutSlice.reduce((s, p) => s + (p || 0), 0) / tiedCount)
             : (payouts[r - 1] || 0);
-          const coName = [row.coAnglerFirst, row.coAnglerLast].filter(Boolean).join(' ') || '—';
+          const coName = [row.coAnglerFirst, row.coAnglerLast, row.coAnglerSuffix].filter(Boolean).join(' ') || '—';
 
           const isLunker1 = lunkerRow  && row.id === lunkerRow.id;
           const isLunker2 = lunkerRow2 && row.id === lunkerRow2.id;
@@ -244,7 +244,7 @@ export default function LeaderboardTab({ entries, settings }) {
               </div>
               <div className="lb-anglers">
                 <div className="lb-angler-name">
-                  {row.boaterFirst} {row.boaterLast}
+                  {[row.boaterFirst, row.boaterLast, row.boaterSuffix].filter(Boolean).join(' ')}
                   {row.lunker === 1 && <span style={{ marginLeft: 7, fontSize: 10, fontWeight: 800, color: '#ffb450', background: 'rgba(255,180,80,0.22)', border: '1px solid rgba(255,180,80,0.55)', borderRadius: 3, padding: '1px 5px', verticalAlign: 'middle', letterSpacing: 0.3 }}>L</span>}
                   {row.option === 1 && <span style={{ marginLeft: 4, fontSize: 10, fontWeight: 800, color: '#78c8ff', background: 'rgba(120,200,255,0.22)', border: '1px solid rgba(120,200,255,0.55)', borderRadius: 3, padding: '1px 5px', verticalAlign: 'middle', letterSpacing: 0.3 }}>O</span>}
                   {coName !== '—' && <span className="lb-co">, {coName}</span>}

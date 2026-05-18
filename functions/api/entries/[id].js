@@ -11,14 +11,16 @@ function getDb(env) {
 function toJS(row) {
   return {
     id:             Number(row.id),
-    boaterFirst:    row.boater_first    ?? '',
-    boaterLast:     row.boater_last     ?? '',
-    boaterPhone:    row.boater_phone    ?? '',
-    boaterEmail:    row.boater_email    ?? '',
-    coAnglerFirst:  row.co_angler_first ?? '',
-    coAnglerLast:   row.co_angler_last  ?? '',
-    coAnglerPhone:  row.co_angler_phone ?? '',
-    coAnglerEmail:  row.co_angler_email ?? '',
+    boaterFirst:    row.boater_first     ?? '',
+    boaterLast:     row.boater_last      ?? '',
+    boaterSuffix:   row.boater_suffix    ?? '',
+    boaterPhone:    row.boater_phone     ?? '',
+    boaterEmail:    row.boater_email     ?? '',
+    coAnglerFirst:  row.co_angler_first  ?? '',
+    coAnglerLast:   row.co_angler_last   ?? '',
+    coAnglerSuffix: row.co_angler_suffix ?? '',
+    coAnglerPhone:  row.co_angler_phone  ?? '',
+    coAnglerEmail:  row.co_angler_email  ?? '',
     boatNo:         row.boat_no         ?? '',
     numFish:        row.num_fish        ?? 0,
     lunkerWeight:   row.lunker_weight   ?? 0,
@@ -59,8 +61,8 @@ export async function onRequestPut({ params, request, env }) {
 
     const result = await db.execute({
       sql: `UPDATE entries SET
-              boater_first=?, boater_last=?, boater_phone=?, boater_email=?,
-              co_angler_first=?, co_angler_last=?, co_angler_phone=?, co_angler_email=?,
+              boater_first=?, boater_last=?, boater_suffix=?, boater_phone=?, boater_email=?,
+              co_angler_first=?, co_angler_last=?, co_angler_suffix=?, co_angler_phone=?, co_angler_email=?,
               boat_no=?, num_fish=?, lunker_weight=?, total_weight=?,
               lunker=?, option_field=?, paid=?, app_signed=?, buy_in=?,
               raw_weight=?, dead_fish=?, short_fish=?, needs_attention=?,
@@ -71,8 +73,8 @@ export async function onRequestPut({ params, request, env }) {
               updated_at   = CURRENT_TIMESTAMP
             WHERE id=? AND (? IS NULL OR updated_at = ?)`,
       args: [
-        t(body.boaterFirst),   t(body.boaterLast),    t(body.boaterPhone),   t(body.boaterEmail),
-        t(body.coAnglerFirst), t(body.coAnglerLast),  t(body.coAnglerPhone), t(body.coAnglerEmail),
+        t(body.boaterFirst),   t(body.boaterLast),   t(body.boaterSuffix ?? ''),   t(body.boaterPhone),   t(body.boaterEmail),
+        t(body.coAnglerFirst), t(body.coAnglerLast), t(body.coAnglerSuffix ?? ''), t(body.coAnglerPhone), t(body.coAnglerEmail),
         t(body.boatNo),
         Number(body.numFish)      || 0,
         Number(body.lunkerWeight) || 0,
@@ -105,7 +107,7 @@ export async function onRequestPut({ params, request, env }) {
 
     const updated = await db.execute({ sql: 'SELECT * FROM entries WHERE id = ?', args: [params.id] });
     const after   = updated.rows[0];
-    const boaterName = `${after.boater_first || ''} ${after.boater_last || ''}`.trim();
+    const boaterName = [after.boater_first, after.boater_last, after.boater_suffix].filter(Boolean).join(' ');
     const afterBoat  = after.boat_no ?? '';
 
     // Write lifecycle events (best-effort)

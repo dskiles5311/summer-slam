@@ -96,7 +96,7 @@ export default function ContactSuggest({ value, placeholder, onChange, onSelect,
               style={{ ...ITEM_STYLE, background: i === active ? 'rgba(139,180,225,0.12)' : 'transparent', flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                <span style={{ fontWeight: 600, color: 'var(--white)' }}>{s.firstName} {s.lastName}</span>
+                <span style={{ fontWeight: 600, color: 'var(--white)' }}>{[s.firstName, s.lastName, s.suffix].filter(Boolean).join(' ')}</span>
                 {s.phone && <span style={{ color: 'var(--header-bg)', fontSize: 12 }}>{formatPhone(s.phone)}</span>}
               </div>
               {s.email && <span style={{ color: 'var(--header-bg)', fontSize: 11, opacity: 0.8 }}>{s.email}</span>}

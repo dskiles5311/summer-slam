@@ -62,9 +62,12 @@ function parseCsv(text) {
 
 const FIELD_LABEL = { fontSize: 12, fontWeight: 700, color: 'var(--header-bg)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 5, display: 'block' };
 
+const SUFFIX_OPTIONS = ['', 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V'];
+
 function EditModal({ contact, onSave, onCancel }) {
   const [firstName, setFirstName] = useState(contact.firstName);
   const [lastName,  setLastName]  = useState(contact.lastName);
+  const [suffix,    setSuffix]    = useState(contact.suffix || '');
   const [phone, setPhone] = useState(contact.phone);
   const [email, setEmail] = useState(contact.email);
   const [saving, setSaving] = useState(false);
@@ -77,7 +80,7 @@ function EditModal({ contact, onSave, onCancel }) {
     e.preventDefault();
     if (!firstName.trim() || !lastName.trim()) return;
     setSaving(true);
-    await onSave(contact.id, { firstName: firstName.trim(), lastName: lastName.trim(), phone: phone.trim(), email: email.trim() });
+    await onSave(contact.id, { firstName: firstName.trim(), lastName: lastName.trim(), suffix: suffix.trim(), phone: phone.trim(), email: email.trim() });
     setSaving(false);
   }
 
@@ -94,7 +97,7 @@ function EditModal({ contact, onSave, onCancel }) {
             <button className="edit-panel-close" onClick={onCancel}>✕</button>
           </div>
           <form onSubmit={handleSubmit}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
               <div className="form-field">
                 <label htmlFor="ct-first" style={FIELD_LABEL}>First Name</label>
                 <input ref={firstRef} id="ct-first" name="firstName" type="text" value={firstName} placeholder="First"
@@ -105,6 +108,13 @@ function EditModal({ contact, onSave, onCancel }) {
                 <input id="ct-last" name="lastName" type="text" value={lastName} placeholder="Last"
                        onChange={e => setLastName(e.target.value)} style={FIELD_STYLE} required />
               </div>
+            </div>
+            <div className="form-field" style={{ marginBottom: 14 }}>
+              <label htmlFor="ct-suffix" style={FIELD_LABEL}>Suffix</label>
+              <select id="ct-suffix" value={suffix} onChange={e => setSuffix(e.target.value)}
+                style={{ ...FIELD_STYLE, cursor: 'pointer', maxWidth: 140 }}>
+                {SUFFIX_OPTIONS.map(o => <option key={o} value={o}>{o || '—'}</option>)}
+              </select>
             </div>
             <div className="form-field" style={{ marginBottom: 14 }}>
               <label htmlFor="ct-phone" style={FIELD_LABEL}>Phone</label>
@@ -458,7 +468,9 @@ export default function ContactsTab({ isUnlocked, contacts, contactsLoading, onC
             ) : displayed.map(c => (
               <tr key={c.id}>
                 <td style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.firstName}</td>
-                <td style={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.lastName}</td>
+                <td style={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {c.lastName}{c.suffix ? <span style={{ color: 'var(--header-bg)', fontWeight: 400, marginLeft: 4 }}>{c.suffix}</span> : null}
+                </td>
                 <td className="col-last-seen" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 12, color: 'var(--header-bg)' }}>
                   {formatLastSeen(c.lastSeen)}
                 </td>

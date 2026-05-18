@@ -27,8 +27,8 @@ export function exportHTML(rows, title = 'Summer Slam Results', options = {}) {
 
   const rowsHtml = rows.map((row, i) => {
     const place   = row._isDQ ? `${row._lbRank} DQ` : (row._lbRank ?? '');
-    const boater  = [row.boaterFirst, row.boaterLast].filter(Boolean).join(' ') || '';
-    const co      = [row.coAnglerFirst, row.coAnglerLast].filter(Boolean).join(' ') || '';
+    const boater  = [row.boaterFirst, row.boaterLast, row.boaterSuffix].filter(Boolean).join(' ') || '';
+    const co      = [row.coAnglerFirst, row.coAnglerLast, row.coAnglerSuffix].filter(Boolean).join(' ') || '';
     const lunker  = parseFloat(row.lunkerWeight) > 0 ? parseFloat(row.lunkerWeight).toFixed(2) : '';
     const fish    = row.numFish > 0 ? row.numFish : '';
     const effWt   = row._isDQ ? 'DQ' : (row._effectiveWeight ?? parseFloat(row.totalWeight) ?? 0);

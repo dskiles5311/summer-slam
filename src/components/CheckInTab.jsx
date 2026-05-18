@@ -197,11 +197,11 @@ export default function CheckInTab({ entries, onSave }) {
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--white)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {row.boaterFirst} {row.boaterLast}
+                      {[row.boaterFirst, row.boaterLast, row.boaterSuffix].filter(Boolean).join(' ')}
                     </div>
                     <div style={{ fontSize: 12, color: alreadyCheckedIn ? '#4CAF50' : 'var(--header-bg)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {alreadyCheckedIn ? `✓ Checked in — Boat #${row.boatNo}` : row.coAnglerFirst || row.coAnglerLast
-                        ? `${row.coAnglerFirst} ${row.coAnglerLast}`.trim()
+                        ? [row.coAnglerFirst, row.coAnglerLast, row.coAnglerSuffix].filter(Boolean).join(' ')
                         : 'No co-angler'}
                     </div>
                   </div>
