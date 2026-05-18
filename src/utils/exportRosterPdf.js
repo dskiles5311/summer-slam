@@ -1,5 +1,55 @@
 function isOn(v) { return v === 1 || v === '1'; }
 
+function parseTs(ts) {
+  if (!ts) return null;
+  const d = new Date(ts.includes('T') ? ts : ts.replace(' ', 'T') + 'Z');
+  return isNaN(d) ? null : d;
+}
+
+function parseTimeStr(timeStr, refDate) {
+  if (!timeStr || !refDate) return null;
+  const ampm = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+  if (ampm) {
+    let h = parseInt(ampm[1]);
+    const m = parseInt(ampm[2]);
+    const ap = ampm[3].toUpperCase();
+    if (ap === 'PM' && h !== 12) h += 12;
+    if (ap === 'AM' && h === 12) h = 0;
+    const d = new Date(refDate);
+    d.setHours(h, m, 0, 0);
+    return d;
+  }
+  const bare = timeStr.match(/(\d{1,2}):(\d{2})/);
+  if (bare) {
+    const h = parseInt(bare[1]), m = parseInt(bare[2]);
+    if (h > 23 || m > 59) return null;
+    const d = new Date(refDate);
+    d.setHours(h, m, 0, 0);
+    return d;
+  }
+  return null;
+}
+
+function fmtTime(ts) {
+  const d = parseTs(ts);
+  if (!d) return '—';
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+}
+
+function fmtDur(ms) {
+  if (!ms || ms < 0 || isNaN(ms)) return '—';
+  const totalMins = Math.floor(ms / 60000);
+  const h = Math.floor(totalMins / 60);
+  const m = totalMins % 60;
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
+function flightFor(entry, flights) {
+  const n = parseInt(entry.boatNo);
+  if (isNaN(n)) return null;
+  return flights.find(f => n >= parseInt(f.boatStart) && n <= parseInt(f.boatEnd)) || null;
+}
+
 function pieSlicePath(cx, cy, r, a0, a1) {
   const x1 = cx + r * Math.cos(a0), y1 = cy + r * Math.sin(a0);
   const x2 = cx + r * Math.cos(a1), y2 = cy + r * Math.sin(a1);
@@ -96,6 +146,35 @@ export function exportRosterPdf(entries, settings) {
   const totalWeight = weighed.reduce((s, e) => s + (parseFloat(e.totalWeight) || 0), 0);
   const totalFish   = weighed.reduce((s, e) => s + (parseInt(e.numFish)       || 0), 0);
 
+  // --- Timing computations ---
+  const flights = (settings.flights || []).slice().sort((a, b) => (parseInt(a.boatStart) || 0) - (parseInt(b.boatStart) || 0));
+
+  // Check-in window
+  const ciTimes = entries.map(e => parseTs(e.checkedInAt)).filter(Boolean);
+  const ciFirst = ciTimes.length ? new Date(Math.min(...ciTimes)) : null;
+  const ciLast  = ciTimes.length ? new Date(Math.max(...ciTimes)) : null;
+  const ciWindowMs = ciFirst && ciLast ? ciLast - ciFirst : null;
+
+  // Average weight per boat
+  const avgWeight = weighed.length > 0 ? (totalWeight / weighed.length) : null;
+
+  // Time on water per entry: offWaterAt minus that entry's flight launchTime
+  const waterDurations = entries
+    .map(e => {
+      const offWater = parseTs(e.offWaterAt);
+      if (!offWater) return null;
+      const flight = flightFor(e, flights);
+      if (!flight?.launchTime) return null;
+      const launch = parseTimeStr(flight.launchTime, offWater);
+      if (!launch) return null;
+      const ms = offWater - launch;
+      return ms > 0 ? ms : null;
+    })
+    .filter(Boolean);
+  const avgWaterMs = waterDurations.length > 0
+    ? waterDurations.reduce((s, d) => s + d, 0) / waterDurations.length
+    : null;
+
   const rosterRows = [...registered].sort((a, b) => {
     const an = parseInt(a.boatNo) || Infinity, bn = parseInt(b.boatNo) || Infinity;
     return an !== bn ? an - bn : (a.boaterLast || '').localeCompare(b.boaterLast || '');
@@ -131,8 +210,19 @@ export function exportRosterPdf(entries, settings) {
     statCell(weighed.length,          'Boats Weighed'),
     statCell(totalWeight.toFixed(2),  'Total Weight (lbs)'),
     statCell(totalFish,               'Total Fish'),
+    statCell(avgWeight != null ? avgWeight.toFixed(2) : '—', 'Avg Weight / Boat (lbs)'),
   ] : [];
-  const allStats = [...preStats, ...postStats];
+
+  const timingStats = [
+    ...(ciFirst && ciLast ? [
+      statCell(`${fmtTime(ciFirst.toISOString())} – ${fmtTime(ciLast.toISOString())}`, 'Check-In Window'),
+      statCell(fmtDur(ciWindowMs), 'Check-In Duration'),
+    ] : []),
+    ...(avgWaterMs != null ? [
+      statCell(fmtDur(avgWaterMs), `Avg Time on Water (${waterDurations.length} boats)`),
+    ] : []),
+  ];
+  const allStats = [...preStats, ...postStats, ...timingStats];
   const cols = 4;
   const statRows = [];
   for (let i = 0; i < allStats.length; i += cols) {
@@ -140,6 +230,35 @@ export function exportRosterPdf(entries, settings) {
     while (chunk.length < cols) chunk.push('<td style="border:1px solid #eee;background:#fafafa"></td>');
     statRows.push(`<tr>${chunk.join('')}</tr>`);
   }
+
+  // Activity log rows — all entries with at least one timestamp, sorted by checkedInAt then boatNo
+  const logRows = [...entries]
+    .filter(e => e.checkedInAt || e.offWaterAt || e.weighedAt || e.signedUpAt)
+    .sort((a, b) => {
+      const at = parseTs(a.checkedInAt), bt = parseTs(b.checkedInAt);
+      if (at && bt) return at - bt;
+      if (at) return -1;
+      if (bt) return 1;
+      return (parseInt(a.boatNo) || Infinity) - (parseInt(b.boatNo) || Infinity);
+    });
+
+  const activityTableRows = logRows.map((e, i) => {
+    const boater = [e.boaterFirst, e.boaterLast].filter(Boolean).join(' ') || '—';
+    const offWater = parseTs(e.offWaterAt);
+    const flight = flightFor(e, flights);
+    const launch = offWater && flight?.launchTime ? parseTimeStr(flight.launchTime, offWater) : null;
+    const waterMs = offWater && launch ? offWater - launch : null;
+    const bg = i % 2 === 1 ? '#f7f7f7' : '#fff';
+    return `<tr>
+      <td style="background:${bg};text-align:center;padding:5px 8px;font-weight:bold">${e.boatNo || '—'}</td>
+      <td style="background:${bg};padding:5px 8px">${boater}</td>
+      <td style="background:${bg};text-align:center;padding:5px 8px;font-size:10px;color:#555">${fmtTime(e.signedUpAt)}</td>
+      <td style="background:${bg};text-align:center;padding:5px 8px;font-size:10px;color:#555">${fmtTime(e.checkedInAt)}</td>
+      <td style="background:${bg};text-align:center;padding:5px 8px;font-size:10px;color:#555">${fmtTime(e.offWaterAt)}</td>
+      <td style="background:${bg};text-align:center;padding:5px 8px;font-size:10px;color:#555">${fmtTime(e.weighedAt)}</td>
+      <td style="background:${bg};text-align:center;padding:5px 8px;font-size:10px;font-weight:bold">${waterMs != null ? fmtDur(waterMs) : '—'}</td>
+    </tr>`;
+  }).join('');
 
   // Roster table rows
   const TH = `style="background:#111;color:#fff;padding:7px 8px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:0.8px;font-weight:bold"`;
@@ -239,6 +358,22 @@ export function exportRosterPdf(entries, settings) {
       <th ${THC} style="background:#111;color:#fff;padding:7px 8px;text-align:center;font-size:9px;text-transform:uppercase;letter-spacing:0.8px;font-weight:bold;width:90px">Total Wt (lbs)</th>
     </tr></thead>
     <tbody>${standingsTableRows}</tbody>
+  </table>` : ''}
+
+  <!-- Activity Log -->
+  ${logRows.length > 0 ? `
+  ${sectionHead('Tournament Activity Log')}
+  <table style="width:100%;border-collapse:collapse;font-size:10px">
+    <thead><tr>
+      <th ${THC} style="background:#111;color:#fff;padding:6px 8px;text-align:center;font-size:9px;text-transform:uppercase;letter-spacing:0.8px;font-weight:bold;width:60px">Boat #</th>
+      <th ${TH} style="width:18%">Boater</th>
+      <th ${THC} style="background:#111;color:#fff;padding:6px 8px;text-align:center;font-size:9px;text-transform:uppercase;letter-spacing:0.8px;font-weight:bold;width:82px">Signed Up</th>
+      <th ${THC} style="background:#111;color:#fff;padding:6px 8px;text-align:center;font-size:9px;text-transform:uppercase;letter-spacing:0.8px;font-weight:bold;width:82px">Checked In</th>
+      <th ${THC} style="background:#111;color:#fff;padding:6px 8px;text-align:center;font-size:9px;text-transform:uppercase;letter-spacing:0.8px;font-weight:bold;width:82px">Off Water</th>
+      <th ${THC} style="background:#111;color:#fff;padding:6px 8px;text-align:center;font-size:9px;text-transform:uppercase;letter-spacing:0.8px;font-weight:bold;width:82px">Weighed In</th>
+      <th ${THC} style="background:#111;color:#fff;padding:6px 8px;text-align:center;font-size:9px;text-transform:uppercase;letter-spacing:0.8px;font-weight:bold;width:82px">Time on Water</th>
+    </tr></thead>
+    <tbody>${activityTableRows}</tbody>
   </table>` : ''}
 
   <!-- Footer -->
