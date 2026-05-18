@@ -1014,7 +1014,8 @@ body.light .edit-section-label     { color: #1a5c28; border-bottom-color: #3a6e3
 [data-mike="true"] .lb-rank.rn                        { font-size: 46px; }
 [data-mike="true"] .lb-boatno-num                     { font-size: 46px; }
 [data-mike="true"] .lb-boatno-lbl                     { font-size: 15px; }
-[data-mike="true"] .lb-angler-name                    { font-size: 32px; }
+/* Prevent mid-word breaks; single-line truncation keeps TV layout clean */
+[data-mike="true"] .lb-angler-name                    { font-size: 32px; overflow-wrap: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 [data-mike="true"] .lb-angler-name .lb-co             { font-size: 27px; }
 [data-mike="true"] .lb-stat-item .val                 { font-size: 28px; }
 [data-mike="true"] .lb-stat-item .lbl                 { font-size: 17px; }
