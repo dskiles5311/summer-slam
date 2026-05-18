@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { calcWeightedPayouts } from '../utils/calculations';
 import { exportCSV, importCSV } from '../utils/csv';
 import { evalMath } from '../utils/evalMath';
-import { fetchEventLog, clearEventLog } from '../utils/api';
+import { fetchEventLog, clearEventLog, fetchQrCounts } from '../utils/api';
 import { exportRosterPdf } from '../utils/exportRosterPdf';
 
 const PANEL = { background: 'var(--settings-panel-bg)', border: '1px solid rgba(139,180,225,0.2)', borderRadius: 10, padding: 20, marginBottom: 16 };
@@ -28,6 +28,11 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   const [flightDraft, setFlightDraft]       = useState(null);
   const [flightError, setFlightError]       = useState(null);
   const [defaultFlightSize, setDefaultFlightSize] = useState(parseInt(settings.defaultFlightSize) || 30);
+  const [qrCounts, setQrCounts] = useState(null);
+
+  useEffect(() => {
+    fetchQrCounts().then(setQrCounts).catch(() => {});
+  }, []);
 
   useEffect(() => {
     setTotalPayout(payoutSettings.totalPayout || 0);
@@ -285,6 +290,23 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
             🔒 Settings are locked. Click <strong>Locked</strong> in the header to unlock editing.
           </div>
         )}
+
+        {/* QR Code Scans */}
+        <div style={PANEL}>
+          <h3 style={H3}>QR Code Scans</h3>
+          {qrCounts === null ? (
+            <p style={{ textAlign: 'center', color: 'var(--header-bg)', fontSize: 13 }}>Loading…</p>
+          ) : (
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+              {[['Rules', 'rules'], ['Off Limits', 'off-limits']].map(([label, key]) => (
+                <div key={key} style={{ textAlign: 'center', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(139,180,225,0.2)', borderRadius: 8, padding: '12px 24px', minWidth: 120 }}>
+                  <div style={{ fontSize: 28, fontWeight: 800, color: 'var(--gold-light)' }}>{qrCounts[key] ?? 0}</div>
+                  <div style={{ fontSize: 12, color: 'var(--header-bg)', textTransform: 'uppercase', letterSpacing: 1, marginTop: 4 }}>{label}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Tournament Day */}
         <div style={PANEL}>

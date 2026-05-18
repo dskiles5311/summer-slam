@@ -253,6 +253,12 @@ export async function createEntriesBulk(entries) {
   return res.json();
 }
 
+export async function fetchQrCounts() {
+  const res = await fetchWithTimeout(`${BASE}/qr/counts`, { headers: authHeaders() });
+  if (!res.ok) throw new Error('Failed to fetch QR counts');
+  return res.json();
+}
+
 export async function upsertContacts(people) {
   const valid = people.filter(p => p.firstName && p.lastName);
   if (!valid.length) return;

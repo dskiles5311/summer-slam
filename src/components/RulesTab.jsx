@@ -6,12 +6,13 @@ import rulesRaw from '../content/rules.md?raw';
 marked.setOptions({ breaks: true });
 
 const SITE_URL = 'https://sft-summer-slam.pages.dev';
+const QR_URL   = `${SITE_URL}/api/qr/rules`;
 
 export default function RulesTab({ settings }) {
   const year          = new Date().getFullYear();
   const [qrDataUrl, setQrDataUrl] = useState('');
   useEffect(() => {
-    QRCode.toDataURL(SITE_URL, { width: 160, margin: 1 }).then(setQrDataUrl).catch(e => console.error('QR generation failed:', e));
+    QRCode.toDataURL(QR_URL, { width: 160, margin: 1 }).then(setQrDataUrl).catch(e => console.error('QR generation failed:', e));
   }, []);
   const entryFee      = parseFloat(settings?.fees?.entryFee             || 250).toFixed(2);
   const opt1          = parseInt(settings?.fees?.option1Pct             || 70);
