@@ -67,7 +67,7 @@ export async function onRequestPut({ params, request, env }) {
               signed_up_at  = CASE WHEN signed_up_at IS NULL AND ? != '' THEN CURRENT_TIMESTAMP ELSE signed_up_at END,
               weighed_at   = CASE WHEN ? > 0 AND ? = 0 THEN COALESCE(?, CURRENT_TIMESTAMP) ELSE weighed_at END,
               checked_in_at = CASE WHEN ? != '' AND checked_in_at IS NULL THEN CURRENT_TIMESTAMP ELSE checked_in_at END,
-              off_water_at  = CASE WHEN ? = 1 THEN COALESCE(off_water_at, CURRENT_TIMESTAMP) WHEN ? = 0 THEN NULL ELSE off_water_at END,
+              off_water_at  = CASE WHEN ? = 1 THEN NULLIF(?, '') WHEN ? = 1 THEN COALESCE(off_water_at, CURRENT_TIMESTAMP) WHEN ? = 0 THEN NULL ELSE off_water_at END,
               updated_at   = CURRENT_TIMESTAMP
             WHERE id=? AND (? IS NULL OR updated_at = ?)`,
       args: [
@@ -89,6 +89,8 @@ export async function onRequestPut({ params, request, env }) {
         t(body.boaterFirst),
         newTotalWeight, preserveWeighTime, clientWeighedAt,
         t(body.boatNo),
+        body.offWaterAtDirect ? 1 : 0,
+        body.offWaterAtDirect ? (body.offWaterAt || '') : '',
         body.offWater === true ? 1 : body.offWater === false ? 0 : -1,
         body.offWater === true ? 1 : body.offWater === false ? 0 : -1,
         params.id, clientUpdatedAt, clientUpdatedAt,

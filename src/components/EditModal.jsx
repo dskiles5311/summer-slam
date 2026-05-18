@@ -11,7 +11,16 @@ const EMPTY = {
   lunker: '', option: '', paid: '', appSigned: '', buyIn: '',
   needsAttention: false,
   rawWeight: null, deadFish: 0, shortFish: 0,
+  offWaterAt: '',
 };
+
+function toDatetimeLocal(ts) {
+  if (!ts) return '';
+  const d = new Date(ts.includes('T') ? ts : ts.replace(' ', 'T') + 'Z');
+  if (isNaN(d)) return '';
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
 
 function ToggleButton({ value, onChange }) {
   const isYes = value === 1 || value === '1';
@@ -69,6 +78,7 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
       rawWeight:      entry.rawWeight     ?? null,
       deadFish:       entry.deadFish      ?? 0,
       shortFish:      entry.shortFish     ?? 0,
+      offWaterAt:     toDatetimeLocal(entry.offWaterAt ?? ''),
     });
     setTimeout(() => firstInputRef.current?.focus(), 100);
   }, [entry]);
@@ -133,6 +143,11 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
         data[k] = v === '' ? '' : parseFloat(v);
       } else if (k === 'buyIn') {
         data[k] = v === '' ? '' : parseFloat((evalMath(String(v)) || 0).toFixed(2));
+      } else if (k === 'offWaterAt') {
+        if (entry?.id) {
+          data.offWaterAt = v ? new Date(v).toISOString() : '';
+          data.offWaterAtDirect = true;
+        }
       } else {
         data[k] = typeof v === 'string' ? v.trim() : v;
       }
@@ -314,6 +329,36 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
                 </div>
               ))}
             </div>
+
+            {!isNew && (
+              <div style={{ marginTop: 14 }}>
+                <div className="edit-section-label">Timestamps</div>
+                <div className="form-field">
+                  <label htmlFor="em-off-water-at" style={{ fontSize: 12, fontWeight: 700, color: 'var(--header-bg)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 5, display: 'block' }}>
+                    Off Water Time
+                  </label>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <input
+                      id="em-off-water-at"
+                      name="offWaterAt"
+                      type="datetime-local"
+                      value={form.offWaterAt}
+                      onChange={e => set('offWaterAt', e.target.value)}
+                      style={{ flex: 1, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(139,180,225,0.3)', borderRadius: 8, color: 'var(--white)', fontSize: 14, padding: '9px 12px', outline: 'none', colorScheme: 'dark' }}
+                    />
+                    {form.offWaterAt && (
+                      <button type="button" onClick={() => set('offWaterAt', '')}
+                        style={{ padding: '8px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 700, border: '1px solid rgba(255,107,107,0.4)', background: 'rgba(255,107,107,0.1)', color: '#ff9090', whiteSpace: 'nowrap' }}>
+                        ✕ Clear
+                      </button>
+                    )}
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--header-bg)', marginTop: 4 }}>
+                    {form.offWaterAt ? 'Time shown in your local timezone.' : 'Not set — clearing removes the off-water record.'}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {form.needsAttention && (
               <div style={{ marginTop: 12 }}>
