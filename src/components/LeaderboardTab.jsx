@@ -60,7 +60,7 @@ export default function LeaderboardTab({ entries, settings }) {
       <div className="leaderboard-header">
         <h2>🎣 Summer Slam! 🎣</h2>
         <p style={{ color: 'var(--header-bg)', fontSize: 12, letterSpacing: 2, textTransform: 'uppercase', marginTop: 4 }}>
-          Live Tournament Leaderboard &nbsp;·&nbsp; {boatsWeighed} of {checkedInCount} Boats Weighed
+          Live Tournament Leaderboard &nbsp;·&nbsp; <strong>{boatsWeighed} of {checkedInCount}</strong> Boats Weighed
         </p>
       </div>
 
