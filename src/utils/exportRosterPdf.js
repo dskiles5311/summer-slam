@@ -140,9 +140,12 @@ function sectionHead(title) {
 }
 
 export function exportRosterPdf(entries, settings) {
-  const year    = new Date().getFullYear();
-  const now     = new Date();
-  const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const now           = new Date();
+  const tDate         = settings.tournamentDate ? new Date(settings.tournamentDate + 'T12:00:00') : null;
+  const year          = tDate ? tDate.getFullYear() : now.getFullYear();
+  const tournamentStr = tDate
+    ? tDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    : null;
 
   const registered    = entries.filter(e => isOn(e.paid) && isOn(e.appSigned));
   const paidUnsigned  = entries.filter(e => isOn(e.paid) && !isOn(e.appSigned));
@@ -359,7 +362,8 @@ export function exportRosterPdf(entries, settings) {
   <div style="text-align:center;padding-bottom:18px;border-bottom:3px solid #000;margin-bottom:20px">
     <div style="font-size:32px;font-weight:900;letter-spacing:3px;line-height:1">${year} SUMMER SLAM!</div>
     <div style="font-size:11px;color:#444;letter-spacing:3px;text-transform:uppercase;margin-top:6px">Susquehanna Fishing Tackle · Tournament Report</div>
-    <div style="font-size:10px;color:#888;margin-top:5px">${dateStr}</div>
+    ${tournamentStr ? `<div style="font-size:13px;font-weight:700;margin-top:6px">${tournamentStr}</div>` : ''}
+    <div style="font-size:10px;color:#888;margin-top:4px">Generated ${now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}</div>
   </div>
 
   <!-- Summary Stats -->

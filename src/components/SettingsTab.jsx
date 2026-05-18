@@ -21,6 +21,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   const [showSignUpLog, setShowSignUpLog]   = useState(false);
   const [showCheckInLog, setShowCheckInLog] = useState(false);
   const [showOffWaterLog, setShowOffWaterLog] = useState(false);
+  const [tournamentDate, setTournamentDate] = useState(settings.tournamentDate || '');
   const [localFlights, setLocalFlights]     = useState(() => (settings.flights || []).map((f, i) => ({ ...f, _key: i })));
   const [editingFlightIdx, setEditingFlightIdx] = useState(null);
   const [flightDraft, setFlightDraft]       = useState(null);
@@ -34,6 +35,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
     setRawInputs((payoutSettings.payouts || []).map(v => String(v || 0)));
   }, [payoutSettings]);
 
+  useEffect(() => { setTournamentDate(settings.tournamentDate || ''); }, [settings.tournamentDate]);
   useEffect(() => { setLocalFees(fees); }, [fees]);
   useEffect(() => { setLocalPenalties(penalties); }, [penalties]);
   useEffect(() => {
@@ -232,6 +234,28 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
             🔒 Settings are locked. Click <strong>Locked</strong> in the header to unlock editing.
           </div>
         )}
+
+        {/* Tournament Day */}
+        <div style={PANEL}>
+          <h3 style={H3}>Tournament Day</h3>
+          <div className="form-field" style={{ maxWidth: 220 }}>
+            <label htmlFor="st-tournament-date">Tournament Date</label>
+            <input
+              id="st-tournament-date"
+              name="tournamentDate"
+              type="date"
+              value={tournamentDate}
+              disabled={locked}
+              onChange={e => setTournamentDate(e.target.value)}
+              onBlur={() => onUpdateSettings({ tournamentDate })}
+            />
+          </div>
+          {tournamentDate && (
+            <p style={{ color: 'var(--header-bg)', fontSize: 12, marginTop: 10 }}>
+              {new Date(tournamentDate + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            </p>
+          )}
+        </div>
 
         {/* Payout Structure */}
         <div style={PANEL}>
