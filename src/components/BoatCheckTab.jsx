@@ -186,10 +186,14 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggleOf
                   </td>
                   <td style={{ fontWeight: 700, fontSize: 16 }}>{row.boatNo || '—'}</td>
                   <td style={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
-                    {row.boaterFirst} {row.boaterLast}
+                    {row.boaterPhone
+                      ? <a href={`tel:${row.boaterPhone}`} style={{ color: 'inherit', textDecoration: 'none' }}>{row.boaterFirst} {row.boaterLast}</a>
+                      : <>{row.boaterFirst} {row.boaterLast}</>}
                   </td>
                   <td style={{ color: 'var(--header-bg)', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
-                    {row.coAnglerFirst} {row.coAnglerLast}
+                    {row.coAnglerFirst && row.coAnglerPhone
+                      ? <a href={`tel:${row.coAnglerPhone}`} style={{ color: 'inherit', textDecoration: 'none' }}>{row.coAnglerFirst} {row.coAnglerLast}</a>
+                      : <>{row.coAnglerFirst} {row.coAnglerLast}</>}
                   </td>
                 </tr>
               );
