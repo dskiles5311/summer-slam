@@ -63,10 +63,10 @@ export default function FlightsTab({ entries, settings }) {
         </span>
       </div>
       <div className="tab-scroll">
-        <div style={{ maxWidth: 700, margin: '0 auto', paddingTop: 8 }}>
-          {groups.map(({ flight, entries: flightEntries }, gIdx) => (
-            <div key={gIdx} style={{ marginBottom: 24 }}>
-              <FlightDivider flight={flight} flightNum={gIdx + 1} count={flightEntries.length} isLast={gIdx === groups.length - 1} />
+        {groups.map(({ flight, entries: flightEntries }, gIdx) => (
+          <div key={gIdx} style={{ marginBottom: 24 }}>
+            <FlightDivider flight={flight} flightNum={gIdx + 1} count={flightEntries.length} isLast={gIdx === groups.length - 1} />
+            <div style={{ maxWidth: 700, margin: '0 auto' }}>
               {flightEntries.length === 0 ? (
                 <p style={{ color: 'var(--header-bg)', fontSize: 13, padding: '10px 4px', fontStyle: 'italic' }}>
                   No boats in this flight range yet.
@@ -77,8 +77,8 @@ export default function FlightsTab({ entries, settings }) {
                 </div>
               )}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -92,29 +92,32 @@ function FlightDivider({ flight, flightNum, count, isLast }) {
       zIndex: 5,
       background: 'var(--navy)',
       borderBottom: '2px solid rgba(200,169,106,0.5)',
-      padding: '10px 16px',
       marginBottom: 10,
-      marginLeft: -20,
-      marginRight: -20,
-      display: 'flex',
-      alignItems: 'center',
-      gap: 12,
-      flexWrap: 'wrap',
     }}>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontWeight: 800, color: 'var(--gold-light)', fontSize: 16 }}>
-          Flight {flightNum}
-          <span style={{ fontWeight: 500, fontSize: 13, color: 'var(--header-bg)', marginLeft: 10 }}>
-            {isLast ? `Boats #${flight.boatStart}+ (remaining)` : `Boats #${flight.boatStart}–#${flight.boatEnd}`}
-          </span>
+      <div style={{
+        maxWidth: 700,
+        margin: '0 auto',
+        padding: '10px 12px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        flexWrap: 'wrap',
+      }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontWeight: 800, color: 'var(--gold-light)', fontSize: 16 }}>
+            Flight {flightNum}
+            <span style={{ fontWeight: 500, fontSize: 13, color: 'var(--header-bg)', marginLeft: 10 }}>
+              {isLast ? `Boats #${flight.boatStart}+ (remaining)` : `Boats #${flight.boatStart}–#${flight.boatEnd}`}
+            </span>
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--header-bg)', marginTop: 3, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+            {flight.launchTime  && <span>🚤 Launch: <strong style={{ color: 'var(--white)' }}>{flight.launchTime}</strong></span>}
+            {flight.checkInTime && <span>📋 Check-In: <strong style={{ color: 'var(--white)' }}>{flight.checkInTime}</strong></span>}
+          </div>
         </div>
-        <div style={{ fontSize: 12, color: 'var(--header-bg)', marginTop: 3, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-          {flight.launchTime  && <span>🚤 Launch: <strong style={{ color: 'var(--white)' }}>{flight.launchTime}</strong></span>}
-          {flight.checkInTime && <span>📋 Check-In: <strong style={{ color: 'var(--white)' }}>{flight.checkInTime}</strong></span>}
+        <div style={{ fontWeight: 700, color: 'var(--header-bg)', fontSize: 13, flexShrink: 0 }}>
+          {count} boat{count !== 1 ? 's' : ''}
         </div>
-      </div>
-      <div style={{ fontWeight: 700, color: 'var(--header-bg)', fontSize: 13, flexShrink: 0 }}>
-        {count} boat{count !== 1 ? 's' : ''}
       </div>
     </div>
   );
