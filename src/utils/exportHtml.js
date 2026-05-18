@@ -21,21 +21,22 @@ export function exportHTML(rows, title = 'Summer Slam Results', options = {}) {
 
   const headers = [
     'Place', 'Boat #', 'Boater', 'Co-Angler',
-    'Lunker (lbs)', '# Fish', 'Total Wt (lbs)',
+    'Lunker (lbs)', '# Fish', 'Scale Wt (lbs)', 'Adj. Wt (lbs)',
     ...(hasPayouts ? ['Payout'] : []),
   ];
 
   const rowsHtml = rows.map((row, i) => {
-    const place  = row._isDQ ? `${row._lbRank} DQ` : (row._lbRank ?? '');
-    const boater = [row.boaterFirst, row.boaterLast].filter(Boolean).join(' ') || '';
-    const co     = [row.coAnglerFirst, row.coAnglerLast].filter(Boolean).join(' ') || '';
-    const lunker = parseFloat(row.lunkerWeight) > 0 ? parseFloat(row.lunkerWeight).toFixed(2) : '';
-    const fish   = row.numFish > 0 ? row.numFish : '';
-    const effWt  = row._isDQ ? 'DQ' : (row._effectiveWeight ?? parseFloat(row.totalWeight) ?? 0);
-    const weight = row._isDQ ? 'DQ' : (effWt > 0 ? Number(effWt).toFixed(2) : '');
-    const late   = row._latePenalty > 0 ? ` (−${row._latePenalty.toFixed(2)} late)` : '';
-    const payout = payoutForRow(row);
-    const bg     = i % 2 === 0 ? '' : ' class="alt"';
+    const place   = row._isDQ ? `${row._lbRank} DQ` : (row._lbRank ?? '');
+    const boater  = [row.boaterFirst, row.boaterLast].filter(Boolean).join(' ') || '';
+    const co      = [row.coAnglerFirst, row.coAnglerLast].filter(Boolean).join(' ') || '';
+    const lunker  = parseFloat(row.lunkerWeight) > 0 ? parseFloat(row.lunkerWeight).toFixed(2) : '';
+    const fish    = row.numFish > 0 ? row.numFish : '';
+    const rawWt   = parseFloat(row.rawWeight) > 0 ? parseFloat(row.rawWeight).toFixed(2) : '';
+    const effWt   = row._isDQ ? 'DQ' : (row._effectiveWeight ?? parseFloat(row.totalWeight) ?? 0);
+    const adjWt   = row._isDQ ? 'DQ' : (effWt > 0 ? Number(effWt).toFixed(2) : '');
+    const late    = row._latePenalty > 0 ? ` (−${row._latePenalty.toFixed(2)} late)` : '';
+    const payout  = payoutForRow(row);
+    const bg      = i % 2 === 0 ? '' : ' class="alt"';
     return `<tr${bg}>
       <td>${place}</td>
       <td>${row.boatNo || ''}</td>
@@ -43,7 +44,8 @@ export function exportHTML(rows, title = 'Summer Slam Results', options = {}) {
       <td>${co}</td>
       <td>${lunker}</td>
       <td>${fish}</td>
-      <td>${weight}${late}</td>
+      <td>${rawWt}</td>
+      <td>${adjWt}${late}</td>
       ${hasPayouts ? `<td>${payout}</td>` : ''}
     </tr>`;
   }).join('\n');

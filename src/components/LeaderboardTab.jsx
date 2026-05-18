@@ -267,9 +267,15 @@ export default function LeaderboardTab({ entries, settings }) {
                   <div className="val">{parseFloat(row.lunkerWeight) > 0 ? parseFloat(row.lunkerWeight).toFixed(2) : '—'}</div>
                   <div className="lbl">Lunker (lbs)</div>
                 </div>
+                {parseFloat(row.rawWeight) > 0 && (
+                  <div className="lb-stat-item">
+                    <div className="val">{parseFloat(row.rawWeight).toFixed(2)}</div>
+                    <div className="lbl">Scale Wt (lbs)</div>
+                  </div>
+                )}
                 <div className="lb-stat-item highlight">
-                  <div className="val">{(row._effectiveWeight ?? parseFloat(row.totalWeight) ?? 0) > 0 ? (row._effectiveWeight ?? parseFloat(row.totalWeight)).toFixed(2) : '—'} lbs</div>
-                  <div className="lbl">Total Weight{row._latePenalty > 0 ? ` (−${row._latePenalty.toFixed(2)} late)` : ''}</div>
+                  <div className="val">{row._isDQ ? 'DQ' : ((row._effectiveWeight ?? parseFloat(row.totalWeight) ?? 0) > 0 ? `${(row._effectiveWeight ?? parseFloat(row.totalWeight)).toFixed(2)} lbs` : '—')}</div>
+                  <div className="lbl">Adj. Wt{row._latePenalty > 0 ? ` (−${row._latePenalty.toFixed(2)} late)` : ''}</div>
                 </div>
               </div>
               <div className="lb-payout">
