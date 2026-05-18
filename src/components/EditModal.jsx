@@ -22,6 +22,13 @@ function toDatetimeLocal(ts) {
   return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
+function toSqliteUtc(v) {
+  if (!v) return '';
+  const d = new Date(v); // datetime-local value is local time
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getUTCFullYear()}-${p(d.getUTCMonth()+1)}-${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}`;
+}
+
 function ToggleButton({ value, onChange }) {
   const isYes = value === 1 || value === '1';
   const isNo  = value === 0 || value === '0';
@@ -145,7 +152,7 @@ export default function EditModal({ entry, onSave, onCancel, settings }) {
         data[k] = v === '' ? '' : parseFloat((evalMath(String(v)) || 0).toFixed(2));
       } else if (k === 'offWaterAt') {
         if (entry?.id) {
-          data.offWaterAt = v ? new Date(v).toISOString() : '';
+          data.offWaterAt = v ? toSqliteUtc(v) : '';
           data.offWaterAtDirect = true;
         }
       } else {
