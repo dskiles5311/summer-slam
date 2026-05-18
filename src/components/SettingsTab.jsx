@@ -104,7 +104,23 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   }
 
   function handleResetPayStructure() {
-    if (!confirm('Reset payout structure to tournament defaults?')) return;
+    if (!confirm('Reset payout structure to tournament defaults? (15 winners / $10,000)')) return;
+    const d = {
+      totalPayout: 10000,
+      numWinners:  15,
+      minPayout:   250,
+      payouts:     [3500,1500,1000,800,600,280,270,270,265,265,250,250,250,250,250],
+    };
+    setTotalPayout(d.totalPayout);
+    setNumWinners(d.numWinners);
+    setMinPayout(d.minPayout);
+    setPayouts(d.payouts);
+    setRawInputs(d.payouts.map(String));
+    onUpdateSettings({ payoutSettings: d });
+  }
+
+  function handleReset17Winners() {
+    if (!confirm('Apply 17-winner / $10,500 payout structure?')) return;
     const d = {
       totalPayout: 10500,
       numWinners:  17,
@@ -292,7 +308,8 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
             <button className="btn btn-primary btn-sm" onClick={handleAutoCalc} disabled={locked}>↻ Auto-Calculate</button>
             <button className="btn btn-outline btn-sm" onClick={handleClearPayouts} disabled={locked}>Clear Payouts</button>
-            <button className="btn btn-outline btn-sm" onClick={handleResetPayStructure} disabled={locked}>↺ Reset to Default</button>
+            <button className="btn btn-outline btn-sm" onClick={handleResetPayStructure} disabled={locked}>↺ Reset to Default (15 winners)</button>
+            <button className="btn btn-outline btn-sm" onClick={handleReset17Winners} disabled={locked}>↺ 17-Winner Preset</button>
           </div>
 
           {numWinners > 0 && (
