@@ -221,6 +221,8 @@ export function exportRosterPdf(entries, settings) {
     return an !== bn ? an - bn : (a.boaterLast || '').localeCompare(b.boaterLast || '');
   });
 
+  const numWinners = parseInt(settings.payoutSettings?.numWinners) || 20;
+
   const standings = [...entries]
     .filter(e => parseFloat(e.totalWeight) > 0)
     .sort((a, b) => {
@@ -228,7 +230,7 @@ export function exportRosterPdf(entries, settings) {
       const bw = b._isDQ ? -1 : (b._effectiveWeight ?? parseFloat(b.totalWeight) ?? 0);
       return bw - aw;
     })
-    .slice(0, 20);
+    .slice(0, numWinners);
 
   const pieSvg = buildPieSvg([
     { label: 'Registered (Paid + Signed)', count: registered.length   },
@@ -236,7 +238,7 @@ export function exportRosterPdf(entries, settings) {
     { label: 'Not Paid',                   count: unpaid.length       },
   ]);
 
-  const barSvg = hasWeightData ? buildBarSvg(standings.slice(0, 15)) : '';
+  const barSvg = hasWeightData ? buildBarSvg(standings.slice(0, numWinners)) : '';
 
   // Stats cells
   const preStats = [
@@ -433,7 +435,7 @@ export function exportRosterPdf(entries, settings) {
 
   <!-- Standings -->
   ${hasWeightData ? `
-  ${sectionHead('Final Standings')}
+  ${sectionHead(`Final Standings — Top ${numWinners}`)}
   <table style="width:100%;border-collapse:collapse;font-size:11px">
     <thead><tr>
       <th ${THC} style="background:#111;color:#fff;padding:7px 8px;text-align:center;font-size:9px;text-transform:uppercase;letter-spacing:0.8px;font-weight:bold;width:44px">Pos</th>
