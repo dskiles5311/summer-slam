@@ -317,6 +317,10 @@ export function exportRosterPdf(entries, settings) {
     </tr>`;
   }).join('');
 
+  const payoutsList = settings.payoutSettings?.payouts || [];
+  const rankCounts  = {};
+  standings.forEach(e => { const r = e._lbRank ?? 0; rankCounts[r] = (rankCounts[r] || 0) + 1; });
+
   const standingsTableRows = standings.map((e, i) => {
     const ew     = e._isDQ ? 'DQ' : (e._effectiveWeight ?? parseFloat(e.totalWeight) ?? 0).toFixed(2);
     const boater = [e.boaterFirst, e.boaterLast].filter(Boolean).join(' ') || '—';
@@ -325,6 +329,13 @@ export function exportRosterPdf(entries, settings) {
     const pen    = e._latePenalty > 0 ? ` <span style="font-size:9px;color:#888">(−${e._latePenalty.toFixed(2)} late)</span>` : '';
     const bg     = i % 2 === 1 ? '#f7f7f7' : '#fff';
     const medal  = i === 0 ? '1st' : i === 1 ? '2nd' : i === 2 ? '3rd' : `${i + 1}`;
+    const rank        = e._lbRank ?? (i + 1);
+    const tiedCount   = rankCounts[rank] || 1;
+    const payoutSlice = payoutsList.slice(rank - 1, rank - 1 + tiedCount);
+    const payoutAmt   = tiedCount > 1
+      ? Math.round(payoutSlice.reduce((s, p) => s + (p || 0), 0) / tiedCount)
+      : (payoutsList[rank - 1] || 0);
+    const payoutCell  = e._isDQ || payoutAmt <= 0 ? '—' : `$${payoutAmt.toLocaleString()}`;
     const isL1 = lunkerRow1 && e.id === lunkerRow1.id;
     const isL2 = lunkerRow2 && e.id === lunkerRow2.id;
     const isO1 = option1Row && e.id === option1Row.id;
@@ -342,6 +353,7 @@ export function exportRosterPdf(entries, settings) {
       <td style="background:${bg};text-align:center;padding:5px 8px">${e.numFish || 0}</td>
       <td style="background:${bg};text-align:center;padding:5px 8px">${parseFloat(e.lunkerWeight) > 0 ? parseFloat(e.lunkerWeight).toFixed(2) : '—'}</td>
       <td style="background:${bg};text-align:center;padding:5px 8px;font-weight:bold${e._isDQ ? ';color:#aaa' : ''}">${ew}</td>
+      <td style="background:${bg};text-align:center;padding:5px 8px;font-weight:bold;color:${payoutCell === '—' ? '#aaa' : '#000'}">${payoutCell}</td>
     </tr>`;
   }).join('');
 
@@ -407,6 +419,7 @@ export function exportRosterPdf(entries, settings) {
       <th ${THC} style="background:#111;color:#fff;padding:7px 8px;text-align:center;font-size:9px;text-transform:uppercase;letter-spacing:0.8px;font-weight:bold;width:44px">Fish</th>
       <th ${THC} style="background:#111;color:#fff;padding:7px 8px;text-align:center;font-size:9px;text-transform:uppercase;letter-spacing:0.8px;font-weight:bold;width:80px">Lunker (lbs)</th>
       <th ${THC} style="background:#111;color:#fff;padding:7px 8px;text-align:center;font-size:9px;text-transform:uppercase;letter-spacing:0.8px;font-weight:bold;width:90px">Total Wt (lbs)</th>
+      <th ${THC} style="background:#111;color:#fff;padding:7px 8px;text-align:center;font-size:9px;text-transform:uppercase;letter-spacing:0.8px;font-weight:bold;width:80px">Payout</th>
     </tr></thead>
     <tbody>${standingsTableRows}</tbody>
   </table>` : ''}
