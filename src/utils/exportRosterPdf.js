@@ -36,6 +36,15 @@ function fmtTime(ts) {
   return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 }
 
+function fmtDateTime(ts) {
+  const d = parseTs(ts);
+  if (!d) return '—';
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const yy = String(d.getFullYear()).slice(-2);
+  return `${mm}/${dd}/${yy} ${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
+}
+
 function fmtDur(ms) {
   if (!ms || ms < 0 || isNaN(ms)) return '—';
   const totalMins = Math.floor(ms / 60000);
@@ -257,15 +266,13 @@ export function exportRosterPdf(entries, settings) {
     statRows.push(`<tr>${chunk.join('')}</tr>`);
   }
 
-  // Activity log rows — all entries with at least one timestamp, sorted by checkedInAt then boatNo
+  // Activity log rows — all entries with at least one timestamp, sorted by boat #
   const logRows = [...entries]
     .filter(e => e.checkedInAt || e.offWaterAt || e.weighedAt || e.signedUpAt)
     .sort((a, b) => {
-      const at = parseTs(a.checkedInAt), bt = parseTs(b.checkedInAt);
-      if (at && bt) return at - bt;
-      if (at) return -1;
-      if (bt) return 1;
-      return (parseInt(a.boatNo) || Infinity) - (parseInt(b.boatNo) || Infinity);
+      const an = parseInt(a.boatNo) || Infinity;
+      const bn = parseInt(b.boatNo) || Infinity;
+      return an !== bn ? an - bn : (a.boaterLast || '').localeCompare(b.boaterLast || '');
     });
 
   const activityTableRows = logRows.map((e, i) => {
@@ -278,7 +285,7 @@ export function exportRosterPdf(entries, settings) {
     return `<tr>
       <td style="background:${bg};text-align:center;padding:5px 8px;font-weight:bold">${e.boatNo || '—'}</td>
       <td style="background:${bg};padding:5px 8px">${boater}</td>
-      <td style="background:${bg};text-align:center;padding:5px 8px;font-size:10px;color:#555">${fmtTime(e.signedUpAt)}</td>
+      <td style="background:${bg};text-align:center;padding:5px 8px;font-size:10px;color:#555">${fmtDateTime(e.signedUpAt)}</td>
       <td style="background:${bg};text-align:center;padding:5px 8px;font-size:10px;color:#555">${fmtTime(e.checkedInAt)}</td>
       <td style="background:${bg};text-align:center;padding:5px 8px;font-size:10px;color:#555">${fmtTime(e.offWaterAt)}</td>
       <td style="background:${bg};text-align:center;padding:5px 8px;font-size:10px;color:#555">${fmtTime(e.weighedAt)}</td>
