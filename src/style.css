@@ -152,10 +152,10 @@ header {
 .nav-tab.active { color: var(--gold-light); border-bottom-color: var(--gold); }
 
 /* ── MAIN CONTENT ── */
-main { flex: 1; min-height: 0; padding: 0 20px 16px; overflow: hidden; }
+main { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 0 20px 16px; overflow: hidden; }
 
 .tab-panel { display: none; }
-.tab-panel.active { display: flex; flex-direction: column; height: 100%; }
+.tab-panel.active { display: flex; flex-direction: column; flex: 1; min-height: 0; }
 
 /* scroll container for non-table tabs */
 .tab-scroll {
