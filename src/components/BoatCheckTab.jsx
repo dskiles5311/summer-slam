@@ -10,18 +10,23 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggleOf
   const [flashMsg, setFlashMsg]   = useState(null);
   const inputRef = useRef(null);
 
+  const previewEntry = boatInput.trim()
+    ? entries.find(en => String(en.boatNo) === boatInput.trim()) ?? null
+    : null;
+
   function handleQuickCheckOut(e) {
     e.preventDefault();
     const val = boatInput.trim();
     if (!val) return;
     const match = entries.find(en => String(en.boatNo) === val);
+    const boaterName = match ? `${match.boaterFirst} ${match.boaterLast}`.trim() : '';
     if (!match) {
       setFlashMsg({ type: 'error', text: `Boat #${val} not found` });
     } else if (offWater[match.id]) {
-      setFlashMsg({ type: 'warn', text: `Boat #${val} already checked out` });
+      setFlashMsg({ type: 'warn', text: `Boat #${val} (${boaterName}) already checked out` });
     } else {
       onToggleOffWater(match.id);
-      setFlashMsg({ type: 'ok', text: `Boat #${val} checked out` });
+      setFlashMsg({ type: 'ok', text: `Boat #${val} — ${boaterName} checked out` });
     }
     setBoatInput('');
     setTimeout(() => { setFlashMsg(null); inputRef.current?.focus(); }, 1800);
@@ -80,6 +85,23 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggleOf
           <button className="btn btn-outline" onClick={onReset}>↺ Reset All</button>
         )}
       </div>
+
+      {previewEntry && !flashMsg && (
+        <div style={{
+          margin: '0 0 10px 0', padding: '7px 14px', borderRadius: 6, fontSize: 13,
+          background: offWater[previewEntry.id] ? 'rgba(255,180,80,0.1)' : 'rgba(120,200,255,0.08)',
+          border: `1px solid ${offWater[previewEntry.id] ? 'rgba(255,180,80,0.35)' : 'rgba(120,200,255,0.3)'}`,
+          color: offWater[previewEntry.id] ? 'rgba(255,180,80,0.9)' : 'var(--white)',
+        }}>
+          <span style={{ fontWeight: 700 }}>Boat #{previewEntry.boatNo}</span>
+          {' — '}
+          {previewEntry.boaterFirst} {previewEntry.boaterLast}
+          {previewEntry.coAnglerFirst && (
+            <span style={{ color: 'var(--header-bg)' }}> / {previewEntry.coAnglerFirst} {previewEntry.coAnglerLast}</span>
+          )}
+          {offWater[previewEntry.id] && <span style={{ marginLeft: 8, fontWeight: 700 }}>· already off water</span>}
+        </div>
+      )}
 
       {flashMsg && (
         <div style={{
