@@ -233,27 +233,6 @@ export async function archiveEntries(year, entries) {
   return res.json();
 }
 
-export async function backfillPhones() {
-  const res = await fetchWithTimeout(`${BASE}/entries/backfill-phones`, {
-    method: 'POST',
-    headers: authHeaders(),
-  });
-  if (!res.ok) throw new Error('Failed to backfill phones');
-  return res.json();
-}
-
-export async function normalizePhones() {
-  const res = await fetchWithTimeout(`${BASE}/entries/normalize-phones`, {
-    method: 'POST',
-    headers: authHeaders(),
-  });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || `HTTP ${res.status}`);
-  }
-  return res.json();
-}
-
 export async function clearAllEntries() {
   const res = await fetchWithTimeout(`${BASE}/entries`, {
     method: 'DELETE',

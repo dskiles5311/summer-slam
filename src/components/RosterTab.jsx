@@ -82,7 +82,7 @@ export default function RosterTab({
   entries, settings, isUnlocked, buyInBlurred,
   onEdit, onAdd, onDelete, onClearAll, onImport,
   onToggleOffWater, onToggleField, onUpdateInlineField,
-  onClearDeductions, onArchive, onBackfillInfo, onNormalizePhones,
+  onClearDeductions, onArchive,
 }) {
   const entryFee = parseFloat(settings.fees?.entryFee) || 249;
   const offWater = settings.offWater || {};
@@ -631,16 +631,6 @@ export default function RosterTab({
               <button className="actions-item" onClick={() => { setActionsOpen(false); confirmed('archive year', onArchive); }}>
                 🗂️ Archive Year
               </button>
-              {onNormalizePhones && (
-                <button className="actions-item" onClick={() => { setActionsOpen(false); confirmed('normalize all phone numbers to xxx-xxx-xxxx', onNormalizePhones); }}>
-                  📞 Format phone #'s
-                </button>
-              )}
-              {onBackfillInfo && (
-                <button className="actions-item" onClick={() => { setActionsOpen(false); confirmed('backfill phones and emails from contacts', onBackfillInfo); }}>
-                  📋 Backfill info
-                </button>
-              )}
               <div className="actions-divider" />
               <button className="actions-item actions-item--danger" onClick={() => { setActionsOpen(false); confirmed('clear all entries', onClearAll); }}>
                 🗑️ Clear All

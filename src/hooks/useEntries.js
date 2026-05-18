@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   fetchEntries, createEntry, updateEntry, deleteEntry,
   clearWeighLog, clearSignUpLog, clearCheckInLog, clearCheckOutLog,
-  backfillPhones, normalizePhones,
   clearAllEntries, createEntriesBulk,
 } from '../utils/api';
 import { CONTACTS_KEY } from './useContacts';
@@ -154,21 +153,3 @@ export function useCreateEntriesBulk() {
   });
 }
 
-export function useBackfillPhones() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: backfillPhones,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ENTRIES_KEY }),
-  });
-}
-
-export function useNormalizePhones() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: normalizePhones,
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ENTRIES_KEY });
-      qc.invalidateQueries({ queryKey: CONTACTS_KEY });
-    },
-  });
-}

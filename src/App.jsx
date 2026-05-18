@@ -18,7 +18,7 @@ import ConfirmActionModal from './components/ConfirmActionModal';
 import Toast from './components/Toast';
 import { verifyPassword, storePassword, clearPassword, isPasswordStored, revalidatePassword, archiveEntries } from './utils/api';
 import { calcRanks } from './utils/calculations';
-import { useEntries, useCreateEntry, useUpdateEntry, useDeleteEntry, useClearWeighLog, useClearSignUpLog, useClearCheckInLog, useClearCheckOutLog, useClearAllEntries, useCreateEntriesBulk, useBackfillPhones, useNormalizePhones } from './hooks/useEntries';
+import { useEntries, useCreateEntry, useUpdateEntry, useDeleteEntry, useClearWeighLog, useClearSignUpLog, useClearCheckInLog, useClearCheckOutLog, useClearAllEntries, useCreateEntriesBulk } from './hooks/useEntries';
 import { useSettings, useSaveSettings } from './hooks/useSettings';
 import { useContacts, useUpdateContact, useDeleteContact, useUpsertContacts } from './hooks/useContacts';
 
@@ -97,9 +97,7 @@ export default function App() {
   const clearCheckOutLogMut = useClearCheckOutLog();
   const clearAllMut       = useClearAllEntries();
   const bulkCreateMut     = useCreateEntriesBulk();
-  const backfillMut       = useBackfillPhones();
-  const normalizePhonesMut = useNormalizePhones();
-  const saveSettingsMut   = useSaveSettings();
+const saveSettingsMut   = useSaveSettings();
   const updateContactMut  = useUpdateContact();
   const deleteContactMut  = useDeleteContact();
   const upsertContactsMut = useUpsertContacts();
@@ -476,37 +474,6 @@ export default function App() {
     }
   }
 
-  async function handleBackfillInfo() {
-    try {
-      const result = await backfillMut.mutateAsync();
-      if (result.total === 0) {
-        showToast('No matches found — entries already have info or no contact record exists', 'info');
-      } else {
-        const phones = (result.boaterPhoneCount || 0) + (result.coAnglerPhoneCount || 0);
-        const emails = (result.boaterEmailCount || 0) + (result.coAnglerEmailCount || 0);
-        const parts = [];
-        if (phones) parts.push(`${phones} phone${phones !== 1 ? 's' : ''}`);
-        if (emails) parts.push(`${emails} email${emails !== 1 ? 's' : ''}`);
-        showToast(`Filled in: ${parts.join(', ')}`, 'success');
-      }
-    } catch {
-      showToast('Failed to backfill info', 'error');
-    }
-  }
-
-  async function handleNormalizePhones() {
-    try {
-      const result = await normalizePhonesMut.mutateAsync();
-      if (result.total === 0) {
-        showToast('All phone numbers already formatted', 'info');
-      } else {
-        showToast(`Normalized ${result.total} phone number${result.total !== 1 ? 's' : ''} (${result.entriesUpdated} entries, ${result.contactsUpdated} contacts)`, 'success');
-      }
-    } catch (e) {
-      showToast(`Normalize phones failed: ${e.message}`, 'error');
-    }
-  }
-
   async function handleImport(newEntries) {
     try {
       await bulkCreateMut.mutateAsync(newEntries);
@@ -586,8 +553,6 @@ export default function App() {
             onUpdateInlineField={handleUpdateInlineField}
             onClearDeductions={handleClearDeductions}
             onArchive={handleArchive}
-            onBackfillInfo={handleBackfillInfo}
-            onNormalizePhones={handleNormalizePhones}
           />
         </div>
         <div style={{ display: activeTab === 'leaderboard' ? '' : 'none' }}>
