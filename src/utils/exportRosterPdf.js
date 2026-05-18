@@ -284,14 +284,34 @@ export function exportRosterPdf(entries, settings) {
       return an !== bn ? an - bn : (a.boaterLast || '').localeCompare(b.boaterLast || '');
     });
 
-  const activityTableRows = logRows.map((e, i) => {
-    const boater = [e.boaterFirst, e.boaterLast].filter(Boolean).join(' ') || '—';
+  let lastFlightRef = undefined;
+  let altRow = 0;
+  const activityTableRows = logRows.flatMap(e => {
+    const boater   = [e.boaterFirst, e.boaterLast].filter(Boolean).join(' ') || '—';
+    const flight   = e.boatNo ? flightFor(e, flights) : null;
     const offWater = parseTs(e.offWaterAt);
-    const flight = flightFor(e, flights);
-    const launch = offWater && flight?.launchTime ? parseTimeStr(flight.launchTime, offWater) : null;
-    const waterMs = offWater && launch ? offWater - launch : null;
-    const bg = i % 2 === 1 ? '#f7f7f7' : '#fff';
-    return `<tr>
+    const launch   = offWater && flight?.launchTime ? parseTimeStr(flight.launchTime, offWater) : null;
+    const waterMs  = offWater && launch ? offWater - launch : null;
+    const rows     = [];
+
+    if (flights.length > 0 && flight !== lastFlightRef) {
+      lastFlightRef = flight;
+      altRow = 0;
+      const flightIdx  = flight ? flights.indexOf(flight) : -1;
+      const rangeLabel = flight
+        ? (flight.boatEnd ? `Boats #${flight.boatStart}–#${flight.boatEnd}` : `Boats #${flight.boatStart}+`)
+        : 'No Flight / Unassigned';
+      const timeLabel  = flight?.launchTime  ? ` · Launch ${flight.launchTime}`          : '';
+      const ciLabel    = flight?.checkInTime ? ` · Check-In by ${flight.checkInTime}` : '';
+      const label      = flightIdx >= 0
+        ? `Flight ${flightIdx + 1} — ${rangeLabel}${timeLabel}${ciLabel}`
+        : rangeLabel;
+      rows.push(`<tr><td colspan="7" style="background:#333;color:#fff;padding:5px 10px;font-size:9px;font-weight:bold;text-transform:uppercase;letter-spacing:1px">${label}</td></tr>`);
+    }
+
+    const bg = altRow % 2 === 0 ? '#fff' : '#f7f7f7';
+    altRow++;
+    rows.push(`<tr>
       <td style="background:${bg};text-align:center;padding:5px 8px;font-weight:bold">${e.boatNo || '—'}</td>
       <td style="background:${bg};padding:5px 8px">${boater}</td>
       <td style="background:${bg};text-align:center;padding:5px 8px;font-size:10px;color:#555">${fmtDateTime(e.signedUpAt)}</td>
@@ -299,7 +319,8 @@ export function exportRosterPdf(entries, settings) {
       <td style="background:${bg};text-align:center;padding:5px 8px;font-size:10px;color:#555">${fmtTime(e.offWaterAt)}</td>
       <td style="background:${bg};text-align:center;padding:5px 8px;font-size:10px;color:#555">${fmtTime(e.weighedAt)}</td>
       <td style="background:${bg};text-align:center;padding:5px 8px;font-size:10px;font-weight:bold">${waterMs != null ? fmtDur(waterMs) : '—'}</td>
-    </tr>`;
+    </tr>`);
+    return rows;
   }).join('');
 
   // Roster table rows
