@@ -162,9 +162,13 @@ export function exportRosterPdf(entries, settings) {
 
   const lunkerPot   = entries.filter(e => isOn(e.lunker)).length * (parseFloat(settings.fees?.lunkerFee) || 0);
   const optionPot   = entries.filter(e => isOn(e.option)).length  * (parseFloat(settings.fees?.optFee)   || 0);
-  const totalBuyIn  = entries.reduce((s, e) => s + (parseFloat(e.buyIn) || 0), 0);
-  const totalWeight = weighed.reduce((s, e) => s + (parseFloat(e.totalWeight) || 0), 0);
-  const totalFish   = weighed.reduce((s, e) => s + (parseInt(e.numFish)       || 0), 0);
+  const totalBuyIn     = entries.reduce((s, e) => s + (parseFloat(e.buyIn)    || 0), 0);
+  const totalWeight    = weighed.reduce((s, e) => s + (parseFloat(e.totalWeight) || 0), 0);
+  const totalFish      = weighed.reduce((s, e) => s + (parseInt(e.numFish)       || 0), 0);
+  const totalDeadFish  = entries.reduce((s, e) => s + (parseInt(e.deadFish)  || 0), 0);
+  const totalShortFish = entries.reduce((s, e) => s + (parseInt(e.shortFish) || 0), 0);
+  const deadPenaltyLbs  = totalDeadFish  * (parseFloat(settings.penalties?.deadFishPenalty)  || 0.5);
+  const shortPenaltyLbs = totalShortFish * (parseFloat(settings.penalties?.shortFishPenalty) || 1.0);
 
   // --- Side pot winners ---
   const lunkerEligible = entries.filter(e => e.lunker === 1 && e.boatNo && parseFloat(e.lunkerWeight) > 0);
@@ -257,6 +261,8 @@ export function exportRosterPdf(entries, settings) {
     statCell(totalWeight.toFixed(2),  'Total Weight (lbs)'),
     statCell(totalFish,               'Total Fish'),
     statCell(avgWeight != null ? avgWeight.toFixed(2) : '—', 'Avg Weight / Boat (lbs)'),
+    statCell(totalDeadFish  > 0 ? `${totalDeadFish} (−${deadPenaltyLbs.toFixed(2)} lbs)`  : totalDeadFish,  'Dead Fish'),
+    statCell(totalShortFish > 0 ? `${totalShortFish} (−${shortPenaltyLbs.toFixed(2)} lbs)` : totalShortFish, 'Short Fish'),
   ] : [];
 
   const timingStats = [
