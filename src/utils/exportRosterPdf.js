@@ -50,6 +50,13 @@ function flightFor(entry, flights) {
   return flights.find(f => n >= parseInt(f.boatStart) && n <= parseInt(f.boatEnd)) || null;
 }
 
+function rowName(r) {
+  if (!r) return '—';
+  const boater = [r.boaterFirst, r.boaterLast].filter(Boolean).join(' ') || '—';
+  const co = [r.coAnglerFirst, r.coAnglerLast].filter(Boolean).join(' ');
+  return co ? `${boater} / ${co}` : boater;
+}
+
 function pieSlicePath(cx, cy, r, a0, a1) {
   const x1 = cx + r * Math.cos(a0), y1 = cy + r * Math.sin(a0);
   const x2 = cx + r * Math.cos(a1), y2 = cy + r * Math.sin(a1);
@@ -145,6 +152,25 @@ export function exportRosterPdf(entries, settings) {
   const optionPot   = entries.filter(e => isOn(e.option)).length  * (parseFloat(settings.fees?.optFee)   || 0);
   const totalWeight = weighed.reduce((s, e) => s + (parseFloat(e.totalWeight) || 0), 0);
   const totalFish   = weighed.reduce((s, e) => s + (parseInt(e.numFish)       || 0), 0);
+
+  // --- Side pot winners ---
+  const lunkerEligible = entries.filter(e => e.lunker === 1 && e.boatNo && parseFloat(e.lunkerWeight) > 0);
+  const lunkerRow1 = lunkerEligible.length
+    ? lunkerEligible.reduce((best, r) => parseFloat(r.lunkerWeight) > parseFloat(best.lunkerWeight) ? r : best)
+    : null;
+  const lunkerRow2 = lunkerEligible.length > 1
+    ? lunkerEligible.filter(r => r.id !== lunkerRow1?.id)
+        .reduce((best, r) => parseFloat(r.lunkerWeight) > parseFloat(best.lunkerWeight) ? r : best)
+    : null;
+
+  const option1Pct  = (settings.fees?.option1Pct ?? 70) / 100;
+  const optionEligible = entries
+    .filter(e => e.option === 1 && e.paid === 1 && e.appSigned === 1 && parseFloat(e.totalWeight) > 0)
+    .sort((a, b) => parseFloat(b.totalWeight) - parseFloat(a.totalWeight));
+  const option1Row    = optionEligible[0] || null;
+  const option2Row    = optionEligible[1] || null;
+  const option1Payout = (optionPot * option1Pct).toFixed(2);
+  const option2Payout = (optionPot * (1 - option1Pct)).toFixed(2);
 
   // --- Timing computations ---
   const flights = (settings.flights || []).slice().sort((a, b) => (parseInt(a.boatStart) || 0) - (parseInt(b.boatStart) || 0));
@@ -285,13 +311,23 @@ export function exportRosterPdf(entries, settings) {
     const pen    = e._latePenalty > 0 ? ` <span style="font-size:9px;color:#888">(−${e._latePenalty.toFixed(2)} late)</span>` : '';
     const bg     = i % 2 === 1 ? '#f7f7f7' : '#fff';
     const medal  = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+    const isL1 = lunkerRow1 && e.id === lunkerRow1.id;
+    const isL2 = lunkerRow2 && e.id === lunkerRow2.id;
+    const isO1 = option1Row && e.id === option1Row.id;
+    const isO2 = option2Row && e.id === option2Row.id;
+    const potBadges = [
+      isL1 && `<span style="background:#c87800;color:#fff;font-size:8px;font-weight:bold;padding:1px 5px;border-radius:3px;margin-left:6px">🎯 LUNKER</span>`,
+      isL2 && `<span style="background:#666;color:#fff;font-size:8px;font-weight:bold;padding:1px 5px;border-radius:3px;margin-left:6px">🎯 LUNKER 2ND</span>`,
+      isO1 && `<span style="background:#1a6fbf;color:#fff;font-size:8px;font-weight:bold;padding:1px 5px;border-radius:3px;margin-left:6px">⚡ OPT 1</span>`,
+      isO2 && `<span style="background:#4a9fd4;color:#fff;font-size:8px;font-weight:bold;padding:1px 5px;border-radius:3px;margin-left:6px">⚡ OPT 2</span>`,
+    ].filter(Boolean).join('');
     return `<tr>
       <td style="background:${bg};text-align:center;padding:5px 8px;font-weight:bold;font-size:${i < 3 ? 14 : 11}px">${medal}</td>
       <td style="background:${bg};text-align:center;padding:5px 8px;font-weight:bold">${e.boatNo || '—'}</td>
-      <td style="background:${bg};padding:5px 8px">${names}</td>
+      <td style="background:${bg};padding:5px 8px">${names}${pen}${potBadges}</td>
       <td style="background:${bg};text-align:center;padding:5px 8px">${e.numFish || 0}</td>
       <td style="background:${bg};text-align:center;padding:5px 8px">${parseFloat(e.lunkerWeight) > 0 ? parseFloat(e.lunkerWeight).toFixed(2) : '—'}</td>
-      <td style="background:${bg};text-align:center;padding:5px 8px;font-weight:bold${e._isDQ ? ';color:#aaa' : ''}">${ew}${pen}</td>
+      <td style="background:${bg};text-align:center;padding:5px 8px;font-weight:bold${e._isDQ ? ';color:#aaa' : ''}">${ew}</td>
     </tr>`;
   }).join('');
 
@@ -358,6 +394,54 @@ export function exportRosterPdf(entries, settings) {
       <th ${THC} style="background:#111;color:#fff;padding:7px 8px;text-align:center;font-size:9px;text-transform:uppercase;letter-spacing:0.8px;font-weight:bold;width:90px">Total Wt (lbs)</th>
     </tr></thead>
     <tbody>${standingsTableRows}</tbody>
+  </table>` : ''}
+
+  <!-- Side Pot Results -->
+  ${(lunkerRow1 || option1Row) ? `
+  ${sectionHead('Side Pot Results')}
+  <table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:8px">
+    <thead><tr>
+      <th ${TH} style="width:12%">Pot</th>
+      <th ${TH} style="width:9%">Place</th>
+      <th ${THC} style="width:9%">Boat #</th>
+      <th ${TH}>Boater / Co-Angler</th>
+      <th ${THC} style="width:14%">Key Weight</th>
+      <th ${THC} style="width:13%">Payout</th>
+    </tr></thead>
+    <tbody>
+      ${lunkerRow1 ? `<tr>
+        <td style="background:#fff;padding:6px 8px;font-weight:bold;font-size:10px">🎯 Lunker<br><span style="font-size:9px;color:#888;font-weight:normal">$${lunkerPot.toFixed(2)} pot</span></td>
+        <td style="background:#fff;padding:6px 8px"><span style="background:#c87800;color:#fff;font-size:9px;font-weight:bold;padding:2px 7px;border-radius:3px">1ST</span></td>
+        <td style="background:#fff;padding:6px 8px;text-align:center;font-weight:bold">${lunkerRow1.boatNo || '—'}</td>
+        <td style="background:#fff;padding:6px 8px">${rowName(lunkerRow1)}</td>
+        <td style="background:#fff;padding:6px 8px;text-align:center">${parseFloat(lunkerRow1.lunkerWeight).toFixed(2)} lbs</td>
+        <td style="background:#fff;padding:6px 8px;text-align:center;font-weight:900;font-size:16px">$${lunkerPot.toFixed(2)}</td>
+      </tr>` : ''}
+      ${lunkerRow2 ? `<tr>
+        <td style="background:#f7f7f7;padding:6px 8px;color:#999;font-size:10px">🎯 Lunker</td>
+        <td style="background:#f7f7f7;padding:6px 8px"><span style="background:#777;color:#fff;font-size:9px;font-weight:bold;padding:2px 7px;border-radius:3px">2ND</span></td>
+        <td style="background:#f7f7f7;padding:6px 8px;text-align:center;font-weight:bold">${lunkerRow2.boatNo || '—'}</td>
+        <td style="background:#f7f7f7;padding:6px 8px">${rowName(lunkerRow2)}</td>
+        <td style="background:#f7f7f7;padding:6px 8px;text-align:center">${parseFloat(lunkerRow2.lunkerWeight).toFixed(2)} lbs</td>
+        <td style="background:#f7f7f7;padding:6px 8px;text-align:center;color:#aaa">—</td>
+      </tr>` : ''}
+      ${option1Row ? `<tr>
+        <td style="background:#fff;padding:6px 8px;font-weight:bold;font-size:10px">⚡ Option<br><span style="font-size:9px;color:#888;font-weight:normal">$${optionPot.toFixed(2)} · ${Math.round(option1Pct * 100)}%/${Math.round((1 - option1Pct) * 100)}%</span></td>
+        <td style="background:#fff;padding:6px 8px"><span style="background:#1a6fbf;color:#fff;font-size:9px;font-weight:bold;padding:2px 7px;border-radius:3px">OPT 1</span></td>
+        <td style="background:#fff;padding:6px 8px;text-align:center;font-weight:bold">${option1Row.boatNo || '—'}</td>
+        <td style="background:#fff;padding:6px 8px">${rowName(option1Row)}</td>
+        <td style="background:#fff;padding:6px 8px;text-align:center">${parseFloat(option1Row.totalWeight).toFixed(2)} lbs</td>
+        <td style="background:#fff;padding:6px 8px;text-align:center;font-weight:900;font-size:16px">$${option1Payout}</td>
+      </tr>` : ''}
+      ${option2Row ? `<tr>
+        <td style="background:#f7f7f7;padding:6px 8px;color:#999;font-size:10px">⚡ Option</td>
+        <td style="background:#f7f7f7;padding:6px 8px"><span style="background:#4a9fd4;color:#fff;font-size:9px;font-weight:bold;padding:2px 7px;border-radius:3px">OPT 2</span></td>
+        <td style="background:#f7f7f7;padding:6px 8px;text-align:center;font-weight:bold">${option2Row.boatNo || '—'}</td>
+        <td style="background:#f7f7f7;padding:6px 8px">${rowName(option2Row)}</td>
+        <td style="background:#f7f7f7;padding:6px 8px;text-align:center">${parseFloat(option2Row.totalWeight).toFixed(2)} lbs</td>
+        <td style="background:#f7f7f7;padding:6px 8px;text-align:center;font-weight:900;font-size:16px">$${option2Payout}</td>
+      </tr>` : ''}
+    </tbody>
   </table>` : ''}
 
   <!-- Activity Log -->
