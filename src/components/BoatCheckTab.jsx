@@ -58,7 +58,7 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggleOf
   }, [sorted, listFilter, offWater]);
 
   return (
-    <div className="tab-panel active">
+    <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
       <div className="toolbar">
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
           <button
@@ -146,7 +146,7 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggleOf
         )}
       </div>
 
-      <div className="table-wrapper">
+      <div className="table-wrapper" style={{ flex: 1, minHeight: 0, maxHeight: 'none' }}>
         <table style={{ tableLayout: 'fixed', minWidth: 360 }}>
           <thead>
             <tr>

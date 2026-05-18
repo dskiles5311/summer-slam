@@ -125,12 +125,12 @@ export default function CheckInTab({ entries, onSave }) {
   }
 
   return (
-    <div className="tab-panel active">
+    <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
       <div className="toolbar">
         <h2 style={{ color: 'var(--gold-light)', fontSize: 18, fontWeight: 800 }}>✅ Check In</h2>
       </div>
 
-      <div style={{ maxWidth: 560, margin: '0 auto', paddingBottom: 12, borderBottom: '1px solid rgba(168,200,160,0.13)' }}>
+      <div style={{ maxWidth: 560, margin: '0 auto', width: '100%', paddingBottom: 12, borderBottom: '1px solid rgba(168,200,160,0.13)', flexShrink: 0 }}>
         <input
           ref={searchRef}
           id="ci-search"
@@ -151,9 +151,9 @@ export default function CheckInTab({ entries, onSave }) {
       </div>
 
       <div style={{
-        maxWidth: 560, margin: '0 auto', paddingTop: 12,
+        maxWidth: 560, margin: '0 auto', width: '100%', paddingTop: 12,
         overflowY: 'auto',
-        maxHeight: 'max(200px, calc(100dvh - 330px))',
+        flex: 1, minHeight: 0,
         WebkitOverflowScrolling: 'touch',
         overscrollBehavior: 'contain',
         paddingBottom: 'env(safe-area-inset-bottom, 12px)',
