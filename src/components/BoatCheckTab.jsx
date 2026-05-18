@@ -84,41 +84,41 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggleOf
         {isUnlocked && offWaterCount > 0 && (
           <button className="btn btn-outline" onClick={onReset}>↺ Reset All</button>
         )}
+
+        {previewEntry && !flashMsg && (
+          <div style={{
+            flex: '0 0 100%', padding: '7px 14px', borderRadius: 6, fontSize: 13,
+            background: offWater[previewEntry.id] ? 'rgba(255,180,80,0.1)' : 'rgba(120,200,255,0.08)',
+            border: `1px solid ${offWater[previewEntry.id] ? 'rgba(255,180,80,0.35)' : 'rgba(120,200,255,0.3)'}`,
+            color: offWater[previewEntry.id] ? 'rgba(255,180,80,0.9)' : 'var(--white)',
+          }}>
+            <span style={{ fontWeight: 700 }}>Boat #{previewEntry.boatNo}</span>
+            {' — '}
+            {previewEntry.boaterFirst} {previewEntry.boaterLast}
+            {previewEntry.coAnglerFirst && (
+              <span style={{ color: 'var(--header-bg)' }}> / {previewEntry.coAnglerFirst} {previewEntry.coAnglerLast}</span>
+            )}
+            {offWater[previewEntry.id] && <span style={{ marginLeft: 8, fontWeight: 700 }}>· already off water</span>}
+          </div>
+        )}
+
+        {flashMsg && (
+          <div style={{
+            flex: '0 0 100%', padding: '7px 14px', borderRadius: 6, fontSize: 13, fontWeight: 700,
+            background: flashMsg.type === 'ok' ? 'rgba(76,175,80,0.15)' : 'rgba(255,107,107,0.15)',
+            border: `1px solid ${flashMsg.type === 'ok' ? 'rgba(76,175,80,0.4)' : 'rgba(255,107,107,0.4)'}`,
+            color: flashMsg.type === 'ok' ? '#4CAF50' : '#ff9090',
+          }}>
+            {flashMsg.type === 'ok' ? '✓' : '⚠️'} {flashMsg.text}
+          </div>
+        )}
+
+        {!isUnlocked && (
+          <div style={{ flex: '0 0 100%', background: 'rgba(255,180,80,0.1)', border: '1px solid rgba(255,180,80,0.3)', borderRadius: 8, padding: '10px 16px', fontSize: 13, color: 'rgba(255,180,80,0.9)' }}>
+            🔒 Off water check is locked. Click <strong>Locked</strong> in the header to unlock.
+          </div>
+        )}
       </div>
-
-      {previewEntry && !flashMsg && (
-        <div style={{
-          margin: '0 0 10px 0', padding: '7px 14px', borderRadius: 6, fontSize: 13,
-          background: offWater[previewEntry.id] ? 'rgba(255,180,80,0.1)' : 'rgba(120,200,255,0.08)',
-          border: `1px solid ${offWater[previewEntry.id] ? 'rgba(255,180,80,0.35)' : 'rgba(120,200,255,0.3)'}`,
-          color: offWater[previewEntry.id] ? 'rgba(255,180,80,0.9)' : 'var(--white)',
-        }}>
-          <span style={{ fontWeight: 700 }}>Boat #{previewEntry.boatNo}</span>
-          {' — '}
-          {previewEntry.boaterFirst} {previewEntry.boaterLast}
-          {previewEntry.coAnglerFirst && (
-            <span style={{ color: 'var(--header-bg)' }}> / {previewEntry.coAnglerFirst} {previewEntry.coAnglerLast}</span>
-          )}
-          {offWater[previewEntry.id] && <span style={{ marginLeft: 8, fontWeight: 700 }}>· already off water</span>}
-        </div>
-      )}
-
-      {flashMsg && (
-        <div style={{
-          margin: '0 0 10px 0', padding: '7px 14px', borderRadius: 6, fontSize: 13, fontWeight: 700,
-          background: flashMsg.type === 'ok' ? 'rgba(76,175,80,0.15)' : 'rgba(255,107,107,0.15)',
-          border: `1px solid ${flashMsg.type === 'ok' ? 'rgba(76,175,80,0.4)' : 'rgba(255,107,107,0.4)'}`,
-          color: flashMsg.type === 'ok' ? '#4CAF50' : '#ff9090',
-        }}>
-          {flashMsg.type === 'ok' ? '✓' : '⚠️'} {flashMsg.text}
-        </div>
-      )}
-
-      {!isUnlocked && (
-        <div style={{ background: 'rgba(255,180,80,0.1)', border: '1px solid rgba(255,180,80,0.3)', borderRadius: 8, padding: '10px 16px', margin: '0 0 16px 0', fontSize: 13, color: 'rgba(255,180,80,0.9)' }}>
-          🔒 Off water check is locked. Click <strong>Locked</strong> in the header to unlock.
-        </div>
-      )}
 
       <div className="table-wrapper">
         <table style={{ tableLayout: 'fixed', minWidth: 360 }}>
