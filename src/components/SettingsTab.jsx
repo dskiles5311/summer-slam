@@ -25,6 +25,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   const [tournamentDate, setTournamentDate] = useState(settings.tournamentDate || '');
   const [checkInOpens, setCheckInOpens]     = useState(settings.checkInOpens || '04:00');
   const [localFlights, setLocalFlights]     = useState(() => (settings.flights || []).map((f, i) => ({ ...f, _key: i })));
+  const [localPresets, setLocalPresets]     = useState(settings.payoutPresets || []);
   const [editingFlightIdx, setEditingFlightIdx] = useState(null);
   const [flightDraft, setFlightDraft]       = useState(null);
   const [flightError, setFlightError]       = useState(null);
@@ -51,6 +52,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   useEffect(() => {
     setLocalFlights((settings.flights || []).map((f, i) => ({ ...f, _key: i })));
   }, [settings.flights]);
+  useEffect(() => { setLocalPresets(settings.payoutPresets || []); }, [settings.payoutPresets]);
 
   function evalExpr(str) {
     const result = evalMath(String(str));
@@ -94,7 +96,103 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   }
 
   function handleAutoCalc() {
-    syncPayouts(calcWithMin(totalPayout, numWinners, minPayout));
+    const r5 = n => Math.round(n / 5) * 5;
+    const n = numWinners;
+    const floor = minPayout;
+    if (totalPayout <= 0 || n <= 0) return;
+
+    const topCount = Math.min(5, n);
+    const backCount = n - topCount;
+    const maxTop = totalPayout - backCount * floor;
+    const totalPrem = Math.max(0, totalPayout - n * floor);
+
+    // 1st: use current value if valid, else derive from 56% of premium pool
+    const first = (payouts[0] > 0 && payouts[0] <= maxTop)
+      ? payouts[0]
+      : Math.max(floor, r5(floor + totalPrem * 0.56));
+
+    // Cascade 2nd–5th using clean fractions derived from actual payout history
+    const RATIOS = [null, 3/7, 2/3, 4/5, 3/4];
+    const top = [first];
+    for (let i = 1; i < topCount; i++) {
+      top.push(Math.max(floor, r5(top[i - 1] * RATIOS[i])));
+    }
+
+    // Scale 2nd–5th down if top exceeds available budget
+    let topTotal = top.reduce((s, v) => s + v, 0);
+    if (topTotal > maxTop && topCount > 1) {
+      const avail = maxTop - top[0];
+      const need = top.slice(1).reduce((s, v) => s + v, 0);
+      const scale = avail > 0 && need > 0 ? avail / need : 0;
+      for (let i = 1; i < top.length; i++) {
+        top[i] = Math.max(floor, r5(top[i] * scale));
+      }
+      topTotal = top.reduce((s, v) => s + v, 0);
+      // Trim any $5 rounding overshoot from lowest top place
+      let i = top.length - 1;
+      while (topTotal > maxTop && i >= 1) {
+        if (top[i] > floor) { top[i] -= 5; topTotal -= 5; } else i--;
+      }
+    }
+
+    // Back half: step ladder down to floor in $5 steps
+    const backBudget = totalPayout - topTotal;
+    const backPrem = backBudget - backCount * floor;
+    const back = [];
+    if (backCount > 0) {
+      if (backPrem <= 0) {
+        for (let i = 0; i < backCount; i++) back.push(floor);
+      } else {
+        // Max k non-floor places: 5*k*(k+1)/2 ≤ backPrem
+        let k = 0;
+        while (k < backCount && 5 * (k + 1) * (k + 2) / 2 <= backPrem) k++;
+        if (k === 0) {
+          const b = Array(backCount).fill(floor);
+          b[0] = floor + r5(backPrem);
+          back.push(...b);
+        } else {
+          const startPrem = r5((backPrem + 5 * k * (k - 1) / 2) / k);
+          let used = 0;
+          for (let i = 0; i < backCount; i++) {
+            const p = i < k ? Math.max(0, startPrem - 5 * i) : 0;
+            back.push(floor + p);
+            used += p;
+          }
+          back[0] += backPrem - used; // absorb $5 rounding into 6th
+        }
+      }
+    }
+
+    // Absorb any final rounding gap into 1st
+    const result = [...top, ...back];
+    result[0] += totalPayout - result.reduce((s, v) => s + v, 0);
+    syncPayouts(result);
+  }
+
+  function handleSavePreset() {
+    const name = prompt('Name this preset (e.g. "14-Winner Preset (2027)"):');
+    if (!name || !name.trim()) return;
+    const preset = { name: name.trim(), totalPayout, numWinners, minPayout, payouts: [...payouts] };
+    const updated = [...localPresets, preset];
+    setLocalPresets(updated);
+    onUpdateSettings({ payoutPresets: updated });
+  }
+
+  function handleLoadPreset(preset) {
+    if (!confirm(`Load "${preset.name}"? This will overwrite your current payout structure.`)) return;
+    setTotalPayout(preset.totalPayout);
+    setNumWinners(preset.numWinners);
+    setMinPayout(preset.minPayout);
+    setPayouts(preset.payouts);
+    setRawInputs(preset.payouts.map(String));
+    onUpdateSettings({ payoutSettings: { totalPayout: preset.totalPayout, numWinners: preset.numWinners, minPayout: preset.minPayout, payouts: preset.payouts } });
+  }
+
+  function handleDeletePreset(idx) {
+    if (!confirm('Delete this preset?')) return;
+    const updated = localPresets.filter((_, i) => i !== idx);
+    setLocalPresets(updated);
+    onUpdateSettings({ payoutPresets: updated });
   }
 
   function handleNumWinnersBlur() {
@@ -380,8 +478,17 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
           <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
             <button className="btn btn-primary btn-sm" onClick={handleAutoCalc} disabled={locked}>↻ Auto-Calculate</button>
             <button className="btn btn-outline btn-sm" onClick={handleClearPayouts} disabled={locked}>Clear Payouts</button>
-            <button className="btn btn-outline btn-sm" onClick={handleResetPayStructure} disabled={locked}>↺ Reset to Default (15 winners)</button>
-            <button className="btn btn-outline btn-sm" onClick={handleReset17Winners} disabled={locked}>↺ 17-Winner Preset</button>
+            <button className="btn btn-outline btn-sm" onClick={handleResetPayStructure} disabled={locked}>↺ 15-Winner Preset (2026)</button>
+            <button className="btn btn-outline btn-sm" onClick={handleReset17Winners} disabled={locked}>↺ 17-Winner Preset (2025)</button>
+            {localPresets.map((preset, idx) => (
+              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <button className="btn btn-outline btn-sm" onClick={() => handleLoadPreset(preset)} disabled={locked}>↺ {preset.name}</button>
+                <button className="btn btn-outline btn-sm" onClick={() => handleDeletePreset(idx)} disabled={locked}
+                  style={{ padding: '3px 8px', color: '#ff9090', borderColor: 'rgba(255,107,107,0.4)' }}>✕</button>
+              </div>
+            ))}
+            <button className="btn btn-outline btn-sm" onClick={handleSavePreset} disabled={locked}
+              style={{ borderStyle: 'dashed' }}>+ Save as Preset</button>
           </div>
 
           {numWinners > 0 && (
