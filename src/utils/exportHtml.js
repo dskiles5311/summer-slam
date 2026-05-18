@@ -21,7 +21,7 @@ export function exportHTML(rows, title = 'Summer Slam Results', options = {}) {
 
   const headers = [
     'Place', 'Boat #', 'Boater', 'Co-Angler',
-    'Lunker (lbs)', '# Fish', 'Scale Wt (lbs)', 'Adj. Wt (lbs)',
+    'Lunker (lbs)', '# Fish', 'Adj. Wt (lbs)',
     ...(hasPayouts ? ['Payout'] : []),
   ];
 
@@ -31,7 +31,6 @@ export function exportHTML(rows, title = 'Summer Slam Results', options = {}) {
     const co      = [row.coAnglerFirst, row.coAnglerLast].filter(Boolean).join(' ') || '';
     const lunker  = parseFloat(row.lunkerWeight) > 0 ? parseFloat(row.lunkerWeight).toFixed(2) : '';
     const fish    = row.numFish > 0 ? row.numFish : '';
-    const rawWt   = parseFloat(row.rawWeight) > 0 ? parseFloat(row.rawWeight).toFixed(2) : '';
     const effWt   = row._isDQ ? 'DQ' : (row._effectiveWeight ?? parseFloat(row.totalWeight) ?? 0);
     const adjWt   = row._isDQ ? 'DQ' : (effWt > 0 ? Number(effWt).toFixed(2) : '');
     const late    = row._latePenalty > 0 ? ` (−${row._latePenalty.toFixed(2)} late)` : '';
@@ -44,7 +43,6 @@ export function exportHTML(rows, title = 'Summer Slam Results', options = {}) {
       <td>${co}</td>
       <td>${lunker}</td>
       <td>${fish}</td>
-      <td>${rawWt}</td>
       <td>${adjWt}${late}</td>
       ${hasPayouts ? `<td>${payout}</td>` : ''}
     </tr>`;
