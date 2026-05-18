@@ -206,7 +206,7 @@ export default function LeaderboardTab({ entries, settings }) {
           Showing top <strong style={{ color: 'var(--gold-light)' }}>{topN}</strong> positions — set in Settings
         </span>
         <button className="btn btn-gold btn-sm" onClick={() => window.print()}>🖨️ Print / PDF</button>
-        <button className="btn btn-outline btn-sm" onClick={() => exportHTML(lbEntries, 'Summer Slam Leaderboard', { payouts: payoutSettings?.payouts || [] })}>📄 Export HTML</button>
+        <button className="btn btn-outline btn-sm" onClick={() => exportHTML(lbEntries, 'Summer Slam Leaderboard')}>📄 Export HTML</button>
       </div>
 
       <div id="lbContainer" style={{ maxWidth: 900, marginLeft: 'auto', marginRight: 'auto' }}>
