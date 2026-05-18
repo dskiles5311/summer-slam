@@ -7,7 +7,7 @@ import {
   flexRender,
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { importCSV, exportCSV } from '../utils/csv';
+import { exportCSV } from '../utils/csv';
 import ConfirmActionModal from './ConfirmActionModal';
 
 // ---------------------------------------------------------------------------
@@ -103,7 +103,6 @@ export default function RosterTab({
   const [confirmAction, setConfirmAction] = useState(null);
   const [actionsOpen, setActionsOpen] = useState(false);
   const [actionsPos, setActionsPos]   = useState({ top: 0, right: 0, bottom: 'auto' });
-  const fileInputRef      = useRef(null);
   const tableContainerRef = useRef(null);
   const actionsRef        = useRef(null);
 
@@ -624,22 +623,12 @@ export default function RosterTab({
           }}
         />
 
-        <input ref={fileInputRef} type="file" accept=".csv" style={{ display: 'none' }}
-               onChange={e => {
-                 const f = e.target.files[0];
-                 if (f) importCSV(f).then(onImport).catch(err => alert(`Import error: ${err.message}`));
-                 e.target.value = '';
-               }} />
-
         <div ref={actionsRef} style={{ position: 'relative' }}>
           <button className="btn btn-outline" onClick={openActions}>
             ⚙️ Actions {actionsOpen ? '▲' : '▼'}
           </button>
           {actionsOpen && (
             <div className="actions-dropdown" style={{ position: 'fixed', top: actionsPos.top, bottom: actionsPos.bottom, right: actionsPos.right }}>
-              <button className="actions-item" onClick={() => { setActionsOpen(false); confirmed('import CSV', () => fileInputRef.current?.click()); }}>
-                📂 Import CSV
-              </button>
               <button className="actions-item" onClick={() => { setActionsOpen(false); confirmed('export CSV', () => exportCSV(entries, settings.payoutSettings)); }}>
                 💾 Export CSV
               </button>
