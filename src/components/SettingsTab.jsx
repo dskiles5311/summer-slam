@@ -23,7 +23,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   const [showCheckInLog, setShowCheckInLog] = useState(false);
   const [showOffWaterLog, setShowOffWaterLog] = useState(false);
   const [tournamentDate, setTournamentDate] = useState(settings.tournamentDate || '');
-  const [checkInOpens, setCheckInOpens]     = useState(settings.checkInOpens || '');
+  const [checkInOpens, setCheckInOpens]     = useState(settings.checkInOpens || '04:00');
   const [localFlights, setLocalFlights]     = useState(() => (settings.flights || []).map((f, i) => ({ ...f, _key: i })));
   const [editingFlightIdx, setEditingFlightIdx] = useState(null);
   const [flightDraft, setFlightDraft]       = useState(null);
@@ -44,7 +44,7 @@ export default function SettingsTab({ settings, entries, isUnlocked, onUpdateSet
   }, [payoutSettings]);
 
   useEffect(() => { setTournamentDate(settings.tournamentDate || ''); }, [settings.tournamentDate]);
-  useEffect(() => { setCheckInOpens(settings.checkInOpens || ''); }, [settings.checkInOpens]);
+  useEffect(() => { setCheckInOpens(settings.checkInOpens || '04:00'); }, [settings.checkInOpens]);
   useEffect(() => { setDefaultFlightSize(parseInt(settings.defaultFlightSize) || 30); }, [settings.defaultFlightSize]);
   useEffect(() => { setLocalFees(fees); }, [fees]);
   useEffect(() => { setLocalPenalties(penalties); }, [penalties]);
