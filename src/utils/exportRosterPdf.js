@@ -115,7 +115,7 @@ function buildBarSvg(rows) {
     const wt = vals[i];
     const bw = (wt / maxW) * barArea;
     const y  = i * (barH + gap) + 10;
-    const lbl = r.boatNo ? `Boat #${r.boatNo}` : ([r.boaterFirst, r.boaterLast].filter(Boolean).join(' ').slice(0, 12) || '—');
+    const lbl = r.boatNo ? `Boat #${r.boatNo}` : ([r.boaterFirst, r.boaterLast, r.boaterSuffix].filter(Boolean).join(' ').slice(0, 12) || '—');
     const val = r._isDQ ? 'DQ' : `${wt.toFixed(2)} lbs`;
     return `
       <text x="${leftPad - 6}" y="${y + barH * 0.72}" text-anchor="end" font-family="Arial,sans-serif" font-size="10" fill="#000">${lbl}</text>
@@ -295,7 +295,7 @@ export function exportRosterPdf(entries, settings) {
   let lastFlightRef = undefined;
   let altRow = 0;
   const activityTableRows = logRows.flatMap(e => {
-    const boater   = [e.boaterFirst, e.boaterLast].filter(Boolean).join(' ') || '—';
+    const boater   = [e.boaterFirst, e.boaterLast, e.boaterSuffix].filter(Boolean).join(' ') || '—';
     const flight   = e.boatNo ? flightFor(e, flights) : null;
     const offWater = parseTs(e.offWaterAt);
     const launch   = offWater && flight?.launchTime ? parseTimeStr(flight.launchTime, offWater) : null;
@@ -336,8 +336,8 @@ export function exportRosterPdf(entries, settings) {
   const THC = `style="background:#111;color:#fff;padding:7px 8px;text-align:center;font-size:9px;text-transform:uppercase;letter-spacing:0.8px;font-weight:bold"`;
 
   const rosterTableRows = rosterRows.map((e, i) => {
-    const boater = [e.boaterFirst, e.boaterLast].filter(Boolean).join(' ') || '—';
-    const co     = [e.coAnglerFirst, e.coAnglerLast].filter(Boolean).join(' ') || '—';
+    const boater = [e.boaterFirst, e.boaterLast, e.boaterSuffix].filter(Boolean).join(' ') || '—';
+    const co     = [e.coAnglerFirst, e.coAnglerLast, e.coAnglerSuffix].filter(Boolean).join(' ') || '—';
     const bg     = i % 2 === 1 ? '#f7f7f7' : '#fff';
     return `<tr>
       <td style="background:${bg};text-align:center;padding:5px 8px;color:#777;font-size:10px">${i + 1}</td>
@@ -354,8 +354,8 @@ export function exportRosterPdf(entries, settings) {
 
   const standingsTableRows = standings.map((e, i) => {
     const ew     = e._isDQ ? 'DQ' : (e._effectiveWeight ?? parseFloat(e.totalWeight) ?? 0).toFixed(2);
-    const boater = [e.boaterFirst, e.boaterLast].filter(Boolean).join(' ') || '—';
-    const co     = [e.coAnglerFirst, e.coAnglerLast].filter(Boolean).join(' ');
+    const boater = [e.boaterFirst, e.boaterLast, e.boaterSuffix].filter(Boolean).join(' ') || '—';
+    const co     = [e.coAnglerFirst, e.coAnglerLast, e.coAnglerSuffix].filter(Boolean).join(' ');
     const names  = co ? `${boater} / ${co}` : boater;
     const pen    = e._latePenalty > 0 ? ` <span style="font-size:9px;color:#888">(−${e._latePenalty.toFixed(2)} late)</span>` : '';
     const bg     = i % 2 === 1 ? '#f7f7f7' : '#fff';

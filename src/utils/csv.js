@@ -1,5 +1,5 @@
 export function exportCSV(entries, payoutSettings) {
-  const headers = ['Place','Boater First','Boater Last','Boater Phone','Co-Angler First','Co-Angler Last','Co-Angler Phone',
+  const headers = ['Place','Boater First','Boater Last','Boater Suffix','Boater Phone','Co-Angler First','Co-Angler Last','Co-Angler Suffix','Co-Angler Phone',
     'Boat No','# Fish','Lunker Weight','Total Weight','Lunker','Option','Paid','App Signed','Buy-In',
     'Raw Weight','Dead Fish','Short Fish','Needs Attention'];
   const lines = [headers.join(',')];
@@ -11,8 +11,8 @@ export function exportCSV(entries, payoutSettings) {
   sorted.forEach(r => {
     lines.push([
       r._rank || '',
-      r.boaterFirst, r.boaterLast, r.boaterPhone || '',
-      r.coAnglerFirst, r.coAnglerLast, r.coAnglerPhone || '',
+      r.boaterFirst, r.boaterLast, r.boaterSuffix || '', r.boaterPhone || '',
+      r.coAnglerFirst, r.coAnglerLast, r.coAnglerSuffix || '', r.coAnglerPhone || '',
       r.boatNo, r.numFish,
       r.lunkerWeight, r.totalWeight,
       r.lunker, r.option, r.paid, r.appSigned, r.buyIn,
