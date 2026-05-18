@@ -125,7 +125,7 @@ export default function CheckInTab({ entries, onSave }) {
   }
 
   return (
-    <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+    <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div className="toolbar">
         <h2 style={{ color: 'var(--gold-light)', fontSize: 18, fontWeight: 800 }}>✅ Check In</h2>
       </div>

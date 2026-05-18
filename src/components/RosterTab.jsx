@@ -484,7 +484,7 @@ export default function RosterTab({
     }
 
     return (
-      <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <div style={{ padding: '16px 20px 12px', flexShrink: 0, background: 'rgba(255,180,80,0.1)', borderBottom: '2px solid rgba(255,180,80,0.35)', textAlign: 'center' }}>
           <div style={{ display: 'inline-flex', gap: 10, alignItems: 'center', justifyContent: 'center', marginBottom: 10, flexWrap: 'wrap' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(255,180,80,0.2)', border: '1px solid rgba(255,180,80,0.5)', borderRadius: 10, padding: '6px 20px' }}>
@@ -585,7 +585,7 @@ export default function RosterTab({
   const regFilter = globalFilter.regFilter || 'all';
 
   return (
-    <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+    <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
 
       {/* Toolbar */}
       <div className="toolbar" style={{ flexShrink: 0 }}>

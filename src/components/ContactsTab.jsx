@@ -358,7 +358,7 @@ export default function ContactsTab({ isUnlocked, contacts, contactsLoading, onC
                     : 'var(--gold-light)';
 
   return (
-    <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+    <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div className="toolbar">
         <span style={{ fontSize: 13, color: 'var(--header-bg)' }}>
           <strong style={{ color: 'var(--gold-light)' }}>{displayed.length}</strong>

@@ -58,7 +58,7 @@ export default function BoatCheckTab({ entries, settings, isUnlocked, onToggleOf
   }, [sorted, listFilter, offWater]);
 
   return (
-    <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+    <div className="tab-panel active" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div className="toolbar">
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
           <button
