@@ -72,7 +72,7 @@ header {
 
 .stats-bar {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 6px 20px 8px;
   overflow-x: auto;
   overflow-y: hidden;
@@ -81,7 +81,9 @@ header {
 }
 .stats-bar::-webkit-scrollbar { display: none; }
 
-.header-stats { display: flex; gap: 16px; }
+/* margin: auto centers the row when it fits; collapses to 0 when it overflows
+   so the left-most chip is never clipped behind the scroll origin */
+.header-stats { display: flex; gap: 16px; margin: 0 auto; }
 
 .stat-chip {
   background: rgba(255,255,255,0.07);
