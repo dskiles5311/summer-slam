@@ -24,8 +24,10 @@ self.addEventListener('fetch', e => {
       if (e.request.method === 'GET' && res.ok) {
         const clone = res.clone(); // clone synchronously before any async work
         caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
+        return res;
       }
-      return res;
-    }).catch(() => caches.match(e.request).then(cached => cached || caches.match('/')))
+      // Non-ok (e.g. 500): serve cached version if available, otherwise pass through
+      return caches.match(e.request).then(cached => cached ?? res);
+    }).catch(() => caches.match(e.request).then(cached => cached ?? caches.match('/')))
   );
 });
