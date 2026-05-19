@@ -1,4 +1,4 @@
-const CACHE_NAME = 'summer-slam-v8';
+const CACHE_NAME = 'summer-slam-v9';
 
 self.addEventListener('install', e => {
   // Pre-cache the app shell so the UI loads even on first visit with no network
