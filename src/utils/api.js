@@ -225,6 +225,12 @@ export async function fetchArchive(year) {
   return res.json();
 }
 
+export async function fetchArchiveWinners() {
+  const res = await fetchWithTimeout(`${BASE}/archive/winners`, { headers: authHeaders() });
+  if (!res.ok) throw new Error('Failed to fetch archive winners');
+  return res.json();
+}
+
 export async function archiveEntries(year, entries) {
   const res = await fetchWithTimeout(`${BASE}/archive`, {
     method: 'POST',

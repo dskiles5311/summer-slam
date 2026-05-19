@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getLeaderboardEntries } from '../utils/calculations';
 import { exportHTML } from '../utils/exportHtml';
+import { fetchArchiveWinners } from '../utils/api';
 
 export default function LeaderboardTab({ entries, settings }) {
   const topN = parseInt(settings.payoutSettings?.numWinners) || 10;
@@ -45,6 +46,29 @@ export default function LeaderboardTab({ entries, settings }) {
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
+
+  const [pastWinners, setPastWinners] = useState([]);
+  useEffect(() => {
+    fetchArchiveWinners().then(setPastWinners).catch(() => {});
+  }, []);
+
+  function norm(first, last) {
+    return `${(first || '').trim().toLowerCase()} ${(last || '').trim().toLowerCase()}`;
+  }
+  function getPastWinYears(row) {
+    const b = norm(row.boaterFirst, row.boaterLast);
+    const c = norm(row.coAnglerFirst, row.coAnglerLast);
+    const currentYear = new Date().getFullYear();
+    return pastWinners
+      .filter(w => {
+        if (Number(w.year) >= currentYear) return false;
+        const wb = norm(w.boaterFirst, w.boaterLast);
+        const wc = norm(w.coAnglerFirst, w.coAnglerLast);
+        return (wb === b && wc === c) || (wb === c && wc === b);
+      })
+      .map(w => w.year)
+      .sort();
+  }
 
   const cwEntry    = settings.currentlyWeighing;
   const cwDuration = (parseInt(settings.currentlyWeighingDuration) || 2) * (settings.currentlyWeighingUnit === 'seconds' ? 1000 : 60000);
@@ -232,7 +256,8 @@ export default function LeaderboardTab({ entries, settings }) {
           const isLunker2 = lunkerRow2 && row.id === lunkerRow2.id;
           const isOpt1    = option1Row && row.id === option1Row.id;
           const isOpt2    = option2Row && row.id === option2Row.id;
-          const hasBadge  = isLunker1 || isLunker2 || isOpt1 || isOpt2;
+          const winYears  = getPastWinYears(row);
+          const hasBadge  = isLunker1 || isLunker2 || isOpt1 || isOpt2 || winYears.length > 0;
 
           const BADGE = { display: 'inline-flex', alignItems: 'center', gap: 4, borderRadius: 6, padding: '4px 10px', fontSize: 13, fontWeight: 700, letterSpacing: 0.3 };
 
@@ -256,6 +281,9 @@ export default function LeaderboardTab({ entries, settings }) {
                     {isLunker2 && <span style={{ ...BADGE, background: '#444', border: '1px solid #aaa', color: '#fff' }}>🎯 Lunker 2nd</span>}
                     {isOpt1    && <span style={{ ...BADGE, background: '#0a5a9e', border: '1px solid #78c8ff', color: '#fff' }}>⚡ Option 1</span>}
                     {isOpt2    && <span style={{ ...BADGE, background: '#1e6e9e', border: '1px solid #a8dcff', color: '#fff' }}>⚡ Option 2</span>}
+                    {winYears.map(yr => (
+                      <span key={yr} style={{ ...BADGE, background: '#3d2a00', border: '1px solid #ffd700', color: '#ffd700' }}>🏆 {yr}</span>
+                    ))}
                   </div>
                 )}
               </div>
