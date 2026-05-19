@@ -509,8 +509,8 @@ const saveSettingsMut   = useSaveSettings();
         settings={settingsWithTheme}
         activeTab={(() => {
           const publicTabs = ['rules', 'offlimits', 'archive', 'roster', 'flights', 'leaderboard'];
-          const operatorTabs = ['checkin', 'boatcheck'];
-          const adminTabs = ['signup', 'weighin', 'contacts', 'settings'];
+          const operatorTabs = ['checkin', 'boatcheck', 'signup'];
+          const adminTabs = ['weighin', 'contacts', 'settings'];
           if (publicTabs.includes(activeTab)) return activeTab;
           if (isOperator && operatorTabs.includes(activeTab)) return activeTab;
           if (isAdmin && adminTabs.includes(activeTab)) return activeTab;
@@ -518,8 +518,8 @@ const saveSettingsMut   = useSaveSettings();
         })()}
         onTabChange={tab => {
           const publicTabs = ['rules', 'offlimits', 'archive', 'roster', 'flights', 'leaderboard'];
-          const operatorTabs = ['checkin', 'boatcheck'];
-          const adminTabs = ['signup', 'weighin', 'contacts', 'settings'];
+          const operatorTabs = ['checkin', 'boatcheck', 'signup'];
+          const adminTabs = ['weighin', 'contacts', 'settings'];
           if (publicTabs.includes(tab) || (isOperator && operatorTabs.includes(tab)) || (isAdmin && adminTabs.includes(tab))) {
             setActiveTab(tab);
           }
@@ -599,11 +599,9 @@ const saveSettingsMut   = useSaveSettings();
 
         {everUnlocked && (
           <>
-            {everAdmin && (
-              <div style={{ display: activeTab === 'signup' ? 'contents' : 'none' }}>
-                <SignUpTab onAddEntry={handleSignUpEntry} settings={settingsWithTheme} />
-              </div>
-            )}
+            <div style={{ display: activeTab === 'signup' ? 'contents' : 'none' }}>
+              <SignUpTab onAddEntry={handleSignUpEntry} settings={settingsWithTheme} />
+            </div>
             <div style={{ display: activeTab === 'checkin' ? 'contents' : 'none' }}>
               <CheckInTab entries={rankedEntries} onSave={handleCheckInSave} />
             </div>

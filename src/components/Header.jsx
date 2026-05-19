@@ -92,7 +92,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
       </div>
       <div className="nav-tabs-wrap">
       <nav className="nav-tabs" ref={navRef}>
-        {isAdmin && (
+        {isOperator && (
           <button
             className={`nav-tab ${activeTab === 'signup' ? 'active' : ''}`}
             onClick={() => onTabChange('signup')}
