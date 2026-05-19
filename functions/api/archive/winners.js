@@ -1,13 +1,11 @@
 import { createClient } from '@libsql/client/web';
-import { checkAuth } from '../_auth.js';
 
 function getDb(env) {
   return createClient({ url: env.TURSO_DATABASE_URL, authToken: env.TURSO_AUTH_TOKEN });
 }
 
-// GET /api/archive/winners — all 1st-place finishers across all archived years
-export async function onRequestGet({ request, env }) {
-  if (!checkAuth(request, env)) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+// GET /api/archive/winners — all 1st-place finishers across all archived years (public, no auth required)
+export async function onRequestGet({ env }) {
   try {
     const db = getDb(env);
     const result = await db.execute(
