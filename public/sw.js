@@ -1,7 +1,6 @@
-const CACHE_NAME = 'summer-slam-v9';
+const CACHE_NAME = 'summer-slam-v10';
 
 self.addEventListener('install', e => {
-  // Pre-cache the app shell so the UI loads even on first visit with no network
   e.waitUntil(
     caches.open(CACHE_NAME)
       .then(c => c.addAll(['/', '/index.html']))
@@ -20,11 +19,11 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.url.includes('/api/')) return;
 
-  // Network-first: try network, cache successful GET responses, fall back to cache offline
   e.respondWith(
     fetch(e.request).then(res => {
       if (e.request.method === 'GET' && res.ok) {
-        caches.open(CACHE_NAME).then(c => c.put(e.request, res.clone()));
+        const clone = res.clone(); // clone synchronously before any async work
+        caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
       }
       return res;
     }).catch(() => caches.match(e.request).then(cached => cached || caches.match('/')))
