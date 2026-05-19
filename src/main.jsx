@@ -21,6 +21,10 @@ createRoot(document.getElementById('root')).render(
   </StrictMode>
 );
 
+// Expose build timestamp so CF Pages always uploads a fresh bundle blob
+// (prevents KV deduplication from reusing a corrupted blob across deployments)
+window.__buildTime = __BUILD_TIME__;
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
