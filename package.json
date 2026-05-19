@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node -e \"const fs=require('fs'),p='dist/sw.js',t=Date.now();fs.writeFileSync(p,fs.readFileSync(p,'utf8').replace(/summer-slam-v[\\w]+/,'summer-slam-'+t))\"",
+    "build": "vite build && node scripts/bump-sw.mjs",
     "preview": "vite preview",
     "pages:dev": "wrangler pages dev --proxy 5173 --compatibility-date=2024-09-23"
   },
