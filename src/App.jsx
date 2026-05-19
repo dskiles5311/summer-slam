@@ -16,7 +16,7 @@ import EditModal from './components/EditModal';
 import UnlockModal from './components/UnlockModal';
 import ConfirmActionModal from './components/ConfirmActionModal';
 import Toast from './components/Toast';
-import { verifyPassword, storePassword, clearPassword, isPasswordStored, revalidatePassword, archiveEntries } from './utils/api';
+import { verifyPassword, storePassword, storeLevel, clearPassword, isPasswordStored, revalidatePassword, archiveEntries } from './utils/api';
 import { calcRanks } from './utils/calculations';
 import { useEntries, useCreateEntry, useUpdateEntry, useDeleteEntry, useClearWeighLog, useClearSignUpLog, useClearCheckInLog, useClearCheckOutLog, useClearAllEntries, useCreateEntriesBulk } from './hooks/useEntries';
 import { useSettings, useSaveSettings } from './hooks/useSettings';
@@ -61,8 +61,9 @@ export default function App() {
   const [activeTab, setActiveTab]       = useState('leaderboard');
   const [toasts, setToasts]             = useState([]);
   const [editingEntry, setEditingEntry] = useState(null);
-  const [isUnlocked, setIsUnlocked]     = useState(false);
+  const [accessLevel, setAccessLevel]   = useState(null); // 'admin' | 'operator' | null
   const [everUnlocked, setEverUnlocked] = useState(false);
+  const [everAdmin, setEverAdmin]       = useState(false);
   const [showUnlock, setShowUnlock]     = useState(false);
   const [buyInBlurred, setBuyInBlurred] = useState(() => localStorage.getItem('ss_buyin_blur') !== 'false');
   const [confirmAction, setConfirmAction] = useState(null);
@@ -74,12 +75,15 @@ export default function App() {
     setToasts(prev => prev.filter(t => t.id !== id));
   }, []);
 
-  const pollInterval = isUnlocked ? 5000 : 10000;
+  const isAdmin    = accessLevel === 'admin';
+  const isOperator = accessLevel === 'admin' || accessLevel === 'operator';
+
+  const pollInterval = isOperator ? 5000 : 10000;
 
   // --- Queries ---
   const entriesQuery  = useEntries({ refetchInterval: pollInterval });
   const settingsQuery = useSettings({ refetchInterval: pollInterval });
-  const contactsQuery = useContacts({ enabled: isUnlocked });
+  const contactsQuery = useContacts({ enabled: isAdmin });
 
   const rawEntries = entriesQuery.data  || [];
   const settings   = useMemo(() => mergeSettings(settingsQuery.data), [settingsQuery.data]);
@@ -105,11 +109,12 @@ const saveSettingsMut   = useSaveSettings();
   // --- Auth ---
   useEffect(() => {
     if (isPasswordStored()) {
-      revalidatePassword().then(ok => { if (ok) setIsUnlocked(true); });
+      revalidatePassword().then(level => { if (level) setAccessLevel(level); });
     }
   }, []);
 
-  useEffect(() => { if (isUnlocked) setEverUnlocked(true); }, [isUnlocked]);
+  useEffect(() => { if (isOperator) setEverUnlocked(true); }, [isOperator]);
+  useEffect(() => { if (isAdmin) setEverAdmin(true); }, [isAdmin]);
 
   useEffect(() => {
     document.body.classList.remove('light');
@@ -122,16 +127,17 @@ const saveSettingsMut   = useSaveSettings();
   }, [mikeMode]);
 
   async function handleUnlock(password) {
-    await verifyPassword(password);
+    const level = await verifyPassword(password);
     storePassword(password);
-    setIsUnlocked(true);
+    storeLevel(level);
+    setAccessLevel(level);
     setShowUnlock(false);
   }
 
   function handleLock() {
     clearPassword();
-    setIsUnlocked(false);
-    setActiveTab(prev => (['rules', 'archive', 'leaderboard', 'flights'].includes(prev) ? prev : 'leaderboard'));
+    setAccessLevel(null);
+    setActiveTab(prev => (['rules', 'offlimits', 'archive', 'leaderboard', 'roster', 'flights'].includes(prev) ? prev : 'leaderboard'));
   }
 
   function handleToggleBuyInBlur() {
@@ -501,8 +507,23 @@ const saveSettingsMut   = useSaveSettings();
       <Header
         entries={rankedEntries}
         settings={settingsWithTheme}
-        activeTab={isUnlocked || activeTab === 'rules' || activeTab === 'offlimits' || activeTab === 'archive' || activeTab === 'roster' || activeTab === 'flights' ? activeTab : 'leaderboard'}
-        onTabChange={tab => { if (isUnlocked || tab === 'rules' || tab === 'offlimits' || tab === 'leaderboard' || tab === 'archive' || tab === 'roster' || tab === 'flights') setActiveTab(tab); }}
+        activeTab={(() => {
+          const publicTabs = ['rules', 'offlimits', 'archive', 'roster', 'flights', 'leaderboard'];
+          const operatorTabs = ['checkin', 'boatcheck'];
+          const adminTabs = ['signup', 'weighin', 'contacts', 'settings'];
+          if (publicTabs.includes(activeTab)) return activeTab;
+          if (isOperator && operatorTabs.includes(activeTab)) return activeTab;
+          if (isAdmin && adminTabs.includes(activeTab)) return activeTab;
+          return 'leaderboard';
+        })()}
+        onTabChange={tab => {
+          const publicTabs = ['rules', 'offlimits', 'archive', 'roster', 'flights', 'leaderboard'];
+          const operatorTabs = ['checkin', 'boatcheck'];
+          const adminTabs = ['signup', 'weighin', 'contacts', 'settings'];
+          if (publicTabs.includes(tab) || (isOperator && operatorTabs.includes(tab)) || (isAdmin && adminTabs.includes(tab))) {
+            setActiveTab(tab);
+          }
+        }}
         onThemeToggle={() => {
           const next = theme === 'dark' ? 'light' : 'dark';
           setTheme(next);
@@ -510,8 +531,9 @@ const saveSettingsMut   = useSaveSettings();
         }}
         mikeMode={mikeMode}
         onToggleMikeMode={() => setMikeMode(m => !m)}
-        isUnlocked={isUnlocked}
-        onToggleLock={() => isUnlocked ? handleLock() : setShowUnlock(true)}
+        isAdmin={isAdmin}
+        isOperator={isOperator}
+        onToggleLock={() => isOperator ? handleLock() : setShowUnlock(true)}
         buyInBlurred={buyInBlurred}
         onToggleBuyInBlur={handleToggleBuyInBlur}
       />
@@ -541,7 +563,7 @@ const saveSettingsMut   = useSaveSettings();
           <RosterTab
             entries={rankedEntries}
             settings={settingsWithTheme}
-            isUnlocked={isUnlocked}
+            isUnlocked={isAdmin}
             buyInBlurred={buyInBlurred}
             onEdit={setEditingEntry}
             onAdd={() => setEditingEntry({})}
@@ -566,7 +588,7 @@ const saveSettingsMut   = useSaveSettings();
         </div>
         <div style={{ display: activeTab === 'archive' ? 'contents' : 'none' }}>
           <ArchiveTab
-            isUnlocked={isUnlocked}
+            isUnlocked={isAdmin}
             rosterCount={rawEntries.length}
             onLoadArchive={handleLoadArchive}
           />
@@ -577,9 +599,11 @@ const saveSettingsMut   = useSaveSettings();
 
         {everUnlocked && (
           <>
-            <div style={{ display: activeTab === 'signup' ? 'contents' : 'none' }}>
-              <SignUpTab onAddEntry={handleSignUpEntry} settings={settingsWithTheme} />
-            </div>
+            {everAdmin && (
+              <div style={{ display: activeTab === 'signup' ? 'contents' : 'none' }}>
+                <SignUpTab onAddEntry={handleSignUpEntry} settings={settingsWithTheme} />
+              </div>
+            )}
             <div style={{ display: activeTab === 'checkin' ? 'contents' : 'none' }}>
               <CheckInTab entries={rankedEntries} onSave={handleCheckInSave} />
             </div>
@@ -587,39 +611,45 @@ const saveSettingsMut   = useSaveSettings();
               <BoatCheckTab
                 entries={rankedEntries}
                 settings={settingsWithTheme}
-                isUnlocked={isUnlocked}
+                isUnlocked={isOperator}
                 onToggleOffWater={handleToggleOffWater}
                 onReset={handleResetBoatCheck}
               />
             </div>
-            <div style={{ display: activeTab === 'weighin' ? 'contents' : 'none' }}>
-              <WeighInTab entries={rawEntries} settings={settingsWithTheme} onWeighIn={handleWeighIn} onAddEntry={handleAddWeighInEntry}
-                onSetCurrentlyWeighing={payload => handleUpdateSettings({ currentlyWeighing: payload })} />
-            </div>
-            <div style={{ display: activeTab === 'contacts' ? 'contents' : 'none' }}>
-              <ContactsTab
-                isUnlocked={isUnlocked}
-                contacts={contacts}
-                contactsLoading={contactsQuery.isLoading}
-                onContactsChange={() => {}}
-                updateContact={(id, data) => updateContactMut.mutateAsync({ id, data })}
-                deleteContact={(id) => deleteContactMut.mutateAsync(id)}
-              />
-            </div>
-            <div style={{ display: activeTab === 'settings' ? 'contents' : 'none' }}>
-              <SettingsTab
-                settings={settingsWithTheme}
-                entries={rankedEntries}
-                isUnlocked={isUnlocked}
-                onUpdateSettings={handleUpdateSettings}
-                onClearAll={handleClearAll}
-                onImport={handleImport}
-                onClearWeighLog={handleClearWeighLog}
-                onClearSignUpLog={handleClearSignUpLog}
-                onClearCheckInLog={handleClearCheckInLog}
-                onClearCheckOutLog={handleClearCheckOutLog}
-              />
-            </div>
+            {everAdmin && (
+              <div style={{ display: activeTab === 'weighin' ? 'contents' : 'none' }}>
+                <WeighInTab entries={rawEntries} settings={settingsWithTheme} onWeighIn={handleWeighIn} onAddEntry={handleAddWeighInEntry}
+                  onSetCurrentlyWeighing={payload => handleUpdateSettings({ currentlyWeighing: payload })} />
+              </div>
+            )}
+            {everAdmin && (
+              <div style={{ display: activeTab === 'contacts' ? 'contents' : 'none' }}>
+                <ContactsTab
+                  isUnlocked={isAdmin}
+                  contacts={contacts}
+                  contactsLoading={contactsQuery.isLoading}
+                  onContactsChange={() => {}}
+                  updateContact={(id, data) => updateContactMut.mutateAsync({ id, data })}
+                  deleteContact={(id) => deleteContactMut.mutateAsync(id)}
+                />
+              </div>
+            )}
+            {everAdmin && (
+              <div style={{ display: activeTab === 'settings' ? 'contents' : 'none' }}>
+                <SettingsTab
+                  settings={settingsWithTheme}
+                  entries={rankedEntries}
+                  isUnlocked={isAdmin}
+                  onUpdateSettings={handleUpdateSettings}
+                  onClearAll={handleClearAll}
+                  onImport={handleImport}
+                  onClearWeighLog={handleClearWeighLog}
+                  onClearSignUpLog={handleClearSignUpLog}
+                  onClearCheckInLog={handleClearCheckInLog}
+                  onClearCheckOutLog={handleClearCheckOutLog}
+                />
+              </div>
+            )}
           </>
         )}
       </main>

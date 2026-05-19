@@ -1,5 +1,6 @@
 const BASE = '/api';
 const SESSION_PW_KEY = 'ss_password';
+const SESSION_LEVEL_KEY = 'ss_access_level';
 
 function fetchWithTimeout(url, options = {}, ms = 10000) {
   const controller = new AbortController();
@@ -9,8 +10,13 @@ function fetchWithTimeout(url, options = {}, ms = 10000) {
 }
 
 export function storePassword(pw) { sessionStorage.setItem(SESSION_PW_KEY, pw); }
-export function clearPassword() { sessionStorage.removeItem(SESSION_PW_KEY); }
+export function storeLevel(level) { sessionStorage.setItem(SESSION_LEVEL_KEY, level); }
+export function clearPassword() {
+  sessionStorage.removeItem(SESSION_PW_KEY);
+  sessionStorage.removeItem(SESSION_LEVEL_KEY);
+}
 export function isPasswordStored() { return !!sessionStorage.getItem(SESSION_PW_KEY); }
+export function getStoredLevel() { return sessionStorage.getItem(SESSION_LEVEL_KEY); }
 
 function authHeaders() {
   const pw = sessionStorage.getItem(SESSION_PW_KEY);
@@ -58,17 +64,20 @@ export async function verifyPassword(password) {
     body: JSON.stringify({ password }),
   });
   if (!res.ok) throw new Error('Invalid password');
+  const data = await res.json();
+  return data.level; // 'admin' | 'operator'
 }
 
 export async function revalidatePassword() {
   const pw = sessionStorage.getItem(SESSION_PW_KEY);
-  if (!pw) return false;
+  if (!pw) return null;
   try {
-    await verifyPassword(pw);
-    return true;
+    const level = await verifyPassword(pw);
+    storeLevel(level);
+    return level;
   } catch {
     clearPassword();
-    return false;
+    return null;
   }
 }
 

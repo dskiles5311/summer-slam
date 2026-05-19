@@ -2,7 +2,7 @@
 import { useRef, useEffect } from 'react';
 import { getStats } from '../utils/calculations';
 
-export default function Header({ entries, settings, activeTab, onTabChange, onThemeToggle, mikeMode, onToggleMikeMode, isUnlocked, onToggleLock, buyInBlurred, onToggleBuyInBlur }) {
+export default function Header({ entries, settings, activeTab, onTabChange, onThemeToggle, mikeMode, onToggleMikeMode, isAdmin, isOperator, onToggleLock, buyInBlurred, onToggleBuyInBlur }) {
   const stats = getStats(entries, settings.fees);
   const buyInFilter = buyInBlurred ? 'blur(6px)' : 'none';
   const navRef = useRef(null);
@@ -36,10 +36,10 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
           <button
             className="theme-toggle"
             onClick={onToggleLock}
-            title={isUnlocked ? 'Lock editing' : 'Unlock editing'}
-            style={{ opacity: isUnlocked ? 1 : 0.7 }}
+            title={isAdmin ? 'Admin — tap to lock' : isOperator ? 'Operator — tap to lock' : 'Unlock'}
+            style={{ opacity: isOperator ? 1 : 0.7 }}
           >
-            {isUnlocked ? '🔓 Unlocked' : '🔒 Locked'}
+            {isAdmin ? '🔓 Admin' : isOperator ? '🔓 Operator' : '🔒 Locked'}
           </button>
         </div>
       </div>
@@ -65,7 +65,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
             <span className="val" style={{ color: '#78c8ff' }}>${stats.optionPot}</span>
             <span className="lbl">⚡ Option Pot <span style={{ color: 'rgba(120,200,255,0.7)', fontWeight: 700, textTransform: 'uppercase' }}>{stats.optionPaidCount} PAID</span></span>
           </div>
-          {isUnlocked && (
+          {isAdmin && (
             <div className="stat-chip" onClick={onToggleBuyInBlur}
                  title={buyInBlurred ? 'Tap to reveal' : 'Tap to hide'}
                  style={{ cursor: 'pointer', userSelect: 'none' }}>
@@ -79,7 +79,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
             <span className="val">{stats.grandTotalWeight} lbs</span>
             <span className="lbl">Total Weight · {stats.totalNumFish} fish</span>
           </div>
-          {isUnlocked && (
+          {isAdmin && (
             <div className="stat-chip" style={{ borderColor: 'rgba(255,107,107,0.4)', cursor: 'pointer', userSelect: 'none' }} onClick={onToggleBuyInBlur} title={buyInBlurred ? 'Tap to reveal' : 'Tap to hide'}>
               <span className="val" style={{ color: '#ff9090', fontSize: 13, lineHeight: 1.5, filter: buyInFilter, transition: 'filter 0.25s' }}>
                 <span style={{ display: 'block' }}>{stats.totalDeadFish} dead</span>
@@ -92,7 +92,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
       </div>
       <div className="nav-tabs-wrap">
       <nav className="nav-tabs" ref={navRef}>
-        {isUnlocked && (
+        {isAdmin && (
           <button
             className={`nav-tab ${activeTab === 'signup' ? 'active' : ''}`}
             onClick={() => onTabChange('signup')}
@@ -106,7 +106,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
         >
           📋 Roster
         </button>
-        {isUnlocked && (
+        {isOperator && (
           <button
             className={`nav-tab ${activeTab === 'checkin' ? 'active' : ''}`}
             onClick={() => onTabChange('checkin')}
@@ -114,7 +114,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
             ✅ Check In
           </button>
         )}
-        {isUnlocked && (
+        {isOperator && (
           <button
             className={`nav-tab ${activeTab === 'boatcheck' ? 'active' : ''}`}
             onClick={() => onTabChange('boatcheck')}
@@ -122,7 +122,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
             ⚓ Check Out
           </button>
         )}
-        {isUnlocked && (
+        {isAdmin && (
           <button
             className={`nav-tab ${activeTab === 'weighin' ? 'active' : ''}`}
             onClick={() => onTabChange('weighin')}
@@ -154,7 +154,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
         >
           🚫 Off Limits
         </button>
-        {isUnlocked && (
+        {isAdmin && (
           <button
             className={`nav-tab ${activeTab === 'contacts' ? 'active' : ''}`}
             onClick={() => onTabChange('contacts')}
@@ -168,7 +168,7 @@ export default function Header({ entries, settings, activeTab, onTabChange, onTh
         >
           🗂️ Archive
         </button>
-        {isUnlocked && (
+        {isAdmin && (
           <button
             className={`nav-tab ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => onTabChange('settings')}
